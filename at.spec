@@ -7,7 +7,7 @@
 Summary: Job spooling tools.
 Name: at
 Version: 3.1.8
-Release: 68_FC4
+Release: 70_FC4
 License: GPL
 Group: System Environment/Daemons
 Source: http://ftp.debian.org/debian/pool/main/a/at/at_3.1.8-11.tar.gz
@@ -36,6 +36,8 @@ Patch25: at-3.1.8-usage.patch
 Patch26: at-3.1.8-fix_no_export.patch
 Patch27: at-3.1.8-pam.patch
 Patch28: at-3.1.8-pam_perms.patch
+Patch29: at-3.1.8-pam_fail_close_session.patch
+
 Prereq: fileutils chkconfig /etc/init.d
 BuildPrereq: flex bison autoconf
 %if %{WITH_SELINUX}
@@ -100,6 +102,7 @@ cp %{SOURCE1} .
 %patch26 -p1 -b .fix_no_export
 %patch27 -p1 -b .pam
 %patch28 -p1 -b .pam_perms
+%patch29 -p1 -b .pam_fail_close_session
 
 %build
 # patch10 touches configure.in
@@ -187,6 +190,9 @@ fi
 %attr(4755,root,root)	%{_bindir}/at
 
 %changelog
+* Tue Apr 05 2005 Jason Vas Dias <jvdias@redhat.com> 3.1.8-70
+- always call pam_close_session on PAM_FAIL or pam_end
+
 * Tue Mar 08 2005 Jason Vas Dias <jvdias@redhat.com> 3.1.8-68
 - Put PAM authentication check in 'check_permissions()', so
 - user can know when using at(1) if PAM permission is denied.
