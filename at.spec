@@ -1,7 +1,10 @@
+%if %{?WITH_SELINUX:0}%{!?WITH_SELINUX:1}
+%define WITH_SELINUX 1
+%endif
 Summary: Job spooling tools.
 Name: at
 Version: 3.1.8
-Release: 46.1
+Release: 49
 License: GPL
 Group: System Environment/Daemons
 Source: http://ftp.debian.org/debian/pool/main/a/at/at_3.1.8-11.tar.gz
@@ -21,8 +24,10 @@ Patch15: at-3.1.8-env-tng.patch
 #Patch16: at-3.1.8-lsbdoc.patch
 Patch18: at-3.1.8-perr.patch
 Patch19: at-3.1.8-instinet.patch
-Patch20: at-3.1.8-SHELL-91233.patch
+Patch20: at-3.1.8-SHELL-111386.patch
 Patch21: at-3.1.8-atrun.8-typo-97697.patch
+Patch22: at-selinux.patch
+Patch23: at-3.1.8-pie.patch
 
 Prereq: fileutils chkconfig /etc/init.d
 BuildPrereq: flex bison autoconf
@@ -70,6 +75,11 @@ cp %{SOURCE1} .
 %patch19 -p1 -b .instinet
 %patch20 -p1 -b .SHELL
 %patch21 -p1 -b .typo
+%if %{WITH_SELINUX}
+#SELinux
+%patch22 -p1 -b .selinux
+%endif
+%patch23 -p1 -b .pie
 
 %build
 # patch10 touches configure.in
@@ -145,6 +155,17 @@ fi
 %attr(4755,root,root)	%{_bindir}/at
 
 %changelog
+* Tue Dec  9 2003 Jens Petersen <petersen@redhat.com> - 3.1.8-49
+- replace at-3.1.8-SHELL-91233.patch by at-3.1.8-SHELL-111386.patch which
+  now executes $SHELL directly in the at shell script after all the variables
+  have been setup with /bin/sh (#91233) [suggested by GÃ¶ran Uddeborg]
+- this changelog is now in utf-8
+
+* Fri Nov  7 2003 Jens Petersen <petersen@redhat.com> - 3.1.8-48
+- add at-3.1.8-pie.patch to build atd as pie (#108415) [Ulrich Drepper]
+
+* Fri Oct 31 2003 Dan Walsh <dwalsh@redhat.com> - 3.1.8-47.sel
+
 * Fri Jun 20 2003 Jens Petersen <petersen@redhat.com> - 3.1.8-46
 - add at-3.1.8-atrun.8-typo-97697.patch to fix typo in atrun.8 (#97697)
 - update at.1 description of shell behaviour (#91233)
@@ -209,7 +230,7 @@ fi
 * Thu Jan 31 2002 Bill Nottingham <notting@redhat.com> 3.1.8-24
 - rebuild in new env.
 
-* Thu Jan 17 2002 Trond Eivind Glomsrød <teg@redhat.com> 3.1.8-23
+* Thu Jan 17 2002 Trond Eivind GlomsrÃ¸d <teg@redhat.com> 3.1.8-23
 - s/Copyright/License/
 
 * Mon Jan 14 2002 Adrian Havill <havill@redhat.com> 3.1.8-21
@@ -238,7 +259,7 @@ fi
 - he also wrote a test harness in perl
 - bug #28448
 
-* Fri Feb  2 2001 Trond Eivind Glomsrød <teg@redhat.com>
+* Fri Feb  2 2001 Trond Eivind GlomsrÃ¸d <teg@redhat.com>
 - i18nize initscript
 
 * Wed Dec 12 2000 Bill Nottingham <notting@redhat.com>

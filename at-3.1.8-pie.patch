@@ -1,0 +1,20 @@
+--- at-3.1.8/Makefile.in.pie	2003-10-28 23:12:43.000000000 -0800
++++ at-3.1.8/Makefile.in	2003-10-28 23:14:22.000000000 -0800
+@@ -74,7 +74,7 @@
+ 	$(LN_S) -f at atrm
+ 
+ atd: $(RUNOBJECTS)
+-	$(CC) $(CFLAGS) -o atd $(RUNOBJECTS) $(LIBS) $(SELINUXLIB)
++	$(CC) $(CFLAGS) -o atd -pie $(RUNOBJECTS) $(LIBS) $(SELINUXLIB)
+ 
+ y.tab.c y.tab.h: parsetime.y
+ 	$(YACC) -d parsetime.y
+@@ -85,6 +85,8 @@
+ atrun: atrun.in
+ 	configure
+ 
++$(RUNOBJECTS): %.o: %.c
++	$(CC) -c $(CFLAGS) -fpie $(DEFS) $*.c
+ .c.o:
+ 	$(CC) -c $(CFLAGS) $(DEFS) $*.c
+ 

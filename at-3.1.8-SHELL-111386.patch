@@ -1,0 +1,26 @@
+diff -u at-3.1.8/at.c.SHELL at-3.1.8/at.c
+--- at-3.1.8/at.c.SHELL	2003-12-09 17:03:28.000000000 +1000
++++ at-3.1.8/at.c	2003-12-09 17:03:28.000000000 +1000
+@@ -433,6 +433,8 @@
+     fprintf(fp, " || {\n\t echo 'Execution directory "
+ 	    "inaccessible' >&2\n\t exit 1\n}\n");
+ 
++    fprintf(fp, "${SHELL:-/bin/sh} << `(dd if=/dev/urandom count=200 bs=1 2>/dev/null|LC_ALL=C tr -d -c '[:alnum:]')`\n\n");
++
+     istty = isatty(fileno(stdin));
+     if (istty) {
+ 	fprintf(stderr, "at> ");
+@@ -854,10 +856,11 @@
+ 	/* POSIX.2 allows the shell specified by the user's SHELL environment
+ 	   variable, the login shell from the user's password database entry,
+ 	   or /bin/sh to be the command interpreter that processes the at-job.
+-	   It also alows a warning diagnostic to be printed.  Because of the
++	   It also allows a warning diagnostic to be printed.  Because of the
+ 	   possible variance, we always output the diagnostic. */
+ 
+-	fprintf(stderr, "warning: commands will be executed using /bin/sh\n");
++/* 	fprintf(stderr, "warning: commands will be executed using /bin/sh\n");
++ */
+ 
+ 	writefile(timer, queue);
+ 	break;
