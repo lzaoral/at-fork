@@ -1,0 +1,207 @@
+--- at-3.1.8.orig/atd.c	Tue Jul 16 21:35:17 2002
++++ at-3.1.8/atd.c	Wed Jul 17 02:37:05 2002
+@@ -188,7 +188,7 @@
+ #endif
+ 
+ static void
+-run_file(const char *filename, uid_t uid, gid_t gid)
++run_file(char *filename, uid_t uid, gid_t gid)
+ {
+ /* Run a file by by spawning off a process which redirects I/O,
+  * spawns a subshell, then waits for it to complete and sends
+@@ -198,7 +198,7 @@
+     int fd_out, fd_in;
+     char mailbuf[256], jobbuf[9];
+     char *mailname = NULL;
+-    char *newname;
++    char newname[256];
+     FILE *stream;
+     int send_mail = 0;
+     struct stat buf, lbuf;
+@@ -214,12 +214,18 @@
+ 
+     sprintf(jobbuf, "%8lu", jobno);
+ 
+-    if ((newname = malloc(strlen(filename) + 1)) == NULL)
+-	pabort("Job %8lu : out of virtual memory", jobno);
++    if( strlen( filename ) >= sizeof( newname ) - 1 )
++    	pabort("File name too long: %s", filename );
+ 
+     strcpy(newname, filename);
++    
++    newname[0] = '!';
++    
++    if( rename( filename, newname ) < 0 )
++    	perr( "Error renaming job file." );
+ 
+-    newname[0] = '=';
++    filename[0] = '!';
++    newname[0] = '=';    
+ 
+     /* We try to make a hard link to lock the file.  If we fail, then
+      * somebody else has already locked it (a second atd?); log the
+@@ -234,13 +240,15 @@
+ 	}
+     }
+     /* If something goes wrong between here and the unlink() call,
+-     * the job gets restarted as soon as the "=" entry is cleared
+-     * by the main atd loop.
+-     */
++     * the job will remain in the "!" queue.
++     * no point in retrying, and need glaring proof that something went wrong
++     */     
+ 
+     pid = fork();
+-    if (pid == -1)
++    if (pid == -1) {
++        unlink( newname );
+ 	perr("Cannot fork");
++    }
+ 
+     else if (pid != 0) {
+ 	return;
+@@ -252,6 +260,7 @@
+ 
+     pentry = getpwuid(uid);
+     if (pentry == NULL) {
++        unlink( newname );
+ 	pabort("Userid %lu not found - aborting job %8lu (%.500s)",
+ 	       (unsigned long) uid, jobno, filename);
+     }
+@@ -261,34 +270,49 @@
+ 
+     PRIV_END
+ 
+-    if (stream == NULL)
++    if (stream == NULL) {
++    	unlink( newname );
+ 	perr("Cannot open input file");
++    }
+ 
+-    if ((fd_in = dup(fileno(stream))) < 0)
++    if ((fd_in = dup(fileno(stream))) < 0) {
++    	unlink( newname );
+ 	perr("Error duplicating input file descriptor");
++    }
+ 
+-    if (fstat(fd_in, &buf) == -1)
++    if (fstat(fd_in, &buf) == -1) {
++    	unlink( newname );
+ 	perr("Error in fstat of input file descriptor");
++    }
+ 
+-    if (lstat(filename, &lbuf) == -1)
++    if (lstat(filename, &lbuf) == -1) {
++    	unlink( newname );
+ 	perr("Error in fstat of input file");
++    }
+ 
+-    if (S_ISLNK(lbuf.st_mode))
++    if (S_ISLNK(lbuf.st_mode)) {
++    	unlink( newname );
+ 	perr("Symbolic link encountered in job %8lu (%.500s) - aborting",
+ 	     jobno, filename);
++    }			     
+ 
+     if ((lbuf.st_dev != buf.st_dev) || (lbuf.st_ino != buf.st_ino) ||
+ 	(lbuf.st_uid != buf.st_uid) || (lbuf.st_gid != buf.st_gid) ||
+-	(lbuf.st_size != buf.st_size))
++	(lbuf.st_size != buf.st_size)) {
++	unlink( newname );
+ 	perr("Somebody changed files from under us for job %8lu (%.500s) - "
+ 	     "aborting", jobno, filename);
++    }	    
+ 
+     if (buf.st_nlink > 2) {
++    	unlink( newname );
+ 	perr("Somebody is trying to run a linked script for job %8lu (%.500s)",
+ 	     filename);
+     }
+-    if ((fflags = fcntl(fd_in, F_GETFD)) < 0)
++    if ((fflags = fcntl(fd_in, F_GETFD)) < 0) {
++    	unlink( newname );
+ 	perr("Error in fcntl");
++    }		
+ 
+     fcntl(fd_in, F_SETFD, fflags & ~FD_CLOEXEC);
+ 
+@@ -300,33 +324,47 @@
+      * the bug is located.  -Joey
+      */
+     if (fscanf(stream, "#!/bin/sh\n# atrun uid=%d gid=%d\n# mail %255s %d",
+-	       &nuid, &ngid, mailbuf, &send_mail) != 4)
++	       &nuid, &ngid, mailbuf, &send_mail) != 4) {
++	unlink( newname );
+ 	pabort("File %.500s is in wrong format - aborting",
+ 	       filename);
++    }	       
+     mailbuf[255] = '\0';
+ 
+-    if (mailbuf[0] == '-')
++    if (mailbuf[0] == '-') {
++    	unlink( newname );
+ 	pabort("illegal mail name %.300s in job %8lu (%.300s)", mailbuf,
+ 	       jobno, filename);
++    }	       
+ 
+     mailname = mailbuf;
+-    if (nuid != uid)
++    if (nuid != uid) {
++    	unlink( newname );
+ 	pabort("Job %8lu (%.500s) - userid %d does not match file uid %d",
+ 	       jobno, filename, nuid, uid);
++    }	       
+ 
+-    if (ngid != gid)
++    if (ngid != gid) {
++    	unlink( newname );
+ 	pabort("Job %8lu %.500s - groupid %d does not match file gid %d",
+ 	       jobno, filename, ngid, gid);
++    }	       
+ 
+     /* We are now committed to executing this script.  Unlink the
+      * original.
+      */
+ 
+     unlink(filename);
++    
++    /* If we bail out from now on, the job gets stuck in "="
++     * The main loop should take care of that.
++     */
+ 
+     fclose(stream);
+     if (chdir(ATSPOOL_DIR) < 0)
+ 	perr("Cannot chdir to " ATSPOOL_DIR);
++	
++    filename[0] = queue;	
+ 
+     /* Create a file to hold the output of the job we are about to run.
+      * Write the mail header.  Complain in case 
+@@ -417,19 +455,21 @@
+     waitpid(pid, (int *) NULL, 0);
+ 
+     /* Send mail.  Unlink the output file after opening it, so it
+-     * doesn't hang around after the run.
++     * doesn't hang around after the run (if we are to send mail)
+      */
+-    stat(filename, &buf);
+-    if (open(filename, O_RDONLY) != STDIN_FILENO)
+-	perr("Open of jobfile failed");
++     
++    if( send_mail != -1 ) {
++      stat(filename, &buf);
++      if (open(filename, O_RDONLY) != STDIN_FILENO)
++	  perr("Open of jobfile failed");
+ 
+-    unlink(filename);
++      unlink(filename);
++    }
+ 
+     /* The job is now finished.  We can delete its input file.
+      */
+     chdir(ATJOB_DIR);
+     unlink(newname);
+-    free(newname);
+ 
+     if (((send_mail != -1) && (buf.st_size != size)) || (send_mail == 1)) {
+ 

@@ -1,7 +1,7 @@
 Summary: Job spooling tools.
 Name: at
 Version: 3.1.8
-Release: 23
+Release: 30
 License: GPL
 Group: System Environment/Daemons
 Source: ftp://tsx-11.mit.edu/pub/linux/sources/usr.bin/at-3.1.8.tar.bz2
@@ -24,11 +24,14 @@ Patch14: at-3.1.8-test-fix.patch
 Patch15: at-3.1.8-env-tng.patch
 Patch16: at-3.1.8-lsbdoc.patch
 Patch17: at-3.1.8-o_excl.patch
+Patch18: at-3.1.8-perr.patch
+Patch19: at-3.1.8-instinet.patch
+
 Prereq: fileutils chkconfig /etc/init.d
 BuildPrereq: flex bison autoconf
 Conflicts: crontabs <= 1.5
 # No, I'm not kidding
-BuildPrereq: sendmail
+BuildPrereq: smtpdaemon
 Buildroot: %{_tmppath}/%{name}-root
 
 %description
@@ -63,10 +66,13 @@ use crontab instead.
 %patch15 -p1 -b .env
 %patch16 -p1 -b .lsbdoc
 %patch17 -p1 -b .o_excl
+%patch18 -p1 -b .perr
+%patch19 -p1 -b .instinet
 
 %build
 # for patch 9
 autoconf
+cp /usr/share/libtool/config.{sub,guess} .
 %configure --with-atspool=/var/spool/at/spool --with-jobdir=/var/spool/at
 
 # for patch 11
@@ -131,6 +137,28 @@ fi
 %attr(4755,root,root)	%{_prefix}/bin/at
 
 %changelog
+* Fri Jul 19 2002 Bill Huang <bhuang@redhat.com>
+- Apply the patch from Mike Gahanagan <mgahagan@redhat.com>
+  to fix cleaning atq and  multiple atd daemon.(bug#67414)
+
+* Fri Jul 19 2002 Bill Huang <bhuang@redhat.com>
+- Fixed error message output in atd.c
+
+* Fri Jun 21 2002 Tim Powers <timp@redhat.com>
+- automated rebuild
+
+* Mon May 27 2002 Bill Huang <bhuang@redhat.com>
+- Rebuild for Milan
+
+* Thu May 23 2002 Tim Powers <timp@redhat.com>
+- automated rebuild
+
+* Fri Feb  1 2002 Bernhard Rosenkraenzer <bero@redhat.com> 3.1.8-25
+- Require smtpdaemon rather than sendmail - postfix works just as well.
+
+* Thu Jan 31 2002 Bill Nottingham <notting@redhat.com> 3.1.8-24
+- rebuild in new env.
+
 * Thu Jan 17 2002 Trond Eivind Glomsrød <teg@redhat.com> 3.1.8-23
 - s/Copyright/License/
 

@@ -1,0 +1,12 @@
+--- at-3.1.8/atd.c.org	2002-07-19 16:20:24.000000000 +0900
++++ at-3.1.8/atd.c	2002-07-19 16:22:30.000000000 +0900
+@@ -453,7 +453,8 @@
+ #elif  defined(MAILX)
+ 	    execl(MAILX, "mailx", mailname, (char *) NULL);
+ #else
+-#error      "No mail command specified."
++/*#error      "No mail command specified."*/
++	perr("No mail command specified.");
+ #endif
+ 	    perr("Exec failed for mail command");
+ 
