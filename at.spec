@@ -1,10 +1,13 @@
 %if %{?WITH_SELINUX:0}%{!?WITH_SELINUX:1}
 %define WITH_SELINUX 1
 %endif
+%if %{?WITH_PAM:0}%{!?WITH_PAM:1}
+%define WITH_PAM 1
+%endif
 Summary: Job spooling tools.
 Name: at
 Version: 3.1.8
-Release: 60
+Release: 64
 License: GPL
 Group: System Environment/Daemons
 Source: http://ftp.debian.org/debian/pool/main/a/at/at_3.1.8-11.tar.gz
@@ -31,11 +34,15 @@ Patch23: at-3.1.8-pie.patch
 Patch24: at-3.1.8-t_option.patch
 Patch25: at-3.1.8-usage.patch
 Patch26: at-3.1.8-fix_no_export.patch
+Patch27: at-3.1.8-pam.patch
 
 Prereq: fileutils chkconfig /etc/init.d
 BuildPrereq: flex bison autoconf
 %if %{WITH_SELINUX}
 BuildPrereq: libselinux-devel
+%endif
+%if %{WITH_PAM}
+BuildPrereq: pam-devel
 %endif
 Conflicts: crontabs <= 1.5
 # No, I'm not kidding
@@ -91,6 +98,7 @@ cp %{SOURCE1} .
 %patch24 -p1 -b -t_option
 %patch25 -p1 -b .usage
 %patch26 -p1 -b .fix_no_export
+%patch27 -p1 -b .pam
 
 %build
 # patch10 touches configure.in
@@ -99,7 +107,12 @@ autoconf
 rm -f lex.yy.* y.tab.*
 %configure --with-atspool=%{_localstatedir}/spool/at/spool --with-jobdir=%{_localstatedir}/spool/at \
 %if %{WITH_SELINUX}
---with-selinux
+--with-selinux \
+%endif
+%if %{WITH_PAM}
+--with-pam
+%else
+
 %endif
 
 make
@@ -160,6 +173,7 @@ fi
 %attr(0700,daemon,daemon)	%dir %{_localstatedir}/spool/at
 %attr(0600,daemon,daemon)	%verify(not md5 size mtime) %ghost %{_localstatedir}/spool/at/.SEQ
 %attr(0700,daemon,daemon)	%dir %{_localstatedir}/spool/at/spool
+%attr(0640,root,daemon)		%config(noreplace) /etc/pam.d/atd
 %{_sbindir}/atrun
 %{_sbindir}/atd
 %{_mandir}/man*/*
@@ -169,6 +183,9 @@ fi
 %attr(4755,root,root)	%{_bindir}/at
 
 %changelog
+* Tue Jan 25 2005 Jason Vas Dias <jvdias@redhat.com> 3.1.8-64
+- bugs 5160/146132: add PAM authentication control to atd
+
 * Tue Oct 05 2004 Jason Vas Dias <jvdias@redhat.com> 3.1.8-60
 - fix bug 131510: no_export env. var. blacklisting should not
 - remove 'SHELL' when only 'SHELLOPTS' is blacklisted.
