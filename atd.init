@@ -4,7 +4,7 @@
 #
 # Starts the at daemon
 #
-# chkconfig: 345 40 60
+# chkconfig: 345 95 5
 # description: Runs commands scheduled by the at command at the time \
 #    specified when at was run, and runs batch commands when the load \
 #    average is low enough.

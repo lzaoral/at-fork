@@ -1,7 +1,7 @@
 Summary: Job spooling tools.
 Name: at
 Version: 3.1.8
-Release: 16
+Release: 19
 Copyright: GPL
 Group: System Environment/Daemons
 Source: ftp://tsx-11.mit.edu/pub/linux/sources/usr.bin/at-3.1.8.tar.bz2
@@ -20,6 +20,7 @@ Patch11: at-3.1.8-lexer.patch
 Patch12: at-3.1.8-dst.patch
 Patch13: at-3.1.8-test.patch
 Patch14: at-3.1.8-test-fix.patch
+Patch15: at-3.1.8-env.patch
 Prereq: fileutils chkconfig /etc/init.d
 BuildPrereq: flex bison autoconf
 Conflicts: crontabs <= 1.5
@@ -57,6 +58,7 @@ day/week/etc.
 %patch12 -p1 -b .dst
 %patch13 -p1 -b .test
 %patch14 -p1 -b .test-fix
+%patch15 -p1 -b .env
 
 %build
 # for patch 9
@@ -125,6 +127,17 @@ fi
 %attr(4755,root,root)	%{_prefix}/bin/at
 
 %changelog
+* Mon Jul 18 2001 Crutcher Dunnavant <crutcher@redhat.com>
+- applied enrico.scholz@informatik.tu-chemnitz.de's change to the env patch to 
+- address bug #46546
+
+* Mon Jun 25 2001 Crutcher Dunnavant <crutcher@redhat.com>
+- changed atd.init to start at 95, stop at 5, closing #15915
+- applied mailto:wp@supermedia.pl's environment patch
+
+* Sun Jun 24 2001 Elliot Lee <sopwith@redhat.com>
+- Bump release + rebuild.
+
 * Wed Apr  4 2001 Crutcher Dunnavant <crutcher@redhat.com>
 - much love to David Kilzer <ddkilzer@lubricants-oil.com>
 - who nailed UTC, Leap year, DST, and some other edge cases down
