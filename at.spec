@@ -4,7 +4,7 @@
 Summary: Job spooling tools.
 Name: at
 Version: 3.1.8
-Release: 53
+Release: 54
 License: GPL
 Group: System Environment/Daemons
 Source: http://ftp.debian.org/debian/pool/main/a/at/at_3.1.8-11.tar.gz
@@ -31,6 +31,9 @@ Patch23: at-3.1.8-pie.patch
 
 Prereq: fileutils chkconfig /etc/init.d
 BuildPrereq: flex bison autoconf
+%if %{WITH_SELINUX}
+BuildPrereq: libselinux-devel
+%endif
 Conflicts: crontabs <= 1.5
 # No, I'm not kidding
 BuildPrereq: smtpdaemon
@@ -158,6 +161,10 @@ fi
 %attr(4755,root,root)	%{_bindir}/at
 
 %changelog
+* Wed May 12 2004 Thomas Woerner <twoerner@redhat.com> - 3.1.8-54
+- fixed pie patch: at is pie, now
+- added build requires for libselinux-devel
+
 * Tue May 4 2004 Dan Walsh <dwalsh@redhat.com> - 3.1.8-53
 - Add fileentrypoint check
 

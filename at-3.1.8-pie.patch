@@ -1,6 +1,13 @@
---- at-3.1.8/Makefile.in.pie	2003-10-28 23:12:43.000000000 -0800
-+++ at-3.1.8/Makefile.in	2003-10-28 23:14:22.000000000 -0800
-@@ -74,7 +74,7 @@
+--- at-3.1.8/Makefile.in.pie	2004-05-12 11:11:07.690785433 +0200
++++ at-3.1.8/Makefile.in	2004-05-12 11:23:10.367957697 +0200
+@@ -69,13 +69,13 @@
+ all: at atd atrun
+ 
+ at: $(ATOBJECTS)
+-	$(CC) $(CFLAGS) -o at $(ATOBJECTS) $(LIBS) $(LEXLIB)
++	$(CC) $(CFLAGS) -o at -pie $(ATOBJECTS) $(LIBS) $(LEXLIB)
+ 	rm -f $(CLONES)
+ 	$(LN_S) -f at atq
  	$(LN_S) -f at atrm
  
  atd: $(RUNOBJECTS)
@@ -9,12 +16,12 @@
  
  y.tab.c y.tab.h: parsetime.y
  	$(YACC) -d parsetime.y
-@@ -85,6 +85,8 @@
- atrun: atrun.in
+@@ -87,7 +87,7 @@
  	configure
  
-+$(RUNOBJECTS): %.o: %.c
-+	$(CC) -c $(CFLAGS) -fpie $(DEFS) $*.c
  .c.o:
- 	$(CC) -c $(CFLAGS) $(DEFS) $*.c
+-	$(CC) -c $(CFLAGS) $(DEFS) $*.c
++	$(CC) -c $(CFLAGS) -fpie $(DEFS) $*.c
  
+ install: all
+ 	$(INSTALL) -m 755 -d $(IROOT)$(etcdir)
