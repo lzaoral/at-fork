@@ -7,7 +7,7 @@
 Summary: Job spooling tools.
 Name: at
 Version: 3.1.8
-Release: 67_FC4
+Release: 68_FC4
 License: GPL
 Group: System Environment/Daemons
 Source: http://ftp.debian.org/debian/pool/main/a/at/at_3.1.8-11.tar.gz
@@ -35,7 +35,7 @@ Patch24: at-3.1.8-t_option.patch
 Patch25: at-3.1.8-usage.patch
 Patch26: at-3.1.8-fix_no_export.patch
 Patch27: at-3.1.8-pam.patch
-
+Patch28: at-3.1.8-pam_perms.patch
 Prereq: fileutils chkconfig /etc/init.d
 BuildPrereq: flex bison autoconf
 %if %{WITH_SELINUX}
@@ -99,6 +99,7 @@ cp %{SOURCE1} .
 %patch25 -p1 -b .usage
 %patch26 -p1 -b .fix_no_export
 %patch27 -p1 -b .pam
+%patch28 -p1 -b .pam_perms
 
 %build
 # patch10 touches configure.in
@@ -186,6 +187,10 @@ fi
 %attr(4755,root,root)	%{_bindir}/at
 
 %changelog
+* Tue Mar 08 2005 Jason Vas Dias <jvdias@redhat.com> 3.1.8-68
+- Put PAM authentication check in 'check_permissions()', so
+- user can know when using at(1) if PAM permission is denied.
+
 * Tue Mar 08 2005 Jason Vas Dias <jvdias@redhat.com> 3.1.8-67
 - better fix for bug 150131: change DAEMON_USERNAME and 
 - DAEMON_GROUPNAME to 'root' .
