@@ -1,8 +1,8 @@
 Summary: Job spooling tools.
 Name: at
 Version: 3.1.8
-Release: 20
-Copyright: GPL
+Release: 23
+License: GPL
 Group: System Environment/Daemons
 Source: ftp://tsx-11.mit.edu/pub/linux/sources/usr.bin/at-3.1.8.tar.bz2
 Source2: atd.init
@@ -20,7 +20,10 @@ Patch11: at-3.1.8-lexer.patch
 Patch12: at-3.1.8-dst.patch
 Patch13: at-3.1.8-test.patch
 Patch14: at-3.1.8-test-fix.patch
-Patch15: at-3.1.8-env.patch
+#Patch15: at-3.1.8-env.patch
+Patch15: at-3.1.8-env-tng.patch
+Patch16: at-3.1.8-lsbdoc.patch
+Patch17: at-3.1.8-o_excl.patch
 Prereq: fileutils chkconfig /etc/init.d
 BuildPrereq: flex bison autoconf
 Conflicts: crontabs <= 1.5
@@ -58,6 +61,8 @@ use crontab instead.
 %patch13 -p1 -b .test
 %patch14 -p1 -b .test-fix
 %patch15 -p1 -b .env
+%patch16 -p1 -b .lsbdoc
+%patch17 -p1 -b .o_excl
 
 %build
 # for patch 9
@@ -115,7 +120,7 @@ fi
 %config /etc/at.deny
 %config /etc/rc.d/init.d/atd
 %attr(0700,daemon,daemon)	%dir /var/spool/at
-%attr(0700,daemon,daemon)	%verify(not md5 size mtime) %ghost /var/spool/at/.SEQ
+%attr(0600,daemon,daemon)	%verify(not md5 size mtime) %ghost /var/spool/at/.SEQ
 %attr(0700,daemon,daemon)	%dir /var/spool/at/spool
 %{_prefix}/sbin/atrun
 %{_prefix}/sbin/atd
@@ -126,6 +131,15 @@ fi
 %attr(4755,root,root)	%{_prefix}/bin/at
 
 %changelog
+* Thu Jan 17 2002 Trond Eivind Glomsrød <teg@redhat.com> 3.1.8-23
+- s/Copyright/License/
+
+* Mon Jan 14 2002 Adrian Havill <havill@redhat.com> 3.1.8-21
+- fix man page (#51253)
+- fix env prop problem (#49491)
+- .SEQ should not be executable (#52626)
+- beefed up file creation perms against symlink exploits (O_EXCL)
+
 * Thu Aug  2 2001 Crutcher Dunnavant <crutcher@redhat.com> 3.1.8-20
 - updated patch update, still bug #46546
 
