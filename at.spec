@@ -7,7 +7,7 @@
 Summary: Job spooling tools.
 Name: at
 Version: 3.1.8
-Release: 64
+Release: 66
 License: GPL
 Group: System Environment/Daemons
 Source: http://ftp.debian.org/debian/pool/main/a/at/at_3.1.8-11.tar.gz
@@ -35,6 +35,7 @@ Patch24: at-3.1.8-t_option.patch
 Patch25: at-3.1.8-usage.patch
 Patch26: at-3.1.8-fix_no_export.patch
 Patch27: at-3.1.8-pam.patch
+Patch28: at-3.1.8-bug_150131.patch
 
 Prereq: fileutils chkconfig /etc/init.d
 BuildPrereq: flex bison autoconf
@@ -99,6 +100,7 @@ cp %{SOURCE1} .
 %patch25 -p1 -b .usage
 %patch26 -p1 -b .fix_no_export
 %patch27 -p1 -b .pam
+%patch28 -p1 -b .bug_150131
 
 %build
 # patch10 touches configure.in
@@ -183,6 +185,10 @@ fi
 %attr(4755,root,root)	%{_bindir}/at
 
 %changelog
+* Mon Mar 07 2005 Jason Vas Dias <jvdias@redhat.com> 3.1.8-66
+- fix bug 150131: atd should not relinquish root privilege if
+- doing su(1) equivalent with PAM .
+
 * Tue Jan 25 2005 Jason Vas Dias <jvdias@redhat.com> 3.1.8-64
 - bugs 5160/146132: add PAM authentication control to atd
 
