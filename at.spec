@@ -1,7 +1,7 @@
 Summary: Job spooling tools.
 Name: at
 Version: 3.1.8
-Release: 31
+Release: 33
 License: GPL
 Group: System Environment/Daemons
 Source: ftp://tsx-11.mit.edu/pub/linux/sources/usr.bin/at-3.1.8.tar.bz2
@@ -100,6 +100,9 @@ rm -f %{buildroot}/%{_mandir}/man5/at_deny.5
 ln -s at.allow.5 \
       %{buildroot}/%{_mandir}/man5/at.deny.5
 
+# remove unpackaged files from the buildroot
+rm -rf $RPM_BUILD_ROOT%{_prefix}/doc
+
 %clean
 rm -rf %{buildroot}
 
@@ -137,6 +140,12 @@ fi
 %attr(4755,root,root)	%{_prefix}/bin/at
 
 %changelog
+* Wed Jan 22 2003 Tim Powers <timp@redhat.com>
+- rebuilt
+
+* Wed Nov 27 2002 Tim Powers <timp@redhat.com> 3.1.8-32
+- remove unpackaged files from the buildroot
+
 * Tue Jul 25 2002 Bill Huang <bhuang@redhat.com>
 - Fixed delaying job execution and missing starting jobs..(bug#69595)
   (Thanks Bujor D Silaghi <bujor@cs.umd.edu> for his patch.)
