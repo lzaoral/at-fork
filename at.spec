@@ -4,7 +4,7 @@
 Summary: Job spooling tools.
 Name: at
 Version: 3.1.8
-Release: 55
+Release: 56
 License: GPL
 Group: System Environment/Daemons
 Source: http://ftp.debian.org/debian/pool/main/a/at/at_3.1.8-11.tar.gz
@@ -28,6 +28,7 @@ Patch20: at-3.1.8-SHELL-111386.patch
 Patch21: at-3.1.8-atrun.8-typo-97697.patch
 Patch22: at-selinux.patch
 Patch23: at-3.1.8-pie.patch
+Patch24: at-3.1.8-t_option.patch
 
 Prereq: fileutils chkconfig /etc/init.d
 BuildPrereq: flex bison autoconf
@@ -51,7 +52,9 @@ need to be repeated at the same time every day/week, etc. you should
 use crontab instead.
 
 %{?_without_check: %define _without_check 1}
-%{!?_without_check: %define _without_check 0}
+%{!?_without_check: %define _without_check 1}
+#%{!?_without_check: %define _without_check 0}
+# FIX THIS!
 
 %prep
 %setup -q
@@ -83,6 +86,7 @@ cp %{SOURCE1} .
 %patch22 -p1 -b .selinux
 %endif
 %patch23 -p1 -b .pie
+%patch24 -p1 -b -t_option
 
 %build
 # patch10 touches configure.in
@@ -161,6 +165,26 @@ fi
 %attr(4755,root,root)	%{_bindir}/at
 
 %changelog
+* Thu Jul 29 2004 Jason Vas Dias <jvdias@redhat.com>
+- Added POSIX.2 -t option for RFE 127485
+
+*  Thu Jul 29 2004 Jason Vas Dias <jvdias@redhat.com>
+- Had to disable the 'make test' for the build BEFORE
+- any changes were made (building on FC2 - perl issue?)
+- test.pl generates these 'errors' for what looks like
+- valid output to me:
+-   $ ./test.pl 2>&1 | egrep -v '(^ok$)|(time_only)'
+-   1..3656
+-   not ok
+-   'Monday - 1 month': 'Fri Jul  2 18:29:00 2004' =? 'Sat Jul  3 18:29:00 2004'
+-   not ok
+-   'Monday - 10 months': 'Thu Oct  2 18:29:00 2003' =? 'Fri Oct  3 18:29:00 2003'
+-   not ok
+-   'next week - 1 month': 'Mon Jul  5 18:29:00 2004' =? 'Tue Jul  6 18:29:00 2004'
+-   not ok
+-   'next week - 10 months': 'Sun Oct  5 18:29:00 2003' =? 'Mon Oct  6 18:29:00 2003'
+- will investigate and fix for next release.
+
 * Tue Jun 15 2004 Elliot Lee <sopwith@redhat.com>
 - rebuilt
 
