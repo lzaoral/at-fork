@@ -4,7 +4,7 @@
 Summary: Job spooling tools.
 Name: at
 Version: 3.1.8
-Release: 58
+Release: 60
 License: GPL
 Group: System Environment/Daemons
 Source: http://ftp.debian.org/debian/pool/main/a/at/at_3.1.8-11.tar.gz
@@ -30,6 +30,7 @@ Patch22: at-selinux.patch
 Patch23: at-3.1.8-pie.patch
 Patch24: at-3.1.8-t_option.patch
 Patch25: at-3.1.8-usage.patch
+Patch26: at-3.1.8-fix_no_export.patch
 
 Prereq: fileutils chkconfig /etc/init.d
 BuildPrereq: flex bison autoconf
@@ -89,6 +90,7 @@ cp %{SOURCE1} .
 %patch23 -p1 -b .pie
 %patch24 -p1 -b -t_option
 %patch25 -p1 -b .usage
+%patch26 -p1 -b .fix_no_export
 
 %build
 # patch10 touches configure.in
@@ -167,8 +169,16 @@ fi
 %attr(4755,root,root)	%{_bindir}/at
 
 %changelog
+* Tue Oct 05 2004 Jason Vas Dias <jvdias@redhat.com> 3.1.8-60
+- fix bug 131510: no_export env. var. blacklisting should not
+- remove 'SHELL' when only 'SHELLOPTS' is blacklisted.
+- at(1) man-page should not say 'commands are run with /bin/sh'
+- and should explain usage of SHELL environement variable and
+- details of blacklisted variables.
+
 * Tue Sep 28 2004 Rik van Riel <riel@redhat.com> 3.1.8-58
-- fix typo in man page, bug 112303
+- fix typo in man page, bug 112303 
+- (regenerated at-3.1.8-man-timespec-path.patch with fix)
 
 * Tue Aug 03 2004 Jason Vas Dias <jvdias@redhat.com>
 - fixed bug 125634 - made usage() agree with manpage

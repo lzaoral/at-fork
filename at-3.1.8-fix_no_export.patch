@@ -1,0 +1,95 @@
+--- at-3.1.8/at.1.in.fix_no_export	2004-10-05 13:34:39.524060000 -0400
++++ at-3.1.8/at.1.in	2004-10-05 13:36:12.930550000 -0400
+@@ -49,8 +49,7 @@
+ and
+ .B batch
+ read commands from standard input or a specified file which are to
+-be executed at a later time, using
+-.BR /bin/sh .
++be executed at a later time .
+ .TP 8
+ .BR at
+ executes commands at a specified time.
+@@ -252,8 +251,56 @@
+ option argument, which must have the same format as specified for the 
+ .BR touch(1)
+ utility's 
+-.B -t
++.B \-t
+ time option argument ([[CC]YY]MMDDhhmm).
++.SH ENVIRONMENT
++.P
++.TP 8
++.B SHELL
++The value of the SHELL environment variable at the time of 
++.B at
++invocation will determine which shell is used to execute the 
++.B at 
++job commands. If SHELL is unset when 
++.B at
++is invoked, the user's login shell will be used; otherwise, 
++if SHELL is set when 
++.B at 
++is invoked, it must contain the path of a shell interpreter
++executable that will be used to run the commands at the specified time.
++.P
++.B at 
++will record the values of 
++environment variables present at time of 
++.B at
++invocation. When the commands are run at the  specified time, 
++.B at
++will restore these variables to their recorded values .
++These variables are excluded from this processing and are never
++set by
++.B at
++when the commands are run :
++.br
++.BI TERM,
++.BI DISPLAY,
++.BI SHELLOPTS,
++.BI _,
++.BI PPID,
++.BI BASH_VERSINFO,
++.BI EUID,
++.BI UID,
++.BI GROUPS.
++.br
++If the user submitting the 
++.B at 
++job is not the super-user, variables that alter the behaviour of the
++loader
++.BR ld.so(8),
++such as 
++.B LD_LIBRARY_PATH
++, cannot be recorded and restored by 
++.B at . 
++.P
+ .SH FILES
+ .I @ATJBD@
+ .br
+--- at-3.1.8/at.c.fix_no_export	2004-10-05 13:34:39.538036000 -0400
++++ at-3.1.8/at.c	2004-10-05 13:34:39.629944000 -0400
+@@ -358,8 +358,8 @@
+     for (atenv = environ; *atenv != NULL; atenv++) {
+ 	int export = 1;
+ 	char *pch;
+-       char * eqp = *atenv;
+-       char * valp = *atenv;
++	char * eqp = *atenv;
++	char * valp = *atenv;
+ 
+ 	if ((pch = strchr(*atenv, '=')) != 0) {
+ 	    unsigned int i;
+@@ -368,8 +368,9 @@
+             valp = pch + 1;
+ 	    for (i = 0; i < sizeof(no_export) / sizeof(no_export[0]); i++) {
+ 		export = export
+-		    && (strncmp(*atenv, no_export[i],
+-				(size_t) (eqp - *atenv)) != 0);
++		    && (  (((size_t) (eqp - *atenv)) != strlen(no_export[i]))
++		        ||(strncmp(*atenv, no_export[i],(size_t) (eqp - *atenv)) != 0)
++		       );
+ 	    }
+ 	} else {
+             continue; /* no '=', so bail on this one */
