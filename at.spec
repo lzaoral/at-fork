@@ -1,7 +1,7 @@
 Summary: Job spooling tools.
 Name: at
 Version: 3.1.8
-Release: 30
+Release: 31
 License: GPL
 Group: System Environment/Daemons
 Source: ftp://tsx-11.mit.edu/pub/linux/sources/usr.bin/at-3.1.8.tar.bz2
@@ -137,9 +137,13 @@ fi
 %attr(4755,root,root)	%{_prefix}/bin/at
 
 %changelog
+* Tue Jul 25 2002 Bill Huang <bhuang@redhat.com>
+- Fixed delaying job execution and missing starting jobs..(bug#69595)
+  (Thanks Bujor D Silaghi <bujor@cs.umd.edu> for his patch.)
+
 * Fri Jul 19 2002 Bill Huang <bhuang@redhat.com>
-- Apply the patch from Mike Gahanagan <mgahagan@redhat.com>
-  to fix cleaning atq and  multiple atd daemon.(bug#67414)
+- Fixed cleaning atq and  multiple atd daemon.(bug#67414)
+  (Thanks Bujor D Silaghi <bujor@cs.umd.edu> for his patch.)
 
 * Fri Jul 19 2002 Bill Huang <bhuang@redhat.com>
 - Fixed error message output in atd.c

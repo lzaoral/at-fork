@@ -1,5 +1,14 @@
 --- at-3.1.8.orig/atd.c	Tue Jul 16 21:35:17 2002
-+++ at-3.1.8/atd.c	Wed Jul 17 02:37:05 2002
++++ at-3.1.8/atd.c	Sat Jul 20 17:26:24 2002
+@@ -113,7 +113,7 @@
+ static char rcsid[] = "$Id: atd.c,v 1.28 1997/05/06 08:31:09 ig25 Exp $";
+ static double load_avg = LOADAVG_MX;
+ static time_t now;
+-static time_t last_chg;
++//static time_t last_chg;
+ static int nothing_to_do;
+ unsigned int batch_interval;
+ static int run_as_daemon = 0;
 @@ -188,7 +188,7 @@
  #endif
  
@@ -204,4 +213,36 @@
 -    free(newname);
  
      if (((send_mail != -1) && (buf.st_size != size)) || (send_mail == 1)) {
+ 
+@@ -462,6 +502,8 @@
+     exit(EXIT_SUCCESS);
+ }
+ 
++#define CHECK_INTERVAL_5MIN	300
++
+ static time_t
+ run_loop()
+ {
+@@ -491,7 +533,7 @@
+      * atrun.
+      */
+ 
+-    next_job = now + CHECK_INTERVAL;
++    next_job = now + CHECK_INTERVAL_5MIN;
+     if (next_batch == 0)
+ 	next_batch = now;
+ 
+@@ -502,11 +544,11 @@
+ 
+     if (stat(".", &buf) == -1)
+ 	perr("Cannot stat " ATJOB_DIR);
+-
++/*
+     if (nothing_to_do && buf.st_mtime <= last_chg)
+ 	return next_job;
+     last_chg = buf.st_mtime;
+-
++*/    
+     if ((spool = opendir(".")) == NULL)
+ 	perr("Cannot read " ATJOB_DIR);
  
