@@ -187,8 +187,8 @@ fi
 
 %changelog
 * Tue Mar 08 2005 Jason Vas Dias <jvdias@redhat.com> 3.1.8-67
-* better fix for bug 150131: change DAEMON_USERNAME and 
-* DAEMON_GROUPNAME to 'root' .
+- better fix for bug 150131: change DAEMON_USERNAME and 
+- DAEMON_GROUPNAME to 'root' .
 
 * Mon Mar 07 2005 Jason Vas Dias <jvdias@redhat.com> 3.1.8-66
 - fix bug 150131: atd should not relinquish root privilege if
