@@ -1,0 +1,12 @@
+diff -u at-3.1.8/at.1.in~ at-3.1.8/at.1.in
+--- at-3.1.8/at.1.in~	2003-06-03 10:06:37.000000000 +0900
++++ at-3.1.8/at.1.in	2003-06-03 10:06:37.000000000 +0900
+@@ -117,7 +117,7 @@
+ .B at 1am tomorrow.
+ .PP
+ The exact definition of the time specification can be found in
+-.IR @prefix@/share/doc/at/timespec .
++.IR @prefix@/share/doc/at-@VERSION@/timespec .
+ .PP
+ For both
+ .BR at " and " batch ,

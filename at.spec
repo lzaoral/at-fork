@@ -1,31 +1,28 @@
 Summary: Job spooling tools.
 Name: at
 Version: 3.1.8
-Release: 33
+Release: 46.1
 License: GPL
 Group: System Environment/Daemons
-Source: ftp://tsx-11.mit.edu/pub/linux/sources/usr.bin/at-3.1.8.tar.bz2
+Source: http://ftp.debian.org/debian/pool/main/a/at/at_3.1.8-11.tar.gz
+Source1: test.pl
 Source2: atd.init
 Patch0: at-3.1.7-lockfile.patch
 Patch1: at-3.1.7-noon.patch
-Patch2: at-3.1.7-paths.patch
+Patch2: at-3.1.8-man-timespec-path.patch
 Patch3: at-3.1.7-sigchld.patch
 Patch4: at-noroot.patch
 Patch5: at-3.1.7-typo.patch
-Patch6: at-debian.patch
 Patch7: at-3.1.8-buflen.patch
-Patch9: at-3.1.8-shell.patch
 Patch10: at-3.1.8-batch.patch
-Patch11: at-3.1.8-lexer.patch
-Patch12: at-3.1.8-dst.patch
+Patch11: at-3.1.8-11-lexer-parser.diff
 Patch13: at-3.1.8-test.patch
-Patch14: at-3.1.8-test-fix.patch
-#Patch15: at-3.1.8-env.patch
 Patch15: at-3.1.8-env-tng.patch
-Patch16: at-3.1.8-lsbdoc.patch
-Patch17: at-3.1.8-o_excl.patch
+#Patch16: at-3.1.8-lsbdoc.patch
 Patch18: at-3.1.8-perr.patch
 Patch19: at-3.1.8-instinet.patch
+Patch20: at-3.1.8-SHELL-91233.patch
+Patch21: at-3.1.8-atrun.8-typo-97697.patch
 
 Prereq: fileutils chkconfig /etc/init.d
 BuildPrereq: flex bison autoconf
@@ -45,54 +42,62 @@ time-oriented job control. Note: If it is a recurring job that will
 need to be repeated at the same time every day/week, etc. you should
 use crontab instead.
 
+%{?_without_check: %define _without_check 1}
+%{!?_without_check: %define _without_check 0}
+
 %prep
 %setup -q
+cp %{SOURCE1} .
 %patch0 -p1 -b .lockfile
 # The next path is a brute-force fix that will have to be updated
 # when new versions of at are released.
 %patch2 -p1 -b .paths
 
 %patch3 -p1 -b .sigchld
-%patch6 -p1 -b .debian
+#%%patch6 -p1 -b .debian
 %patch4 -p1 -b .noroot
 %patch5 -p1 -b .tyop
 %patch7 -p1 -b .buflen
-%patch9 -p1 -b .shell
 %patch10 -p1 -b .batch
 %patch11 -p1 -b .lexer
-%patch12 -p1 -b .dst
+#%%patch12 -p1 -b .dst
 %patch13 -p1 -b .test
-%patch14 -p1 -b .test-fix
+#%%patch14 -p1 -b .test-fix
 %patch15 -p1 -b .env
-%patch16 -p1 -b .lsbdoc
-%patch17 -p1 -b .o_excl
+#%%patch16 -p1 -b .lsbdoc
+#%%patch17 -p1 -b .o_excl
 %patch18 -p1 -b .perr
 %patch19 -p1 -b .instinet
+%patch20 -p1 -b .SHELL
+%patch21 -p1 -b .typo
 
 %build
-# for patch 9
+# patch10 touches configure.in
 autoconf
-cp /usr/share/libtool/config.{sub,guess} .
-%configure --with-atspool=/var/spool/at/spool --with-jobdir=/var/spool/at
-
-# for patch 11
+# for patch11
 rm -f lex.yy.* y.tab.*
+%configure --with-atspool=%{_localstatedir}/spool/at/spool --with-jobdir=%{_localstatedir}/spool/at
 
 make
 
+%if ! %{_without_check}
+  LANG=C make test > /dev/null
+%endif
+
 %install
 rm -rf %{buildroot}
-mkdir -p %{buildroot}/etc/rc.d/init.d
 
 %makeinstall DAEMON_USERNAME=`id -nu` \
 	DAEMON_GROUPNAME=`id -ng` \
-	etcdir=%{buildroot}/etc \
-	ATJOB_DIR=%{buildroot}/var/spool/at \
-	ATSPOOL_DIR=%{buildroot}/var/spool/at/spool 
-echo > %{buildroot}/etc/at.deny
+	etcdir=%{buildroot}%{_sysconfdir} \
+	ATJOB_DIR=%{buildroot}%{_localstatedir}/spool/at \
+	ATSPOOL_DIR=%{buildroot}%{_localstatedir}/spool/at/spool 
+echo > %{buildroot}%{_sysconfdir}/at.deny
 mkdir docs
 cp $RPM_BUILD_ROOT/%{_prefix}/doc/at/* docs/
-install -m 755 %{SOURCE2} %{buildroot}/etc/rc.d/init.d/atd
+
+mkdir -p %{buildroot}%{_sysconfdir}/rc.d/init.d
+install -m 755 %{SOURCE2} %{buildroot}%{_sysconfdir}/rc.d/init.d/atd
 
 mv -f %{buildroot}/%{_mandir}/man5/at_allow.5 \
       %{buildroot}/%{_mandir}/man5/at.allow.5
@@ -101,15 +106,15 @@ ln -s at.allow.5 \
       %{buildroot}/%{_mandir}/man5/at.deny.5
 
 # remove unpackaged files from the buildroot
-rm -rf $RPM_BUILD_ROOT%{_prefix}/doc
+rm -r $RPM_BUILD_ROOT%{_prefix}/doc
 
 %clean
 rm -rf %{buildroot}
 
 %post
-touch /var/spool/at/.SEQ
-chmod 600 /var/spool/at/.SEQ
-chown daemon.daemon /var/spool/at/.SEQ
+touch %{_localstatedir}/spool/at/.SEQ
+chmod 600 %{_localstatedir}/spool/at/.SEQ
+chown daemon.daemon %{_localstatedir}/spool/at/.SEQ
 /sbin/chkconfig --add atd
 
 %preun
@@ -126,21 +131,53 @@ fi
 %files
 %defattr(-,root,root)
 %doc docs/*
-%config /etc/at.deny
-%config /etc/rc.d/init.d/atd
-%attr(0700,daemon,daemon)	%dir /var/spool/at
-%attr(0600,daemon,daemon)	%verify(not md5 size mtime) %ghost /var/spool/at/.SEQ
-%attr(0700,daemon,daemon)	%dir /var/spool/at/spool
-%{_prefix}/sbin/atrun
-%{_prefix}/sbin/atd
+%config %{_sysconfdir}/at.deny
+%config %{_sysconfdir}/rc.d/init.d/atd
+%attr(0700,daemon,daemon)	%dir %{_localstatedir}/spool/at
+%attr(0600,daemon,daemon)	%verify(not md5 size mtime) %ghost %{_localstatedir}/spool/at/.SEQ
+%attr(0700,daemon,daemon)	%dir %{_localstatedir}/spool/at/spool
+%{_sbindir}/atrun
+%{_sbindir}/atd
 %{_mandir}/man*/*
-%{_prefix}/bin/batch
-%{_prefix}/bin/atrm
-%{_prefix}/bin/atq
-%attr(4755,root,root)	%{_prefix}/bin/at
+%{_bindir}/batch
+%{_bindir}/atrm
+%{_bindir}/atq
+%attr(4755,root,root)	%{_bindir}/at
 
 %changelog
-* Wed Jan 22 2003 Tim Powers <timp@redhat.com>
+* Fri Jun 20 2003 Jens Petersen <petersen@redhat.com> - 3.1.8-46
+- add at-3.1.8-atrun.8-typo-97697.patch to fix typo in atrun.8 (#97697)
+- update at.1 description of shell behaviour (#91233)
+
+* Tue Jun 17 2003 Jens Petersen <petersen@redhat.com> - 3.1.8-45
+- make the job shell default to SHELL instead of "/bin/sh" (#91233)
+
+* Wed Jun 04 2003 Elliot Lee <sopwith@redhat.com> - 3.1.8-44
+- rebuilt
+
+* Tue Jun  3 2003 Jens Petersen <petersen@redhat.com> - 3.1.8-43
+- Replace redundant at-3.1.7-paths.patch by at-3.1.8-man-timespec-path.patch
+  to fix timespec path
+
+* Tue Jun  3 2003 Jens Petersen <petersen@redhat.com> - 3.1.8-41
+- update source to at_3.1.8-11 from debian upstream
+  - update source url
+  - at-debian.patch no longer needed
+  - at-3.1.7-paths.patch: the patch to "at.1.in" no longer needed
+  - replace at-3.1.8-lexer.patch with at-3.1.8-11-lexer-parser.diff
+  - at-3.1.8-dst.patch no longer needed
+  - at-3.1.8-lsbdoc.patch no longer needed
+  - at-3.1.8-o_excl.patch no longer needed
+  - bump release number
+- at-3.1.8-test.patch: move out test.pl to a separate source file
+  - apply at-3.1.8-test-fix.patch to it and drop patch
+- at-3.1.8-shell.patch: drop (#22216,#91233)
+- run "make test" after building
+- add "--without check" rpmbuild option
+- fix autoconf comment to point to right patch
+- use _sysconfdir, _sbindir, _bindir, and _localstatedir
+
+* Wed Jan 22 2003 Tim Powers <timp@redhat.com> 3.1.8-33
 - rebuilt
 
 * Wed Nov 27 2002 Tim Powers <timp@redhat.com> 3.1.8-32
