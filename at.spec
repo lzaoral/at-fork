@@ -4,7 +4,7 @@
 Summary: Job spooling tools.
 Name: at
 Version: 3.1.8
-Release: 56
+Release: 57
 License: GPL
 Group: System Environment/Daemons
 Source: http://ftp.debian.org/debian/pool/main/a/at/at_3.1.8-11.tar.gz
@@ -29,6 +29,7 @@ Patch21: at-3.1.8-atrun.8-typo-97697.patch
 Patch22: at-selinux.patch
 Patch23: at-3.1.8-pie.patch
 Patch24: at-3.1.8-t_option.patch
+Patch25: at-3.1.8-usage.patch
 
 Prereq: fileutils chkconfig /etc/init.d
 BuildPrereq: flex bison autoconf
@@ -87,6 +88,7 @@ cp %{SOURCE1} .
 %endif
 %patch23 -p1 -b .pie
 %patch24 -p1 -b -t_option
+%patch25 -p1 -b .usage
 
 %build
 # patch10 touches configure.in
@@ -165,6 +167,9 @@ fi
 %attr(4755,root,root)	%{_bindir}/at
 
 %changelog
+* Tue Aug 03 2004 Jason Vas Dias <jvdias@redhat.com>
+- fixed bug 125634 - made usage() agree with manpage
+
 * Thu Jul 29 2004 Jason Vas Dias <jvdias@redhat.com>
 - Added POSIX.2 -t option for RFE 127485
 
