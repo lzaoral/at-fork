@@ -10,3 +10,12 @@ diff -u at-3.1.8/at.1.in~ at-3.1.8/at.1.in
  .PP
  For both
  .BR at " and " batch ,
+@@ -240,7 +240,7 @@
+ Times displayed will be in the format "1997-02-20 14:50" unless the
+ environment variable
+ .B POSIXLY_CORRECT 
+-is set; then, it will be "Thu Feb 20 14:50:00 1996".
++is set; then, it will be "Thu Feb 20 14:50:00 1997".
+ .TP
+ .B
+ \-c

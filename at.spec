@@ -4,7 +4,7 @@
 Summary: Job spooling tools.
 Name: at
 Version: 3.1.8
-Release: 57
+Release: 58
 License: GPL
 Group: System Environment/Daemons
 Source: http://ftp.debian.org/debian/pool/main/a/at/at_3.1.8-11.tar.gz
@@ -167,6 +167,9 @@ fi
 %attr(4755,root,root)	%{_bindir}/at
 
 %changelog
+* Tue Sep 28 2004 Rik van Riel <riel@redhat.com> 3.1.8-58
+- fix typo in man page, bug 112303
+
 * Tue Aug 03 2004 Jason Vas Dias <jvdias@redhat.com>
 - fixed bug 125634 - made usage() agree with manpage
 
