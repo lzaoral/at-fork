@@ -1,7 +1,7 @@
 Summary: Job spooling tools.
 Name: at
 Version: 3.1.8
-Release: 19
+Release: 20
 Copyright: GPL
 Group: System Environment/Daemons
 Source: ftp://tsx-11.mit.edu/pub/linux/sources/usr.bin/at-3.1.8.tar.bz2
@@ -29,16 +29,15 @@ BuildPrereq: sendmail
 Buildroot: %{_tmppath}/%{name}-root
 
 %description
-At and batch read commands from standard input or from a specified file.
-At allows you to specify that a command will be run at a particular time
-(now or a specified time in the future).  Batch will execute commands
-when the system load levels drop to a particular level.  Both commands
-use /bin/sh to run the commands.
+At and batch read commands from standard input or from a specified
+file. At allows you to specify that a command will be run at a
+particular time. Batch will execute commands when the system load
+levels drop to a particular level. Both commands use /bin/sh.
 
-You should install the at package if you need a utility that will do
-time-oriented job control.  Note: you should use crontab instead, if it is
-a recurring job that will need to be repeated at the same time every
-day/week/etc.
+You should install the at package if you need a utility for
+time-oriented job control. Note: If it is a recurring job that will
+need to be repeated at the same time every day/week, etc. you should
+use crontab instead.
 
 %prep
 %setup -q
@@ -81,8 +80,8 @@ mkdir -p %{buildroot}/etc/rc.d/init.d
 	ATSPOOL_DIR=%{buildroot}/var/spool/at/spool 
 echo > %{buildroot}/etc/at.deny
 mkdir docs
-cp ${RPM_BUILD_ROOT}%{_prefix}/doc/at/* docs/
-install -m 755 $RPM_SOURCE_DIR/atd.init %{buildroot}/etc/rc.d/init.d/atd
+cp $RPM_BUILD_ROOT/%{_prefix}/doc/at/* docs/
+install -m 755 %{SOURCE2} %{buildroot}/etc/rc.d/init.d/atd
 
 mv -f %{buildroot}/%{_mandir}/man5/at_allow.5 \
       %{buildroot}/%{_mandir}/man5/at.allow.5
@@ -127,6 +126,9 @@ fi
 %attr(4755,root,root)	%{_prefix}/bin/at
 
 %changelog
+* Thu Aug  2 2001 Crutcher Dunnavant <crutcher@redhat.com> 3.1.8-20
+- updated patch update, still bug #46546
+
 * Mon Jul 18 2001 Crutcher Dunnavant <crutcher@redhat.com>
 - applied enrico.scholz@informatik.tu-chemnitz.de's change to the env patch to 
 - address bug #46546
