@@ -7,7 +7,7 @@
 Summary: Job spooling tools.
 Name: at
 Version: 3.1.8
-Release: 66
+Release: 66_FC4
 License: GPL
 Group: System Environment/Daemons
 Source: http://ftp.debian.org/debian/pool/main/a/at/at_3.1.8-11.tar.gz
