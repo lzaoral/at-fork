@@ -4,7 +4,7 @@
 Summary: Job spooling tools.
 Name: at
 Version: 3.1.8
-Release: 50
+Release: 53
 License: GPL
 Group: System Environment/Daemons
 Source: http://ftp.debian.org/debian/pool/main/a/at/at_3.1.8-11.tar.gz
@@ -86,7 +86,10 @@ cp %{SOURCE1} .
 autoconf
 # for patch11
 rm -f lex.yy.* y.tab.*
-%configure --with-atspool=%{_localstatedir}/spool/at/spool --with-jobdir=%{_localstatedir}/spool/at
+%configure --with-atspool=%{_localstatedir}/spool/at/spool --with-jobdir=%{_localstatedir}/spool/at \
+%if %{WITH_SELINUX}
+--with-selinux
+%endif
 
 make
 
@@ -124,7 +127,7 @@ rm -rf %{buildroot}
 %post
 touch %{_localstatedir}/spool/at/.SEQ
 chmod 600 %{_localstatedir}/spool/at/.SEQ
-chown daemon.daemon %{_localstatedir}/spool/at/.SEQ
+chown daemon:daemon %{_localstatedir}/spool/at/.SEQ
 /sbin/chkconfig --add atd
 
 %preun
@@ -155,7 +158,16 @@ fi
 %attr(4755,root,root)	%{_bindir}/at
 
 %changelog
-* Fri Feb 13 2004 Elliot Lee <sopwith@redhat.com>
+* Tue May 4 2004 Dan Walsh <dwalsh@redhat.com> - 3.1.8-53
+- Add fileentrypoint check
+
+* Thu Apr 15 2004 Dan Walsh <dwalsh@redhat.com> - 3.1.8-52
+- Fix SELinux patch
+
+* Mon Feb 23 2004 Tim Waugh <twaugh@redhat.com>
+- Use ':' instead of '.' as separator for chown.
+
+* Fri Feb 13 2004 Elliot Lee <sopwith@redhat.com> - 3.1.8-50
 - rebuilt
 
 * Tue Dec  9 2003 Jens Petersen <petersen@redhat.com> - 3.1.8-49
