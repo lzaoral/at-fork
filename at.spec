@@ -4,7 +4,7 @@
 Summary: Job spooling tools.
 Name: at
 Version: 3.1.8
-Release: 49
+Release: 50
 License: GPL
 Group: System Environment/Daemons
 Source: http://ftp.debian.org/debian/pool/main/a/at/at_3.1.8-11.tar.gz
@@ -155,6 +155,9 @@ fi
 %attr(4755,root,root)	%{_bindir}/at
 
 %changelog
+* Fri Feb 13 2004 Elliot Lee <sopwith@redhat.com>
+- rebuilt
+
 * Tue Dec  9 2003 Jens Petersen <petersen@redhat.com> - 3.1.8-49
 - replace at-3.1.8-SHELL-91233.patch by at-3.1.8-SHELL-111386.patch which
   now executes $SHELL directly in the at shell script after all the variables
