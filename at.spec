@@ -1,0 +1,193 @@
+Summary: Job spooling tools.
+Name: at
+Version: 3.1.8
+Release: 12
+Copyright: GPL
+Group: System Environment/Daemons
+Source: ftp://tsx-11.mit.edu/pub/linux/sources/usr.bin/at-3.1.8.tar.bz2
+Source2: atd.init
+Patch0: at-3.1.7-lockfile.patch
+Patch1: at-3.1.7-noon.patch
+Patch2: at-3.1.7-paths.patch
+Patch3: at-3.1.7-sigchld.patch
+Patch4: at-noroot.patch
+Patch5: at-3.1.7-typo.patch
+Patch6: at-debian.patch
+Patch7: at-3.1.8-buflen.patch
+Patch8: at-3.1.8-UTC.patch
+Prereq: fileutils chkconfig /etc/init.d
+Conflicts: crontabs <= 1.5
+Buildroot: %{_tmppath}/%{name}-root
+
+%description
+At and batch read commands from standard input or from a specified file.
+At allows you to specify that a command will be run at a particular time
+(now or a specified time in the future).  Batch will execute commands
+when the system load levels drop to a particular level.  Both commands
+use /bin/sh to run the commands.
+
+You should install the at package if you need a utility that will do
+time-oriented job control.  Note: you should use crontab instead, if it is
+a recurring job that will need to be repeated at the same time every
+day/week/etc.
+
+%prep
+%setup -q
+%patch0 -p1 -b .lockfile
+# The next path is a brute-force fix that will have to be updated
+# when new versions of at are released.
+%patch2 -p1 -b .paths
+
+%patch3 -p1 -b .sigchld
+%patch6 -p1 -b .debian
+%patch4 -p1 -b .noroot
+%patch5 -p1 -b .tyop
+%patch7 -p1 -b .buflen
+%patch8 -p1
+
+%build
+%configure --with-atspool=/var/spool/at/spool --with-jobdir=/var/spool/at
+
+make
+
+%install
+rm -rf %{buildroot}
+mkdir -p %{buildroot}/etc/rc.d/init.d
+
+%makeinstall DAEMON_USERNAME=`id -nu` \
+	DAEMON_GROUPNAME=`id -ng` \
+	etcdir=%{buildroot}/etc \
+	ATJOB_DIR=%{buildroot}/var/spool/at \
+	ATSPOOL_DIR=%{buildroot}/var/spool/at/spool 
+echo > %{buildroot}/etc/at.deny
+mkdir docs
+cp ${RPM_BUILD_ROOT}%{_prefix}/doc/at/* docs/
+install -m 755 $RPM_SOURCE_DIR/atd.init %{buildroot}/etc/rc.d/init.d/atd
+
+%clean
+rm -rf %{buildroot}
+
+%post
+touch /var/spool/at/.SEQ
+chmod 600 /var/spool/at/.SEQ
+chown daemon.daemon /var/spool/at/.SEQ
+/sbin/chkconfig --add atd
+
+%preun
+if [ "$1" = 0 ] ; then
+  service atd stop >/dev/null 2>&1
+  /sbin/chkconfig --del atd
+fi
+
+%postun
+if [ "$1" -ge "1" ]; then
+  service atd condrestart >/dev/null 2>&1
+fi
+
+%files
+%defattr(-,root,root)
+%doc docs/*
+%config /etc/at.deny
+%config /etc/rc.d/init.d/atd
+%attr(0700,daemon,daemon)	%dir /var/spool/at
+%attr(0700,daemon,daemon)	%verify(not md5 size mtime) %ghost /var/spool/at/.SEQ
+%attr(0700,daemon,daemon)	%dir /var/spool/at/spool
+%{_prefix}/sbin/atrun
+%{_prefix}/sbin/atd
+%{_mandir}/man*/*
+%{_prefix}/bin/batch
+%{_prefix}/bin/atrm
+%{_prefix}/bin/atq
+%attr(4755,root,root)	%{_prefix}/bin/at
+
+%changelog
+* Wed Aug 23 2000 Crutcher Dunnavant <crutcher@redhat.com>
+- Well, we will likely never really close the UTC issues,
+- because of 1) fractional timezones, and 2) daylight savigns time.
+- but there is a slight tweak to the handling of dst in the UTC patch.
+
+* Wed Aug 23 2000 Crutcher Dunnavant <crutcher@redhat.com>
+- fixed bug #15685
+- which had at miscaluclating UTC times.
+
+* Sat Jul 15 2000 Bill Nottingham <notting@redhat.com>
+- move initscript back
+
+* Wed Jul 12 2000 Prospector <bugzilla@redhat.com>
+- automatic rebuild
+
+* Thu Jul  6 2000 Bill Nottingham <notting@redhat.com>
+- prereq /etc/init.d
+
+* Sat Jul  1 2000 Nalin Dahyabhai <nalin@redhat.com>
+- fix syntax error in init script
+
+* Tue Jun 27 2000 Preston Brown <pbrown@redhat.com>
+- don't prereq, only require initscripts
+
+* Mon Jun 26 2000 Preston Brown <pbrown@redhat.com>
+- move init script
+- add condrestart directive
+- fix post/preun/postun scripts
+- prereq initscripts >= 5.20
+
+* Sat Jun 17 2000 Bill Nottingham <notting@redhat.com>
+- fix verify of /var/spool/at/.SEQ (#12262)
+
+* Mon Jun 12 2000 Nalin Dahyabhai <nalin@redhat.com>
+- fix status checking and syntax error in init script
+
+* Fri Jun  9 2000 Bill Nottingham <notting@redhat.com>
+- fix for long usernames (#11321)
+- add some bugfixes from debian
+
+* Mon May  8 2000 Bernhard Rosenkraenzer <bero@redhat.com>
+- 3.1.8
+
+* Wed Mar  1 2000 Bill Nottingham <notting@redhat.com>
+- fix a couple of more typos, null-terminate some strings
+
+* Thu Feb 10 2000 Bill Nottingham <notting@redhat.com>
+- fix many-years-old typo in atd.c
+
+* Thu Feb  3 2000 Bill Nottingham <notting@redhat.com>
+- handle compressed man pages
+
+* Mon Aug 16 1999 Bill Nottingham <notting@redhat.com>
+- initscript munging, build as non-root user
+
+* Sun Jun 13 1999 Jeff Johnson <jbj@redhat.com>
+- correct perms for /var/spool/at after defattr.
+
+* Mon May 24 1999 Jeff Johnson <jbj@redhat.com>
+- reset SIGCHLD before exec (#3016).
+
+* Sun Mar 21 1999 Cristian Gafton <gafton@redhat.com> 
+- auto rebuild in the new build environment (release 8)
+
+* Thu Mar 18 1999 Cristian Gafton <gafton@redhat.com>
+- fix handling the 12:00 time
+
+* Wed Jan 13 1999 Bill Nottingham <notting@redhat.com>
+- configure fix for arm
+
+* Wed Jan 06 1999 Cristian Gafton <gafton@redhat.com>
+- build for glibc 2.1
+
+* Tue May 05 1998 Prospector System <bugs@redhat.com>
+- translations modified for de, fr, tr
+
+* Wed Apr 22 1998 Michael K. Johnson <johnsonm@redhat.com>
+- enhanced initscript
+
+* Sun Nov 09 1997 Michael K. Johnson <johnsonm@redhat.com>
+- learned to spell
+
+* Wed Oct 22 1997 Michael K. Johnson <johnsonm@redhat.com>
+- updated to at version 3.1.7
+- updated lock and sequence file handling with %ghost
+- Use chkconfig and atd, now conflicts with old crontabs packages
+
+* Thu Jun 19 1997 Erik Troan <ewt@redhat.com>
+- built against glibc
+

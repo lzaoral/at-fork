@@ -1,0 +1,83 @@
+#!/bin/bash
+#
+#	/etc/rc.d/init.d/atd
+#
+# Starts the at daemon
+#
+# chkconfig: 345 40 60
+# description: Runs commands scheduled by the at command at the time \
+#    specified when at was run, and runs batch commands when the load \
+#    average is low enough.
+# processname: atd
+
+# Source function library.
+. /etc/init.d/functions
+
+test -x /usr/sbin/atd || exit 0
+
+RETVAL=0
+
+#
+#	See how we were called.
+#
+
+start() {
+	# Check if atd is already running
+	if [ ! -f /var/lock/subsys/atd ]; then
+	    echo -n 'Starting at daemon: '
+	    daemon /usr/sbin/atd
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] && touch /var/lock/subsys/atd
+	    echo
+	fi
+	return $RETVAL
+}
+
+stop() {
+	echo -n 'Stopping at daemon: '
+	killproc /usr/sbin/atd
+	RETVAL=$?
+	[ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/atd
+	echo
+        return $RETVAL
+}
+
+
+restart() {
+	stop
+	start
+}	
+
+reload() {
+	restart
+}	
+
+status_at() {
+ 	status /usr/sbin/atd
+}
+
+case "$1" in
+start)
+	start
+	;;
+stop)
+	stop
+	;;
+reload|restart)
+	restart
+	;;
+condrestart)
+	if [ -f /var/lock/subsys/atd ]; then
+	    restart
+	fi
+	;;
+status)
+	status_at
+	;;
+*)
+	echo "Usage: atd {start|stop|restart|condrestart|status}"
+	exit 1
+esac
+
+exit $?
+exit $RETVAL
