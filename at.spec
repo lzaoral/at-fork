@@ -1,7 +1,7 @@
 Summary: Job spooling tools.
 Name: at
 Version: 3.1.8
-Release: 12
+Release: 16
 Copyright: GPL
 Group: System Environment/Daemons
 Source: ftp://tsx-11.mit.edu/pub/linux/sources/usr.bin/at-3.1.8.tar.bz2
@@ -14,9 +14,17 @@ Patch4: at-noroot.patch
 Patch5: at-3.1.7-typo.patch
 Patch6: at-debian.patch
 Patch7: at-3.1.8-buflen.patch
-Patch8: at-3.1.8-UTC.patch
+Patch9: at-3.1.8-shell.patch
+Patch10: at-3.1.8-batch.patch
+Patch11: at-3.1.8-lexer.patch
+Patch12: at-3.1.8-dst.patch
+Patch13: at-3.1.8-test.patch
+Patch14: at-3.1.8-test-fix.patch
 Prereq: fileutils chkconfig /etc/init.d
+BuildPrereq: flex bison autoconf
 Conflicts: crontabs <= 1.5
+# No, I'm not kidding
+BuildPrereq: sendmail
 Buildroot: %{_tmppath}/%{name}-root
 
 %description
@@ -43,10 +51,20 @@ day/week/etc.
 %patch4 -p1 -b .noroot
 %patch5 -p1 -b .tyop
 %patch7 -p1 -b .buflen
-%patch8 -p1
+%patch9 -p1 -b .shell
+%patch10 -p1 -b .batch
+%patch11 -p1 -b .lexer
+%patch12 -p1 -b .dst
+%patch13 -p1 -b .test
+%patch14 -p1 -b .test-fix
 
 %build
+# for patch 9
+autoconf
 %configure --with-atspool=/var/spool/at/spool --with-jobdir=/var/spool/at
+
+# for patch 11
+rm -f lex.yy.* y.tab.*
 
 make
 
@@ -63,6 +81,12 @@ echo > %{buildroot}/etc/at.deny
 mkdir docs
 cp ${RPM_BUILD_ROOT}%{_prefix}/doc/at/* docs/
 install -m 755 $RPM_SOURCE_DIR/atd.init %{buildroot}/etc/rc.d/init.d/atd
+
+mv -f %{buildroot}/%{_mandir}/man5/at_allow.5 \
+      %{buildroot}/%{_mandir}/man5/at.allow.5
+rm -f %{buildroot}/%{_mandir}/man5/at_deny.5
+ln -s at.allow.5 \
+      %{buildroot}/%{_mandir}/man5/at.deny.5
 
 %clean
 rm -rf %{buildroot}
@@ -101,6 +125,18 @@ fi
 %attr(4755,root,root)	%{_prefix}/bin/at
 
 %changelog
+* Wed Apr  4 2001 Crutcher Dunnavant <crutcher@redhat.com>
+- much love to David Kilzer <ddkilzer@lubricants-oil.com>
+- who nailed UTC, Leap year, DST, and some other edge cases down
+- he also wrote a test harness in perl
+- bug #28448
+
+* Fri Feb  2 2001 Trond Eivind Glomsrød <teg@redhat.com>
+- i18nize initscript
+
+* Wed Dec 12 2000 Bill Nottingham <notting@redhat.com>
+- fix documentation of which shell commands will be run with (#22216)
+
 * Wed Aug 23 2000 Crutcher Dunnavant <crutcher@redhat.com>
 - Well, we will likely never really close the UTC issues,
 - because of 1) fractional timezones, and 2) daylight savigns time.

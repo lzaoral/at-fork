@@ -21,10 +21,12 @@ RETVAL=0
 #	See how we were called.
 #
 
+prog="atd"
+
 start() {
 	# Check if atd is already running
 	if [ ! -f /var/lock/subsys/atd ]; then
-	    echo -n 'Starting at daemon: '
+	    echo -n $"Starting $prog: "
 	    daemon /usr/sbin/atd
 	    RETVAL=$?
 	    [ $RETVAL -eq 0 ] && touch /var/lock/subsys/atd
@@ -34,7 +36,7 @@ start() {
 }
 
 stop() {
-	echo -n 'Stopping at daemon: '
+	echo -n $"Stopping $prog: "
 	killproc /usr/sbin/atd
 	RETVAL=$?
 	[ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/atd
@@ -75,7 +77,7 @@ status)
 	status_at
 	;;
 *)
-	echo "Usage: atd {start|stop|restart|condrestart|status}"
+	echo $"Usage: $0 {start|stop|restart|condrestart|status}"
 	exit 1
 esac
 
