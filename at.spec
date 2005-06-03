@@ -7,7 +7,7 @@
 Summary: Job spooling tools.
 Name: at
 Version: 3.1.8
-Release: 77_FC4
+Release: 78
 License: GPL
 Group: System Environment/Daemons
 Source: http://ftp.debian.org/debian/pool/main/a/at/at_3.1.8-11.tar.gz
@@ -38,6 +38,8 @@ Patch27: at-3.1.8-pam.patch
 Patch28: at-3.1.8-pam_perms.patch
 Patch29: at-3.1.8-pam_fail_close_session.patch
 Patch30: at-3.1.8-pam_delete_cred.patch
+Patch31: at-3.1.8-r_option.patch
+Patch32: at-3.1.8-pam_loginuid.patch
 
 Prereq: fileutils chkconfig /etc/init.d
 BuildPrereq: flex bison autoconf
@@ -105,7 +107,8 @@ cp %{SOURCE1} .
 %patch28 -p1 -b .pam_perms
 %patch29 -p1 -b .pam_fail_close_session
 %patch30 -p1 -b .pam_delete_cred
-
+%patch31 -p1 -b .-r_option
+%patch32 -p1 -b .pam_loginuid
 %build
 # patch10 touches configure.in
 autoconf
@@ -192,6 +195,10 @@ fi
 %attr(4755,root,root)	%{_bindir}/at
 
 %changelog
+* Fri Jun 03 2005 Jason Vas Dias <jvdias@redhat.com> 3.1.8-78
+- fix bug 159220: add pam_loginuid to pam session stack in /etc/pam.d/atd 
+- fix bug 102341: add '-r' synonym for '-d' / atrm for POSIX / SuS conformance
+
 * Fri Apr 08 2005 Jason Vas Dias <jvdias@redhat.com> 3.1.8-77
 - always call pam_setcred(pamh, PAM_DELETE_CRED) before session 
 - close
