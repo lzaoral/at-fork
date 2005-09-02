@@ -1,0 +1,30 @@
+--- at-3.1.8/at.1.in.-r-man	2005-08-03 19:45:50.000000000 -0400
++++ at-3.1.8/at.1.in	2005-09-02 12:17:44.435351000 -0400
+@@ -9,7 +9,7 @@
+ .IR queue ]
+ .RB [ -f
+ .IR file ]
+-.RB [ -mldbv ]
++.RB [ -mldrbv ]
+ .B TIME
+ .br
+ .B at
+@@ -18,7 +18,7 @@
+ .IR queue ]
+ .RB [ -f
+ .IR file ]
+-.RB [ -mldbv ]
++.RB [ -mldrbv ]
+ .RB -t
+ .IR time_arg
+ .br
+@@ -232,6 +232,9 @@
+ Is an alias for
+ .B atrm.
+ .TP
++.B \-r
++Is an alias for
++.B atrm.
+ .TP
+ .B \-v
+ Shows the time the job will be executed.
