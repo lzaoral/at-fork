@@ -7,7 +7,7 @@
 Summary: Job spooling tools.
 Name: at
 Version: 3.1.8
-Release: 78
+Release: 79
 License: GPL
 Group: System Environment/Daemons
 Source: http://ftp.debian.org/debian/pool/main/a/at/at_3.1.8-11.tar.gz
@@ -195,6 +195,9 @@ fi
 %attr(4755,root,root)	%{_bindir}/at
 
 %changelog
+* Fri Sep 30 2005 Tomas Mraz <tmraz@redhat.com> - 3.1.8-79
+- use include instead of pam_stack in pam config
+
 * Fri Jun 03 2005 Jason Vas Dias <jvdias@redhat.com> 3.1.8-78
 - fix bug 159220: add pam_loginuid to pam session stack in /etc/pam.d/atd 
 - fix bug 102341: add '-r' synonym for '-d' / atrm for POSIX / SuS conformance
