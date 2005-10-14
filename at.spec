@@ -1,13 +1,10 @@
-%if %{?WITH_SELINUX:0}%{!?WITH_SELINUX:1}
-%define WITH_SELINUX 1
-%endif
 %if %{?WITH_PAM:0}%{!?WITH_PAM:1}
 %define WITH_PAM 1
 %endif
 Summary: Job spooling tools.
 Name: at
 Version: 3.1.8
-Release: 79
+Release: 80
 License: GPL
 Group: System Environment/Daemons
 Source: http://ftp.debian.org/debian/pool/main/a/at/at_3.1.8-11.tar.gz
@@ -40,12 +37,12 @@ Patch29: at-3.1.8-pam_fail_close_session.patch
 Patch30: at-3.1.8-pam_delete_cred.patch
 Patch31: at-3.1.8-r_option.patch
 Patch32: at-3.1.8-pam_loginuid.patch
+Patch33: at-3.1.8-getseuserbyname.patch
 
 Prereq: fileutils chkconfig /etc/init.d
 BuildPrereq: flex bison autoconf
-%if %{WITH_SELINUX}
-BuildPrereq: libselinux-devel
-%endif
+BuildPrereq: libselinux-devel >= 1.27.9
+
 %if %{WITH_PAM}
 BuildPrereq: pam-devel
 %endif
@@ -95,10 +92,7 @@ cp %{SOURCE1} .
 %patch19 -p1 -b .instinet
 %patch20 -p1 -b .SHELL
 %patch21 -p1 -b .typo
-%if %{WITH_SELINUX}
-#SELinux
 %patch22 -p1 -b .selinux
-%endif
 %patch23 -p1 -b .pie
 %patch24 -p1 -b -t_option
 %patch25 -p1 -b .usage
@@ -109,6 +103,7 @@ cp %{SOURCE1} .
 %patch30 -p1 -b .pam_delete_cred
 %patch31 -p1 -b .-r_option
 %patch32 -p1 -b .pam_loginuid
+%patch33 -p1 -b .getseuserbyname
 %build
 # patch10 touches configure.in
 autoconf
@@ -118,9 +113,7 @@ rm -f lex.yy.* y.tab.*
            --with-jobdir=%{_localstatedir}/spool/at \
            --with-daemon_username=root  \
 	   --with-daemon_groupname=root \
-%if %{WITH_SELINUX}
 --with-selinux \
-%endif
 %if %{WITH_PAM}
 --with-pam
 %else
@@ -195,6 +188,9 @@ fi
 %attr(4755,root,root)	%{_bindir}/at
 
 %changelog
+* Fri Oct 14 2005 Dan Walsh <dwalsh@redhat.com> - 3.1.8-80
+- Add seuserbyname support
+
 * Fri Sep 30 2005 Tomas Mraz <tmraz@redhat.com> - 3.1.8-79
 - use include instead of pam_stack in pam config
 
