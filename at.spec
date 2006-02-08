@@ -4,7 +4,7 @@
 Summary: Job spooling tools.
 Name: at
 Version: 3.1.8
-Release: 80.3
+Release: 81
 License: GPL
 Group: System Environment/Daemons
 Source: http://ftp.debian.org/debian/pool/main/a/at/at_3.1.8-11.tar.gz
@@ -38,7 +38,7 @@ Patch30: at-3.1.8-pam_delete_cred.patch
 Patch31: at-3.1.8-r_option.patch
 Patch32: at-3.1.8-pam_loginuid.patch
 Patch33: at-3.1.8-getseuserbyname.patch
-
+Patch34: at-3.1.8-install_no_chown.patch
 Prereq: fileutils chkconfig /etc/init.d
 BuildPrereq: flex bison autoconf
 BuildPrereq: libselinux-devel >= 1.27.9
@@ -104,6 +104,8 @@ cp %{SOURCE1} .
 %patch31 -p1 -b .-r_option
 %patch32 -p1 -b .pam_loginuid
 %patch33 -p1 -b .getseuserbyname
+%patch34 -p1 -b .install_no_chown
+
 %build
 # patch10 touches configure.in
 autoconf
@@ -128,12 +130,13 @@ make
 
 %install
 rm -rf %{buildroot}
-
 %makeinstall DAEMON_USERNAME=`id -nu` \
 	DAEMON_GROUPNAME=`id -ng` \
 	etcdir=%{buildroot}%{_sysconfdir} \
 	ATJOB_DIR=%{buildroot}%{_localstatedir}/spool/at \
-	ATSPOOL_DIR=%{buildroot}%{_localstatedir}/spool/at/spool 
+	ATSPOOL_DIR=%{buildroot}%{_localstatedir}/spool/at/spool \
+	INSTALL_ROOT_USER=`id -nu` \
+	INSTALL_ROOT_GROUP=`id -nu`;
 echo > %{buildroot}%{_sysconfdir}/at.deny
 mkdir docs
 cp $RPM_BUILD_ROOT/%{_prefix}/doc/at/* docs/
@@ -188,8 +191,9 @@ fi
 %attr(4755,root,root)	%{_bindir}/at
 
 %changelog
-* Tue Feb 07 2006 Jason Vas Dias <jvdias@redhat.com> - 3.1.8-80.3
+* Tue Feb 07 2006 Jason Vas Dias <jvdias@redhat.com> - 3.1.8-81
 - rebuild for new gcc, glibc, glibc-kernheaders
+- workaround new refusal of /usr/bin/install to chown
 
 * Fri Dec 18 2005 Jason Vas Dias<jvdias@redhat.com> - 3.1.8-80.2
 - rebuild for new flex
