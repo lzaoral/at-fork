@@ -4,7 +4,7 @@
 Summary: Job spooling tools.
 Name: at
 Version: 3.1.8
-Release: 81.2
+Release: 82%{?dist}
 License: GPL
 Group: System Environment/Daemons
 Source: http://ftp.debian.org/debian/pool/main/a/at/at_3.1.8-11.tar.gz
@@ -39,6 +39,7 @@ Patch31: at-3.1.8-r_option.patch
 Patch32: at-3.1.8-pam_loginuid.patch
 Patch33: at-3.1.8-getseuserbyname.patch
 Patch34: at-3.1.8-install_no_chown.patch
+Patch35: at-3.1.8-dontfork.patch
 Prereq: fileutils chkconfig /etc/init.d
 BuildPrereq: flex bison autoconf
 BuildPrereq: libselinux-devel >= 1.27.9
@@ -105,6 +106,7 @@ cp %{SOURCE1} .
 %patch32 -p1 -b .pam_loginuid
 %patch33 -p1 -b .getseuserbyname
 %patch34 -p1 -b .install_no_chown
+%patch35 -p1 -b .dontfork
 
 %build
 # patch10 touches configure.in
@@ -191,6 +193,9 @@ fi
 %attr(4755,root,root)	%{_bindir}/at
 
 %changelog
+* Thu Aug 23 2006 Marcela Maslanova <mmaslano@redhat.com> - 3.1.8-82.fc6
+- #176486 don't fork option added (patch from Enrico Scholz)
+
 * Wed Jul 12 2006 Jesse Keating <jkeating@redhat.com> - 3.1.8-81.2
 - rebuild
 
