@@ -1,0 +1,245 @@
+--- at-3.1.10/atd.c.instinet	2006-09-12 11:01:10.000000000 +0200
++++ at-3.1.10/atd.c	2006-09-12 11:24:49.000000000 +0200
+@@ -102,7 +102,7 @@
+ static const char *svnid = "$Id$";
+ static double load_avg = LOADAVG_MX;
+ static time_t now;
+-static time_t last_chg;
++//static time_t last_chg;
+ static int nothing_to_do;
+ unsigned int batch_interval;
+ static int run_as_daemon = 0;
+@@ -197,7 +197,7 @@
+ #endif
+ 
+ static void
+-run_file(const char *filename, uid_t uid, gid_t gid)
++run_file(char *filename, uid_t uid, gid_t gid)
+ {
+ /* Run a file by by spawning off a process which redirects I/O,
+  * spawns a subshell, then waits for it to complete and sends
+@@ -208,7 +208,7 @@
+     char jobbuf[9];
+     char *mailname = NULL;
+     int mailsize = 128;
+-    char *newname;
++    char newname[256];
+     FILE *stream;
+     int send_mail = 0;
+     struct stat buf, lbuf;
+@@ -242,11 +242,17 @@
+ 
+     sprintf(jobbuf, "%8lu", jobno);
+ 
+-    if ((newname = malloc(strlen(filename) + 1)) == NULL)
+-	pabort("Job %8lu : out of virtual memory", jobno);
++    if( strlen( filename ) >= sizeof( newname ) - 1 )
++       pabort("File name too long: %s", filename );
+ 
+     strcpy(newname, filename);
+ 
++    newname[0] = '!';
++
++    if( rename( filename, newname ) < 0 )
++	perr( "Error renaming job file." );
++
++    filename[0] = '!';
+     newname[0] = '=';
+ 
+     /* We try to make a hard link to lock the file.  If we fail, then
+@@ -264,14 +270,15 @@
+ 	}
+     }
+     /* If something goes wrong between here and the unlink() call,
+-     * the job gets restarted as soon as the "=" entry is cleared
+-     * by the main atd loop.
+-     */
++     * the job will remain in the "!" queue.
++     * no point in retrying, and need glaring proof that something went wrong
++    */
+ 
+     pid = fork();
+-    if (pid == -1)
++    if (pid == -1) {
++	unlink(newname);
+ 	perr("Cannot fork");
+-
++    }
+     else if (pid != 0) {
+ 	free(mailname);
+ 	free(newname);
+@@ -284,6 +291,7 @@
+ 
+     pentry = getpwuid(uid);
+     if (pentry == NULL) {
++	unlink(newname);
+ 	pabort("Userid %lu not found - aborting job %8lu (%.500s)",
+ 	       (unsigned long) uid, jobno, filename);
+     }
+@@ -293,35 +301,43 @@
+ 
+     PRIV_END
+ 
+-    if (stream == NULL)
++    if (stream == NULL) {
++	unlink( newname );
+ 	perr("Cannot open input file");
+-
+-    if ((fd_in = dup(fileno(stream))) < 0)
++    }
++    if ((fd_in = dup(fileno(stream))) < 0) {
++	unlink( newname );
+ 	perr("Error duplicating input file descriptor");
+-
+-    if (fstat(fd_in, &buf) == -1)
++    }
++    if (fstat(fd_in, &buf) == -1) {
++	unlink( newname );
+ 	perr("Error in fstat of input file descriptor");
+-
+-    if (lstat(filename, &lbuf) == -1)
++    }
++    if (lstat(filename, &lbuf) == -1) {
++	unlink( newname );
+ 	perr("Error in fstat of input file");
+-
+-    if (S_ISLNK(lbuf.st_mode))
++    }
++    if (S_ISLNK(lbuf.st_mode)) {
++	unlink( newname );
+ 	perr("Symbolic link encountered in job %8lu (%.500s) - aborting",
+ 	     jobno, filename);
+-
++    }
+     if ((lbuf.st_dev != buf.st_dev) || (lbuf.st_ino != buf.st_ino) ||
+ 	(lbuf.st_uid != buf.st_uid) || (lbuf.st_gid != buf.st_gid) ||
+-	(lbuf.st_size != buf.st_size))
++	(lbuf.st_size != buf.st_size)) {
++	unlink( newname );
+ 	perr("Somebody changed files from under us for job %8lu (%.500s) - "
+ 	     "aborting", jobno, filename);
+-
++    }
+     if (buf.st_nlink > 2) {
++	unlink( newname );
+ 	perr("Somebody is trying to run a linked script for job %8lu (%.500s)",
+ 	     jobno, filename);
+     }
+-    if ((fflags = fcntl(fd_in, F_GETFD)) < 0)
++    if ((fflags = fcntl(fd_in, F_GETFD)) < 0) {
++	unlink( newname );
+ 	perr("Error in fcntl");
+-
++    }
+     fcntl(fd_in, F_SETFD, fflags & ~FD_CLOEXEC);
+ 
+     /*
+@@ -335,28 +351,44 @@
+ 	mailsize );
+ 
+     if (fscanf(stream, fmt,
+-	       &nuid, &ngid, mailname, &send_mail) != 4)
++	       &nuid, &ngid, mailname, &send_mail) != 4) {
++	unlink( newname );
+ 	pabort("File %.500s is in wrong format - aborting",
+ 	       filename);
++    }
+ 
+-    if (mailname[0] == '-')
++    if (mailname[0] == '-') {
++	unlink( newname );
+ 	pabort("illegal mail name %.300s in job %8lu (%.300s)", mailname,
+ 	       jobno, filename);
+-
+-    if (nuid != uid)
++    }
++    if (nuid != uid) {
++	unlink( newname );
+ 	pabort("Job %8lu (%.500s) - userid %d does not match file uid %d",
+ 	       jobno, filename, nuid, uid);
+-
++    }
++    if (ngid != gid) {
++	unlink( newname );
++	pabort("Job %8lu %.500s - groupid %d does not match file gid %d",
++	    jobno, filename, ngid, gid);
++    }
+     /* We are now committed to executing this script.  Unlink the
+      * original.
+      */
+ 
+     unlink(filename);
+ 
++    /* If we bail out from now on, the job gets stuck in "="
++     * The main loop should take care of that.
++     */
++
+     fclose(stream);
++
+     if (chdir(ATSPOOL_DIR) < 0)
+ 	perr("Cannot chdir to " ATSPOOL_DIR);
+ 
++    filename[0] = queue;
++
+     /* Create a file to hold the output of the job we are about to run.
+      * Write the mail header.  Complain in case 
+      */
+@@ -466,19 +498,19 @@
+ #endif
+ 
+     /* Send mail.  Unlink the output file after opening it, so it
+-     * doesn't hang around after the run.
++     * doesn't hang around after the run (if we are to send mail).
+      */
+-    stat(filename, &buf);
+-    if (open(filename, O_RDONLY) != STDIN_FILENO)
+-	perr("Open of jobfile failed");
+-
+-    unlink(filename);
++    if( send_mail != -1 ) {
++	stat(filename, &buf);
++	if (open(filename, O_RDONLY) != STDIN_FILENO)
++	    perr("Open of jobfile failed");
++        unlink(filename);
++    }
+ 
+     /* The job is now finished.  We can delete its input file.
+      */
+     chdir(ATJOB_DIR);
+     unlink(newname);
+-    free(newname);
+ 
+     if (((send_mail != -1) && (buf.st_size != size)) || (send_mail == 1)) {
+ 
+@@ -508,6 +540,8 @@
+     exit(EXIT_SUCCESS);
+ }
+ 
++#define CHECK_INTERVAL_5MIN    300
++
+ static time_t
+ run_loop()
+ {
+@@ -537,7 +571,7 @@
+      * atrun.
+      */
+ 
+-    next_job = now + CHECK_INTERVAL;
++    next_job = now + CHECK_INTERVAL_5MIN;
+     if (next_batch == 0)
+ 	next_batch = now;
+ 
+@@ -548,11 +582,11 @@
+ 
+     if (stat(".", &buf) == -1)
+ 	perr("Cannot stat " ATJOB_DIR);
+-
++/*
+     if (nothing_to_do && buf.st_mtime <= last_chg)
+ 	return next_job;
+     last_chg = buf.st_mtime;
+-
++*/
+     if ((spool = opendir(".")) == NULL)
+ 	perr("Cannot read " ATJOB_DIR);
+ 

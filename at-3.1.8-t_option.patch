@@ -1,5 +1,40 @@
---- at-3.1.10/at.c.t_	2006-09-12 10:15:56.000000000 +0200
-+++ at-3.1.10/at.c	2006-09-12 10:30:17.000000000 +0200
+--- at-3.1.10/at.1.in.t_opti	2006-09-12 12:48:04.000000000 +0200
++++ at-3.1.10/at.1.in	2006-09-12 12:45:40.000000000 +0200
+@@ -12,6 +12,16 @@
+ .RB [ -mldbv ]
+ .B TIME
+ .br
++.B at
++.RB [ -V ]
++.RB [ -q
++.IR queue ]
++.RB [ -f
++.IR file ]
++.RB [ -mldbv ]
++.RB -t
++.IR time_arg
++.br
+ .B "at -c"
+ .I job
+ .RI [ job... ]
+@@ -227,6 +237,15 @@
+ .B
+ \-c
+ cats the jobs listed on the command line to standard output.
++.TP
++.BI \-t " time_arg"
++Submit the job to be run at the time specified by the
++.BI time_arg
++option argument, which must have the same format as specified for the
++.BR touch(1)
++utility's
++.B -t
++time option argument ([[CC]YY]MMDDhhmm).
+ .SH FILES
+ .I @ATJBD@
+ .br
+--- at-3.1.10/at.c.t_   2006-09-12 10:15:56.000000000 +0200
++++ at-3.1.10/at.c      2006-09-12 10:30:17.000000000 +0200
 @@ -750,6 +750,101 @@
      return p;
  }
@@ -102,38 +137,3 @@
  int
  main(int argc, char **argv)
  {
---- at-3.1.10/at.1.in.t_option	2006-09-12 12:48:04.000000000 +0200
-+++ at-3.1.10/at.1.in	2006-09-12 12:45:40.000000000 +0200
-@@ -12,6 +12,16 @@
- .RB [ -mldbv ]
- .B TIME
- .br
-+.B at
-+.RB [ -V ]
-+.RB [ -q
-+.IR queue ]
-+.RB [ -f
-+.IR file ]
-+.RB [ -mldbv ]
-+.RB -t
-+.IR time_arg
-+.br
- .B "at -c"
- .I job
- .RI [ job... ]
-@@ -227,6 +237,15 @@
- .B
- \-c
- cats the jobs listed on the command line to standard output.
-+.TP
-+.BI \-t " time_arg"
-+Submit the job to be run at the time specified by the
-+.BI time_arg
-+option argument, which must have the same format as specified for the
-+.BR touch(1)
-+utility's
-+.B -t
-+time option argument ([[CC]YY]MMDDhhmm).
- .SH FILES
- .I @ATJBD@
- .br

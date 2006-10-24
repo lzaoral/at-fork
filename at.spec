@@ -6,7 +6,7 @@
 Summary: Job spooling tools.
 Name: at
 Version: 3.1.10
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPL
 Group: System Environment/Daemons
 Source: http://ftp.debian.org/debian/pool/main/a/at/at-%{major_ver}.tar.gz
@@ -31,7 +31,7 @@ Patch20: at-3.1.10-shell.patch
 #Patch22: at-selinux.patch
 #Patch22: at-3.1.10-selinux.patch
 Patch23: at-3.1.10-pie.patch
-Patch24: at-3.1.8-t_opti.patch
+Patch24: at-3.1.8-t_option.patch
 Patch25: at-3.1.10-usage.patch
 Patch26: at-3.1.10-fix_no_export.patch
 #Patch27: at-3.1.8-pam.patch
@@ -201,7 +201,7 @@ fi
 %attr(4755,root,root)	%{_bindir}/at
 
 %changelog
-* Thu Sep 07 2006 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-1.fc6
+* Tue Oct 24 2006 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-2
 - new version from upstream 3.1.10
 
 * Thu Aug 23 2006 Marcela Maslanova <mmaslano@redhat.com> - 3.1.8-82.fc6
