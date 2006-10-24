@@ -1,41 +1,6 @@
---- at-3.1.8/at.1.in-t_option	2004-08-03 17:27:23.458423000 -0400
-+++ at-3.1.8/at.1.in	2004-08-03 17:27:43.923938000 -0400
-@@ -12,6 +12,16 @@
- .RB [ -mldbv ]
- .B TIME
- .br
-+.B at
-+.RB [ -V ]
-+.RB [ -q 
-+.IR queue ]
-+.RB [ -f
-+.IR file ]
-+.RB [ -mldbv ]
-+.RB -t
-+.IR time_arg
-+.br
- .B "at -c"
- .I job
- .RI [ job... ]
-@@ -235,6 +245,15 @@
- .B
- \-c
- cats the jobs listed on the command line to standard output.
-+.TP
-+.BI \-t " time_arg"
-+Submit the job to be run at the time specified by the 
-+.BI time_arg
-+option argument, which must have the same format as specified for the 
-+.BR touch(1)
-+utility's 
-+.B -t
-+time option argument ([[CC]YY]MMDDhhmm).
- .SH FILES
- .I @ATJBD@
- .br
---- at-3.1.8/at.c-t_option	2004-08-03 17:27:24.036844000 -0400
-+++ at-3.1.8/at.c	2004-08-03 17:27:24.246634000 -0400
-@@ -688,6 +688,100 @@
+--- at-3.1.10/at.c.t_	2006-09-12 10:15:56.000000000 +0200
++++ at-3.1.10/at.c	2006-09-12 10:30:17.000000000 +0200
+@@ -750,6 +750,101 @@
      return p;
  }
  
@@ -47,159 +12,128 @@
 +time_t
 +t_option(char *s)
 +{
-+    time_t t=time(0L);
-+    struct tm tm, tm_now=*localtime(&t);
-+    int l;
++        time_t t=time(0L);
++        struct tm tm, tm_now=*localtime(&t);
++        int l;
 +    
-+    if((s == 0L) || (*s == '\0'))
-+    {
-+	return 0L;
-+    };
-+    memset(&tm,'\0',sizeof(tm));
-+    l = strnlen(s,15);
-+    switch(l)
-+    {
-+    case 15:
-+	/* CCYYMMDDhhmm.ss */
-+	sscanf(s, "%4d%2d%2d%2d%2d.%2d",
-+	       &tm.tm_year, &tm.tm_mon, &tm.tm_mday, &tm.tm_hour, &tm.tm_min, &tm.tm_sec
-+	      );
-+	if(tm.tm_year)
-+	    tm.tm_year -= 1900 ;
-+
-+	break;    
-+
-+    case 13:
-+	/* YYMMDDhhmm.ss */
-+	sscanf(s, "%2d%2d%2d%2d%2d.%2d",
-+	       &tm.tm_year, &tm.tm_mon, &tm.tm_mday, &tm.tm_hour, &tm.tm_min, &tm.tm_sec
-+	      );
-+	if(tm.tm_year)
-+	    tm.tm_year += 100 ; /* Y2.1K+ bug! */
-+
-+	break;
-+
-+    case 11:
-+	/* MMDDhhmm.ss */
-+	sscanf(s, "%2d%2d%2d%2d.%2d",
-+	       &tm.tm_mon, &tm.tm_mday, &tm.tm_hour, &tm.tm_min, &tm.tm_sec
-+	      );
-+		
-+	tm.tm_year = tm_now.tm_year;
-+		
-+	if(tm.tm_mon)
-+	    tm.tm_mon -= 1;				
-+	break;
-+	
-+    case 12:
-+	/* CCYYMMDDhhmm */
-+	sscanf(s, "%4d%2d%2d%2d%2d",
-+	       &tm.tm_year, &tm.tm_mon, &tm.tm_mday, &tm.tm_hour, &tm.tm_min
-+	      );
-+	if(tm.tm_year)
-+	    tm.tm_year -= 1900 ;
-+	break;    
-+
-+    case 10:
-+	/* YYMMDDhhmm */
-+	sscanf(s, "%2d%2d%2d%2d%2d",
-+	       &tm.tm_year, &tm.tm_mon, &tm.tm_mday, &tm.tm_hour, &tm.tm_min
-+	      );
-+	if(tm.tm_year)
-+	    tm.tm_year += 100 ; /* Y2.1K+ bug! */
-+	break;    
-+   
-+    case  8:
-+	/* MMDDhhmm */
-+	sscanf(s, "%2d%2d%2d%2d",
-+	       &tm.tm_mon, &tm.tm_mday, &tm.tm_hour, &tm.tm_min
-+	      );
-+	if( tm.tm_mday )
-+	    tm.tm_year = tm_now.tm_year;
-+	break;    
-+
-+    default:    
-+	break;    
-+    }
-+
-+    if( tm.tm_mon )
-+	tm.tm_mon -= 1;
-+
-+    if( tm.tm_mday )
-+    {
-+	tm.tm_isdst = tm_now.tm_isdst;
-+	return mktime(&tm);
-+    }else
-+	return 0L;
++        if((s == 0L) || (*s == '\0'))
++        {
++	       return 0L;
++	    };
++	    memset(&tm,'\0',sizeof(tm));
++	    l = strnlen(s,15);
++	    switch(l)
++	    {
++	        case 15:
++	           /* CCYYMMDDhhmm.ss */
++	           sscanf(s, "%4d%2d%2d%2d%2d.%2d",
++	                  &tm.tm_year, &tm.tm_mon, &tm.tm_mday, &tm.tm_hour, &tm.tm_min, &tm.tm_sec
++	                 );
++	           if(tm.tm_year)
++	               tm.tm_year -= 1900 ;
++	    
++	           break;
++	    
++	        case 13:
++	           /* YYMMDDhhmm.ss */
++	           sscanf(s, "%2d%2d%2d%2d%2d.%2d",
++	                  &tm.tm_year, &tm.tm_mon, &tm.tm_mday, &tm.tm_hour, &tm.tm_min, &tm.tm_sec
++	                 );
++	           if(tm.tm_year)
++	               tm.tm_year += 100 ; /* Y2.1K+ bug! */
++	    
++	           break;
++	    	    
++	        case 11:
++	           /* MMDDhhmm.ss */
++	           sscanf(s, "%2d%2d%2d%2d.%2d",
++	                  &tm.tm_mon, &tm.tm_mday, &tm.tm_hour, &tm.tm_min, &tm.tm_sec
++	                 );
++	    
++	           tm.tm_year = tm_now.tm_year;
++	    
++	           if(tm.tm_mon)
++	               tm.tm_mon -= 1;
++	           break;
++	    
++	        case 12:
++	           /* CCYYMMDDhhmm */
++	           sscanf(s, "%4d%2d%2d%2d%2d",
++	                  &tm.tm_year, &tm.tm_mon, &tm.tm_mday, &tm.tm_hour, &tm.tm_min
++	                 );
++	           if(tm.tm_year)
++	               tm.tm_year -= 1900 ;
++	           break;
++	    
++	        case 10:
++	           /* YYMMDDhhmm */
++	           sscanf(s, "%2d%2d%2d%2d%2d",
++	                  &tm.tm_year, &tm.tm_mon, &tm.tm_mday, &tm.tm_hour, &tm.tm_min
++	                 );
++	           if(tm.tm_year)
++	               tm.tm_year += 100 ; /* Y2.1K+ bug! */
++	           break;
++	    
++	        case  8:
++	           /* MMDDhhmm */
++	           sscanf(s, "%2d%2d%2d%2d",
++	                  &tm.tm_mon, &tm.tm_mday, &tm.tm_hour, &tm.tm_min
++	                 );
++	           if( tm.tm_mday )
++	               tm.tm_year = tm_now.tm_year;
++	           break;
++	        default:
++	           break;
++	        }
++	    
++	        if( tm.tm_mon )
++	           tm.tm_mon -= 1;
++	    
++	        if( tm.tm_mday )
++	        {
++		       tm.tm_isdst = tm_now.tm_isdst;
++		       return mktime(&tm);
++		} else
++		       return 0L;
 +}
-+ 
++		
++
++
  int
  main(int argc, char **argv)
  {
-@@ -697,9 +791,9 @@
-     char *pgm;
- 
-     int program = AT;		/* our default program */
--    char *options = "q:f:MmvldhVc";	/* default options for at */
-+    char *options = "q:f:MmvldhVct:";	/* default options for at */
-     int disp_version = 0;
--    time_t timer;
-+    time_t timer=0L;
-     struct passwd *pwe;
-     struct group *ge;
- 
-@@ -802,6 +896,10 @@
- 	    options = "";
- 	    break;
- 
-+	case 't':
-+	    timer = t_option(optarg);
-+	    break;
-+
- 	default:
- 	    usage();
- 	    break;
-@@ -838,10 +936,13 @@
- 	break;
- 
-     case AT:
--	if (argc > optind) {
--	    timer = parsetime(argc - optind, argv + optind);
--	} else {
--	    timer = 0;
-+	if( timer == 0 )
-+	{
-+	    if (argc > optind) {
-+		timer = parsetime(argc - optind, argv + optind);
-+	    } else {
-+		timer = 0;
-+	    }
- 	}
- 
- 	if (timer == 0) {
-@@ -870,16 +971,20 @@
- 	    queue = toupper(queue);
- 	else
- 	    queue = DEFAULT_BATCH_QUEUE;
--
--	if (argc > optind)
--	    timer = parsetime(argc, argv);
--	else
--	    timer = time(NULL);
-+	
-+	if( timer == 0L )
-+	{
-+	    if (argc > optind)
-+		timer = parsetime(argc, argv);
-+	    else
-+		timer = time(NULL);
-+	}
- 
- 	if (atverify) {
- 	    struct tm *tm = localtime(&timer);
- 	    fprintf(stderr, "%s\n", asctime(tm));
- 	}
-+
- 	writefile(timer, queue);
- 	break;
- 
+--- at-3.1.10/at.1.in.t_option	2006-09-12 12:48:04.000000000 +0200
++++ at-3.1.10/at.1.in	2006-09-12 12:45:40.000000000 +0200
+@@ -12,6 +12,16 @@
+ .RB [ -mldbv ]
+ .B TIME
+ .br
++.B at
++.RB [ -V ]
++.RB [ -q
++.IR queue ]
++.RB [ -f
++.IR file ]
++.RB [ -mldbv ]
++.RB -t
++.IR time_arg
++.br
+ .B "at -c"
+ .I job
+ .RI [ job... ]
+@@ -227,6 +237,15 @@
+ .B
+ \-c
+ cats the jobs listed on the command line to standard output.
++.TP
++.BI \-t " time_arg"
++Submit the job to be run at the time specified by the
++.BI time_arg
++option argument, which must have the same format as specified for the
++.BR touch(1)
++utility's
++.B -t
++time option argument ([[CC]YY]MMDDhhmm).
+ .SH FILES
+ .I @ATJBD@
+ .br

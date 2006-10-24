@@ -1,45 +1,51 @@
+%define major_ver 3.1.10
+
 %if %{?WITH_PAM:0}%{!?WITH_PAM:1}
 %define WITH_PAM 1
 %endif
 Summary: Job spooling tools.
 Name: at
-Version: 3.1.8
-Release: 82%{?dist}
+Version: 3.1.10
+Release: 2%{?dist}
 License: GPL
 Group: System Environment/Daemons
-Source: http://ftp.debian.org/debian/pool/main/a/at/at_3.1.8-11.tar.gz
+Source: http://ftp.debian.org/debian/pool/main/a/at/at-%{major_ver}.tar.gz
 Source1: test.pl
 Source2: atd.init
 Patch0: at-3.1.7-lockfile.patch
-Patch1: at-3.1.7-noon.patch
-Patch2: at-3.1.8-man-timespec-path.patch
+#Patch1: at-3.1.7-noon.patch
+Patch2: at-3.1.10-man-timespec-path.patch
 Patch3: at-3.1.7-sigchld.patch
-Patch4: at-noroot.patch
-Patch5: at-3.1.7-typo.patch
-Patch7: at-3.1.8-buflen.patch
-Patch10: at-3.1.8-batch.patch
-Patch11: at-3.1.8-11-lexer-parser.diff
+#Patch4: at-3.1.10-noroot.patch
+Patch5: at-3.1.10-typo.patch
+#Patch7: at-3.1.8-buflen.patch
+#Patch10: at-3.1.8-batch.patch
+Patch11: at-3.1.10-lexer-parser.patch
 Patch13: at-3.1.8-test.patch
-Patch15: at-3.1.8-env-tng.patch
+#Patch15: at-3.1.8-env-tng.patch
 #Patch16: at-3.1.8-lsbdoc.patch
 Patch18: at-3.1.8-perr.patch
-Patch19: at-3.1.8-instinet.patch
-Patch20: at-3.1.8-SHELL-111386.patch
-Patch21: at-3.1.8-atrun.8-typo-97697.patch
-Patch22: at-selinux.patch
-Patch23: at-3.1.8-pie.patch
-Patch24: at-3.1.8-t_option.patch
-Patch25: at-3.1.8-usage.patch
-Patch26: at-3.1.8-fix_no_export.patch
-Patch27: at-3.1.8-pam.patch
-Patch28: at-3.1.8-pam_perms.patch
-Patch29: at-3.1.8-pam_fail_close_session.patch
-Patch30: at-3.1.8-pam_delete_cred.patch
-Patch31: at-3.1.8-r_option.patch
-Patch32: at-3.1.8-pam_loginuid.patch
-Patch33: at-3.1.8-getseuserbyname.patch
-Patch34: at-3.1.8-install_no_chown.patch
-Patch35: at-3.1.8-dontfork.patch
+Patch19: at-3.1.10-instinet.patch
+Patch20: at-3.1.10-shell.patch
+#Patch21: at-3.1.8-atrun.8-typo-97697.patch
+#Patch22: at-selinux.patch
+#Patch22: at-3.1.10-selinux.patch
+Patch23: at-3.1.10-pie.patch
+Patch24: at-3.1.8-t_opti.patch
+Patch25: at-3.1.10-usage.patch
+Patch26: at-3.1.10-fix_no_export.patch
+#Patch27: at-3.1.8-pam.patch
+#Patch28: at-3.1.8-pam_perms.patch
+#Patch29: at-3.1.8-pam_fail_close_session.patch
+#Patch30: at-3.1.8-pam_delete_cred.patch
+#Patch31: at-3.1.8-r_option.patch
+#Patch32: at-3.1.8-pam_loginuid.patch
+#Patch33: at-3.1.8-getseuserbyname.patch
+#Patch34: at-3.1.8-install_no_chown.patch
+Patch35: at-3.1.10-dont_fork.patch
+Patch36: at-3.1.10-pam.patch
+Patch37: at-3.1.10-makefile.patch
+
 Prereq: fileutils chkconfig /etc/init.d
 BuildPrereq: flex bison autoconf
 BuildPrereq: libselinux-devel >= 1.27.9
@@ -75,38 +81,40 @@ cp %{SOURCE1} .
 # The next path is a brute-force fix that will have to be updated
 # when new versions of at are released.
 %patch2 -p1 -b .paths
-
 %patch3 -p1 -b .sigchld
 #%%patch6 -p1 -b .debian
-%patch4 -p1 -b .noroot
-%patch5 -p1 -b .tyop
-%patch7 -p1 -b .buflen
-%patch10 -p1 -b .batch
+#%patch4 -p1 -b .noroot
+%patch5 -p1 -b .typo
+#%patch7 -p1 -b .buflen
+#%patch10 -p1 -b .batch
 %patch11 -p1 -b .lexer
 #%%patch12 -p1 -b .dst
 %patch13 -p1 -b .test
 #%%patch14 -p1 -b .test-fix
-%patch15 -p1 -b .env
+#%patch15 -p1 -b .env
 #%%patch16 -p1 -b .lsbdoc
 #%%patch17 -p1 -b .o_excl
 %patch18 -p1 -b .perr
 %patch19 -p1 -b .instinet
-%patch20 -p1 -b .SHELL
-%patch21 -p1 -b .typo
-%patch22 -p1 -b .selinux
+%patch20 -p1 -b .shell
+#%patch21 -p1 -b .typo97
+#%patch22 -p1 -b .selinux
+#replace PAMLIB with SELINUXLIB in Makefile.in -> replaced by #36
 %patch23 -p1 -b .pie
 %patch24 -p1 -b -t_option
 %patch25 -p1 -b .usage
 %patch26 -p1 -b .fix_no_export
-%patch27 -p1 -b .pam
-%patch28 -p1 -b .pam_perms
-%patch29 -p1 -b .pam_fail_close_session
-%patch30 -p1 -b .pam_delete_cred
-%patch31 -p1 -b .-r_option
-%patch32 -p1 -b .pam_loginuid
-%patch33 -p1 -b .getseuserbyname
-%patch34 -p1 -b .install_no_chown
-%patch35 -p1 -b .dontfork
+#%patch27 -p1 -b .pam -> pam.patch
+#%patch28 -p1 -b .pam_perms
+#%patch29 -p1 -b .pam_fail_close_session
+#%patch30 -p1 -b .pam_delete_cred
+#%patch31 -p1 -b .-r_option -> added from upstream
+#%patch32 -p1 -b .pam_loginuid -> in pam.patch
+#%patch33 -p1 -b .getseuserbyname -> pam.patch
+#%patch34 -p1 -b .install_no_chown -> makefile.patch
+%patch35 -p1 -b .dont_fork
+%patch36 -p1 -b .pam
+%patch37 -p1 -b .makefile
 
 %build
 # patch10 touches configure.in
@@ -193,6 +201,9 @@ fi
 %attr(4755,root,root)	%{_bindir}/at
 
 %changelog
+* Thu Sep 07 2006 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-1.fc6
+- new version from upstream 3.1.10
+
 * Thu Aug 23 2006 Marcela Maslanova <mmaslano@redhat.com> - 3.1.8-82.fc6
 - #176486 don't fork option added (patch from Enrico Scholz)
 
