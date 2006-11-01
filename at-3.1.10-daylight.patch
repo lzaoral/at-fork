@@ -1,0 +1,11 @@
+--- at-3.1.10/at.c.daylight	2006-10-25 13:45:30.000000000 +0200
++++ at-3.1.10/at.c	2006-10-30 14:14:52.000000000 +0100
+@@ -854,7 +854,7 @@
+ 	    
+ 	        if( tm.tm_mday )
+ 	        {
+-		       tm.tm_isdst = tm_now.tm_isdst;
++		       //tm.tm_isdst = tm_now.tm_isdst;
+ 		       return mktime(&tm);
+ 		} else
+ 		       return 0L;

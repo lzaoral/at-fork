@@ -6,7 +6,7 @@
 Summary: Job spooling tools.
 Name: at
 Version: 3.1.10
-Release: 3%{?dist}
+Release: 5%{?dist}
 License: GPL
 Group: System Environment/Daemons
 Source: http://ftp.debian.org/debian/pool/main/a/at/at-%{major_ver}.tar.gz
@@ -45,6 +45,7 @@ Patch26: at-3.1.10-fix_no_export.patch
 Patch35: at-3.1.10-dont_fork.patch
 Patch36: at-3.1.10-pam.patch
 Patch37: at-3.1.10-makefile.patch
+Patch38: at-3.1.10-daylight.patch
 
 Prereq: fileutils chkconfig /etc/init.d
 BuildPrereq: flex bison autoconf
@@ -115,6 +116,7 @@ cp %{SOURCE1} .
 %patch35 -p1 -b .dont_fork
 %patch36 -p1 -b .pam
 %patch37 -p1 -b .makefile
+%patch38 -p1 -b .daylight
 
 %build
 # patch10 touches configure.in
@@ -201,6 +203,9 @@ fi
 %attr(4755,root,root)	%{_bindir}/at
 
 %changelog
+* Wed Oct 25 2006 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-5
+- daylight-saving
+
 * Tue Oct 24 2006 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-3
 - new version from upstream 3.1.10
 
