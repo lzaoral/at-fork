@@ -6,7 +6,7 @@
 Summary: Job spooling tools.
 Name: at
 Version: 3.1.10
-Release: 5%{?dist}
+Release: 6%{?dist}
 License: GPL
 Group: System Environment/Daemons
 Source: http://ftp.debian.org/debian/pool/main/a/at/at-%{major_ver}.tar.gz
@@ -46,6 +46,7 @@ Patch35: at-3.1.10-dont_fork.patch
 Patch36: at-3.1.10-pam.patch
 Patch37: at-3.1.10-makefile.patch
 Patch38: at-3.1.10-daylight.patch
+Patch39: at-3.1.10-perm.patch
 
 Prereq: fileutils chkconfig /etc/init.d
 BuildPrereq: flex bison autoconf
@@ -102,7 +103,7 @@ cp %{SOURCE1} .
 #%patch22 -p1 -b .selinux
 #replace PAMLIB with SELINUXLIB in Makefile.in -> replaced by #36
 %patch23 -p1 -b .pie
-%patch24 -p1 -b -t_option
+%patch24 -p1 -b .t_option
 %patch25 -p1 -b .usage
 %patch26 -p1 -b .fix_no_export
 #%patch27 -p1 -b .pam -> pam.patch
@@ -117,6 +118,7 @@ cp %{SOURCE1} .
 %patch36 -p1 -b .pam
 %patch37 -p1 -b .makefile
 %patch38 -p1 -b .daylight
+%patch39 -p1 -b .perm
 
 %build
 # patch10 touches configure.in
@@ -203,6 +205,10 @@ fi
 %attr(4755,root,root)	%{_bindir}/at
 
 %changelog
+* Tue Oct 27 2006 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-6
+- fix daylight-saving again 
+- fix #214759 - problem with seteuid
+
 * Wed Oct 25 2006 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-5
 - daylight-saving
 
