@@ -42,8 +42,8 @@ Patch26: at-3.1.10-fix_no_export.patch
 #Patch32: at-3.1.8-pam_loginuid.patch
 #Patch33: at-3.1.8-getseuserbyname.patch
 #Patch34: at-3.1.8-install_no_chown.patch
-Patch35: at-3.1.10-dont_fork.patch
-Patch36: at-3.1.10-pam.patch
+Patch35: at-3.1.10-pam.patch
+Patch36: at-3.1.10-dont_fork.patch
 Patch37: at-3.1.10-makefile.patch
 Patch38: at-3.1.10-daylight.patch
 Patch39: at-3.1.10-perm.patch
@@ -114,8 +114,8 @@ cp %{SOURCE1} .
 #%patch32 -p1 -b .pam_loginuid -> in pam.patch
 #%patch33 -p1 -b .getseuserbyname -> pam.patch
 #%patch34 -p1 -b .install_no_chown -> makefile.patch
-%patch35 -p1 -b .dont_fork
-%patch36 -p1 -b .pam
+%patch35 -p1 -b .pam
+%patch36 -p1 -b .dont_fork
 %patch37 -p1 -b .makefile
 %patch38 -p1 -b .daylight
 %patch39 -p1 -b .perm
