@@ -6,7 +6,7 @@
 Summary: Job spooling tools.
 Name: at
 Version: 3.1.10
-Release: 6%{?dist}
+Release: 7%{?dist}
 License: GPL
 Group: System Environment/Daemons
 Source: http://ftp.debian.org/debian/pool/main/a/at/at-%{major_ver}.tar.gz
@@ -47,6 +47,8 @@ Patch36: at-3.1.10-dont_fork.patch
 Patch37: at-3.1.10-makefile.patch
 Patch38: at-3.1.10-daylight.patch
 Patch39: at-3.1.10-perm.patch
+Patch40: at-3.1.10-nodebug.patch
+Patch41: at-3.1.10-newpam.patch
 
 Prereq: fileutils chkconfig /etc/init.d
 BuildPrereq: flex bison autoconf
@@ -60,6 +62,7 @@ Conflicts: crontabs <= 1.5
 BuildPrereq: smtpdaemon
 Buildroot: %{_tmppath}/%{name}-root
 
+%define debug_package %{nil}
 %description
 At and batch read commands from standard input or from a specified
 file. At allows you to specify that a command will be run at a
@@ -119,6 +122,8 @@ cp %{SOURCE1} .
 %patch37 -p1 -b .makefile
 %patch38 -p1 -b .daylight
 %patch39 -p1 -b .perm
+%patch40 -p1 -b .nodebug
+%patch41 -p1 -b .newpam
 
 %build
 # patch10 touches configure.in
@@ -205,6 +210,11 @@ fi
 %attr(4755,root,root)	%{_bindir}/at
 
 %changelog
+* Tue Jan 30 2007 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-7
+- no debug file - useless
+- new pam configuration
+- rhbz#224597
+
 * Tue Oct 27 2006 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-6
 - fix daylight-saving again 
 - fix #214759 - problem with seteuid
