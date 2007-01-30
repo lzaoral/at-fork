@@ -47,8 +47,7 @@ Patch36: at-3.1.10-dont_fork.patch
 Patch37: at-3.1.10-makefile.patch
 Patch38: at-3.1.10-daylight.patch
 Patch39: at-3.1.10-perm.patch
-Patch40: at-3.1.10-nodebug.patch
-Patch41: at-3.1.10-newpam.patch
+Patch40: at-3.1.10-newpam.patch
 
 Prereq: fileutils chkconfig /etc/init.d
 BuildPrereq: flex bison autoconf
@@ -122,8 +121,7 @@ cp %{SOURCE1} .
 %patch37 -p1 -b .makefile
 %patch38 -p1 -b .daylight
 %patch39 -p1 -b .perm
-%patch40 -p1 -b .nodebug
-%patch41 -p1 -b .newpam
+%patch40 -p1 -b .newpam
 
 %build
 # patch10 touches configure.in
