@@ -5,7 +5,7 @@
      batch_interval = BATCH_INTERVAL_DEFAULT;
  
 -    while ((c = getopt(argc, argv, "sdl:b:")) != EOF) {
-+    while ((c = getopt(argc, argv, "sdl:b:n")) != EOF) {
++    while ((c = getopt(argc, argv, "sdl:b:n:")) != EOF) {
  	switch (c) {
  	case 'l':
  	    if (sscanf(optarg, "%lf", &load_avg) != 1)

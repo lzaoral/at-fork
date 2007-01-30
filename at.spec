@@ -121,7 +121,7 @@ cp %{SOURCE1} .
 %patch37 -p1 -b .makefile
 %patch38 -p1 -b .daylight
 %patch39 -p1 -b .perm
-%patch40 -p1 -b .newpam
+##%patch40 -p1 -b .newpam
 
 %build
 # patch10 touches configure.in
