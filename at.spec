@@ -3,63 +3,47 @@
 %if %{?WITH_PAM:0}%{!?WITH_PAM:1}
 %define WITH_PAM 1
 %endif
-Summary: Job spooling tools.
+Summary: Job spooling tools
 Name: at
 Version: 3.1.10
-Release: 7%{?dist}
+Release: 8%{?dist}
 License: GPL
 Group: System Environment/Daemons
+URL: http://ftp.debian.org/debian/pool/main/a/at
 Source: http://ftp.debian.org/debian/pool/main/a/at/at-%{major_ver}.tar.gz
 Source1: test.pl
 Source2: atd.init
 Patch0: at-3.1.7-lockfile.patch
-#Patch1: at-3.1.7-noon.patch
-Patch2: at-3.1.10-man-timespec-path.patch
-Patch3: at-3.1.7-sigchld.patch
-#Patch4: at-3.1.10-noroot.patch
-Patch5: at-3.1.10-typo.patch
-#Patch7: at-3.1.8-buflen.patch
-#Patch10: at-3.1.8-batch.patch
-Patch11: at-3.1.10-lexer-parser.patch
-Patch13: at-3.1.8-test.patch
-#Patch15: at-3.1.8-env-tng.patch
-#Patch16: at-3.1.8-lsbdoc.patch
-Patch18: at-3.1.8-perr.patch
-Patch19: at-3.1.10-instinet.patch
-Patch20: at-3.1.10-shell.patch
-#Patch21: at-3.1.8-atrun.8-typo-97697.patch
-#Patch22: at-selinux.patch
-#Patch22: at-3.1.10-selinux.patch
-Patch23: at-3.1.10-pie.patch
-Patch24: at-3.1.8-t_option.patch
-Patch25: at-3.1.10-usage.patch
-Patch26: at-3.1.10-fix_no_export.patch
-#Patch27: at-3.1.8-pam.patch
-#Patch28: at-3.1.8-pam_perms.patch
-#Patch29: at-3.1.8-pam_fail_close_session.patch
-#Patch30: at-3.1.8-pam_delete_cred.patch
-#Patch31: at-3.1.8-r_option.patch
-#Patch32: at-3.1.8-pam_loginuid.patch
-#Patch33: at-3.1.8-getseuserbyname.patch
-#Patch34: at-3.1.8-install_no_chown.patch
-Patch35: at-3.1.10-pam.patch
-Patch36: at-3.1.10-dont_fork.patch
-Patch37: at-3.1.10-makefile.patch
-Patch38: at-3.1.10-daylight.patch
-Patch39: at-3.1.10-perm.patch
-Patch40: at-3.1.10-newpam.patch
+Patch1: at-3.1.10-man-timespec-path.patch
+Patch2: at-3.1.7-sigchld.patch
+Patch3: at-3.1.10-typo.patch
+Patch4: at-3.1.10-lexer-parser.patch
+Patch5: at-3.1.8-test.patch
+Patch6: at-3.1.8-perr.patch
+Patch7: at-3.1.10-instinet.patch
+Patch8: at-3.1.10-shell.patch
+Patch9: at-3.1.10-pie.patch
+Patch10: at-3.1.8-t_option.patch
+Patch11: at-3.1.10-usage.patch
+Patch12: at-3.1.10-fix_no_export.patch
+Patch13: at-3.1.10-pam.patch
+Patch14: at-3.1.10-dont_fork.patch
+Patch15: at-3.1.10-makefile.patch
+Patch16: at-3.1.10-daylight.patch
+Patch17: at-3.1.10-perm.patch
+Patch18: at-3.1.10-newpam.patch
 
-Prereq: fileutils chkconfig /etc/init.d
-BuildPrereq: flex bison autoconf
-BuildPrereq: libselinux-devel >= 1.27.9
+BuildRequires: fileutils chkconfig /etc/init.d
+BuildRequires: flex bison autoconf
+BuildRequires: libselinux-devel >= 1.27.9
 
 %if %{WITH_PAM}
-BuildPrereq: pam-devel
+BuildRequires: pam-devel
 %endif
 Conflicts: crontabs <= 1.5
 # No, I'm not kidding
-BuildPrereq: smtpdaemon
-Buildroot: %{_tmppath}/%{name}-root
+BuildRequires: smtpdaemon
+Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 %define debug_package %{nil}
 %description
@@ -73,55 +57,34 @@ time-oriented job control. Note: If it is a recurring job that will
 need to be repeated at the same time every day/week, etc. you should
 use crontab instead.
 
-%{?_without_check: %define _without_check 1}
-%{!?_without_check: %define _without_check 1}
+#%{?_without_check: %define _without_check 1}
+#%{!?_without_check: %define _without_check 1}
 #%{!?_without_check: %define _without_check 0}
 # FIX THIS!
 
 %prep
 %setup -q
+
 cp %{SOURCE1} .
 %patch0 -p1 -b .lockfile
-# The next path is a brute-force fix that will have to be updated
-# when new versions of at are released.
-%patch2 -p1 -b .paths
-%patch3 -p1 -b .sigchld
-#%%patch6 -p1 -b .debian
-#%patch4 -p1 -b .noroot
-%patch5 -p1 -b .typo
-#%patch7 -p1 -b .buflen
-#%patch10 -p1 -b .batch
-%patch11 -p1 -b .lexer
-#%%patch12 -p1 -b .dst
-%patch13 -p1 -b .test
-#%%patch14 -p1 -b .test-fix
-#%patch15 -p1 -b .env
-#%%patch16 -p1 -b .lsbdoc
-#%%patch17 -p1 -b .o_excl
-%patch18 -p1 -b .perr
-%patch19 -p1 -b .instinet
-%patch20 -p1 -b .shell
-#%patch21 -p1 -b .typo97
-#%patch22 -p1 -b .selinux
-#replace PAMLIB with SELINUXLIB in Makefile.in -> replaced by #36
-%patch23 -p1 -b .pie
-%patch24 -p1 -b .t_option
-%patch25 -p1 -b .usage
-%patch26 -p1 -b .fix_no_export
-#%patch27 -p1 -b .pam -> pam.patch
-#%patch28 -p1 -b .pam_perms
-#%patch29 -p1 -b .pam_fail_close_session
-#%patch30 -p1 -b .pam_delete_cred
-#%patch31 -p1 -b .-r_option -> added from upstream
-#%patch32 -p1 -b .pam_loginuid -> in pam.patch
-#%patch33 -p1 -b .getseuserbyname -> pam.patch
-#%patch34 -p1 -b .install_no_chown -> makefile.patch
-%patch35 -p1 -b .pam
-%patch36 -p1 -b .dont_fork
-%patch37 -p1 -b .makefile
-%patch38 -p1 -b .daylight
-%patch39 -p1 -b .perm
-##%patch40 -p1 -b .newpam
+%patch1 -p1 -b .paths
+%patch2 -p1 -b .sigchld
+%patch3 -p1 -b .typo
+%patch4 -p1 -b .lexer
+%patch5 -p1 -b .test
+%patch6 -p1 -b .perr
+%patch7 -p1 -b .instinet
+%patch8 -p1 -b .shell
+%patch9 -p1 -b .pie
+%patch10 -p1 -b .t_option
+%patch11 -p1 -b .usage
+%patch12 -p1 -b .fix_no_export
+%patch13 -p1 -b .pam
+%patch14 -p1 -b .dont_fork
+%patch15 -p1 -b .makefile
+%patch16 -p1 -b .daylight
+%patch17 -p1 -b .perm
+%patch18 -p1 -b .newpam
 
 %build
 # patch10 touches configure.in
@@ -129,78 +92,90 @@ autoconf
 # for patch11
 rm -f lex.yy.* y.tab.*
 %configure --with-atspool=%{_localstatedir}/spool/at/spool \
-           --with-jobdir=%{_localstatedir}/spool/at \
-           --with-daemon_username=root  \
-	   --with-daemon_groupname=root \
---with-selinux \
+	--with-jobdir=%{_localstatedir}/spool/at \
+	--with-daemon_username=root  \
+	--with-daemon_groupname=root \
+	--with-selinux \
 %if %{WITH_PAM}
---with-pam
+	--with-pam
 %else
 
 %endif
 
 make
 
-%if ! %{_without_check}
-  LANG=C make test > /dev/null
+%check
+# don't run "make test" by default                                                                                            
+%{?_without_check: %define _without_check 1}                                                                                  
+%{!?_without_check: %define _without_check 1}                                                                                 
+                                                                                                                              
+%if ! %{_without_check}                                                                                                       
+	LANG=C make test > /dev/null
 %endif
 
 %install
-rm -rf %{buildroot}
-%makeinstall DAEMON_USERNAME=`id -nu` \
+make install \
+	DAEMON_USERNAME=`id -nu`\
+	DESTDIR=%{buildroot}\
+	sbindir=%{buildroot}%{_prefix}/sbin\
+	bindir=%{buildroot}%{_bindir}\
+	prefix=%{buildroot}%{_prefix}\
+	exec_prefix=%{buildroot}%{_prefix}\
+	docdir=%{buildroot}/usr/doc\
+	mandir=%{buildroot}%{_mandir}\
 	DAEMON_GROUPNAME=`id -ng` \
 	etcdir=%{buildroot}%{_sysconfdir} \
 	ATJOB_DIR=%{buildroot}%{_localstatedir}/spool/at \
 	ATSPOOL_DIR=%{buildroot}%{_localstatedir}/spool/at/spool \
 	INSTALL_ROOT_USER=`id -nu` \
 	INSTALL_ROOT_GROUP=`id -nu`;
+
 echo > %{buildroot}%{_sysconfdir}/at.deny
 mkdir docs
-cp $RPM_BUILD_ROOT/%{_prefix}/doc/at/* docs/
+cp  %{buildroot}/%{_prefix}/doc/at/* docs/
 
 mkdir -p %{buildroot}%{_sysconfdir}/rc.d/init.d
 install -m 755 %{SOURCE2} %{buildroot}%{_sysconfdir}/rc.d/init.d/atd
 
 mv -f %{buildroot}/%{_mandir}/man5/at_allow.5 \
-      %{buildroot}/%{_mandir}/man5/at.allow.5
+	%{buildroot}/%{_mandir}/man5/at.allow.5
 rm -f %{buildroot}/%{_mandir}/man5/at_deny.5
 ln -s at.allow.5 \
-      %{buildroot}/%{_mandir}/man5/at.deny.5
+	%{buildroot}/%{_mandir}/man5/at.deny.5
 
 # remove unpackaged files from the buildroot
-rm -r $RPM_BUILD_ROOT%{_prefix}/doc
+rm -r  %{buildroot}%{_prefix}/doc
 
 %clean
 rm -rf %{buildroot}
 
 %post
 touch %{_localstatedir}/spool/at/.SEQ
-chmod 600 %{_localstatedir}/spool/at/.SEQ
 chown daemon:daemon %{_localstatedir}/spool/at/.SEQ
 /sbin/chkconfig --add atd
 
 %preun
 if [ "$1" = 0 ] ; then
-  service atd stop >/dev/null 2>&1
-  /sbin/chkconfig --del atd
+	service atd stop >/dev/null 2>&1
+	/sbin/chkconfig --del atd
 fi
 
 %postun
 if [ "$1" -ge "1" ]; then
-  service atd condrestart >/dev/null 2>&1
+	service atd condrestart >/dev/null 2>&1
 fi
 
 %files
 %defattr(-,root,root)
 %doc docs/*
-%config %{_sysconfdir}/at.deny
-%config %{_sysconfdir}/rc.d/init.d/atd
+%config(noreplace) %{_sysconfdir}/at.deny
+%attr(0755,root,root)		%{_sysconfdir}/rc.d/init.d/atd
 %attr(0700,daemon,daemon)	%dir %{_localstatedir}/spool/at
 %attr(0600,daemon,daemon)	%verify(not md5 size mtime) %ghost %{_localstatedir}/spool/at/.SEQ
 %attr(0700,daemon,daemon)	%dir %{_localstatedir}/spool/at/spool
 %attr(0640,root,daemon)		%config(noreplace) /etc/pam.d/atd
 %{_sbindir}/atrun
-%{_sbindir}/atd
+%attr(0755,root,root)	%{_sbindir}/atd
 %{_mandir}/man*/*
 %{_bindir}/batch
 %{_bindir}/atrm
@@ -208,6 +183,10 @@ fi
 %attr(4755,root,root)	%{_bindir}/at
 
 %changelog
+* Wed Feb 20 2007 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-8
+- review
+- rhbz#225288
+
 * Tue Jan 30 2007 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-7
 - no debug file - useless
 - new pam configuration
@@ -296,16 +275,16 @@ fi
 - any changes were made (building on FC2 - perl issue?)
 - test.pl generates these 'errors' for what looks like
 - valid output to me:
--   $ ./test.pl 2>&1 | egrep -v '(^ok$)|(time_only)'
--   1..3656
--   not ok
--   'Monday - 1 month': 'Fri Jul  2 18:29:00 2004' =? 'Sat Jul  3 18:29:00 2004'
--   not ok
--   'Monday - 10 months': 'Thu Oct  2 18:29:00 2003' =? 'Fri Oct  3 18:29:00 2003'
--   not ok
--   'next week - 1 month': 'Mon Jul  5 18:29:00 2004' =? 'Tue Jul  6 18:29:00 2004'
--   not ok
--   'next week - 10 months': 'Sun Oct  5 18:29:00 2003' =? 'Mon Oct  6 18:29:00 2003'
+- $ ./test.pl 2>&1 | egrep -v '(^ok$)|(time_only)'
+- 1..3656
+- not ok
+- 'Monday - 1 month': 'Fri Jul  2 18:29:00 2004' =? 'Sat Jul  3 18:29:00 2004'
+- not ok
+- 'Monday - 10 months': 'Thu Oct  2 18:29:00 2003' =? 'Fri Oct  3 18:29:00 2003'
+- not ok
+- 'next week - 1 month': 'Mon Jul  5 18:29:00 2004' =? 'Tue Jul  6 18:29:00 2004'
+- not ok
+- 'next week - 10 months': 'Sun Oct  5 18:29:00 2003' =? 'Mon Oct  6 18:29:00 2003'
 - will investigate and fix for next release.
 
 * Tue Jun 15 2004 Elliot Lee <sopwith@redhat.com>
@@ -521,7 +500,7 @@ fi
 
 * Wed Oct 22 1997 Michael K. Johnson <johnsonm@redhat.com>
 - updated to at version 3.1.7
-- updated lock and sequence file handling with %ghost
+- updated lock and sequence file handling with ghost
 - Use chkconfig and atd, now conflicts with old crontabs packages
 
 * Thu Jun 19 1997 Erik Troan <ewt@redhat.com>
