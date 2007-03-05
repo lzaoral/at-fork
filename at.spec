@@ -6,11 +6,11 @@
 Summary: Job spooling tools
 Name: at
 Version: 3.1.10
-Release: 8%{?dist}
+Release: 9%{?dist}
 License: GPL
 Group: System Environment/Daemons
 URL: http://ftp.debian.org/debian/pool/main/a/at
-Source: http://ftp.debian.org/debian/pool/main/a/at/at-%{major_ver}.tar.gz
+Source: http://ftp.debian.org/debian/pool/main/a/at/at_%{major_ver}.tar.gz
 Source1: test.pl
 Source2: atd.init
 Patch0: at-3.1.7-lockfile.patch
@@ -183,6 +183,9 @@ fi
 %attr(4755,root,root)	%{_bindir}/at
 
 %changelog
+* Mon Mar 03 2007 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-9
+- review
+
 * Wed Feb 20 2007 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-8
 - review
 - rhbz#225288
