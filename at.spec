@@ -165,7 +165,7 @@ if [ "$1" -ge "1" ]; then
 fi
 
 %files
-%defattr(-,root,root)
+%defattr(-,root,root,-)
 %doc docs/*
 %config(noreplace) %{_sysconfdir}/at.deny
 %attr(0755,root,root)		%{_sysconfdir}/rc.d/init.d/atd
