@@ -6,7 +6,7 @@
 Summary: Job spooling tools
 Name: at
 Version: 3.1.10
-Release: 9%{?dist}
+Release: 11%{?dist}
 License: GPL
 Group: System Environment/Daemons
 URL: http://ftp.debian.org/debian/pool/main/a/at
@@ -32,6 +32,7 @@ Patch15: at-3.1.10-makefile.patch
 Patch16: at-3.1.10-daylight.patch
 Patch17: at-3.1.10-perm.patch
 Patch18: at-3.1.10-newpam.patch
+Patch19: at-3.1.10-debug.patch
 
 BuildRequires: fileutils chkconfig /etc/init.d
 BuildRequires: flex bison autoconf
@@ -45,7 +46,6 @@ Conflicts: crontabs <= 1.5
 BuildRequires: smtpdaemon
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-%define debug_package %{nil}
 %description
 At and batch read commands from standard input or from a specified
 file. At allows you to specify that a command will be run at a
@@ -85,6 +85,7 @@ cp %{SOURCE1} .
 %patch16 -p1 -b .daylight
 %patch17 -p1 -b .perm
 %patch18 -p1 -b .newpam
+%patch19 -p1 -b .debug
 
 %build
 # patch10 touches configure.in
@@ -98,8 +99,6 @@ rm -f lex.yy.* y.tab.*
 	--with-selinux \
 %if %{WITH_PAM}
 	--with-pam
-%else
-
 %endif
 
 make
@@ -173,7 +172,7 @@ fi
 %attr(0700,daemon,daemon)	%dir %{_localstatedir}/spool/at
 %attr(0600,daemon,daemon)	%verify(not md5 size mtime) %ghost %{_localstatedir}/spool/at/.SEQ
 %attr(0700,daemon,daemon)	%dir %{_localstatedir}/spool/at/spool
-%attr(0640,root,daemon)		%config(noreplace) /etc/pam.d/atd
+%attr(0644,root,root)		%config(noreplace) /etc/pam.d/atd
 %{_sbindir}/atrun
 %attr(0755,root,root)	%{_sbindir}/atd
 %{_mandir}/man*/*
@@ -183,6 +182,13 @@ fi
 %attr(4755,root,root)	%{_bindir}/at
 
 %changelog
+* Tue Mar 27 2007 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-11
+- mistake in pam_atd
+- rhbz#234120
+
+* Tue Mar 05 2007 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-10
+- rhbz#224597
+
 * Mon Mar 03 2007 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-9
 - review
 
