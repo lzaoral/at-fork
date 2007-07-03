@@ -6,7 +6,7 @@
 Summary: Job spooling tools
 Name: at
 Version: 3.1.10
-Release: 11%{?dist}
+Release: 12%{?dist}
 License: GPL
 Group: System Environment/Daemons
 URL: http://ftp.debian.org/debian/pool/main/a/at
@@ -14,25 +14,17 @@ Source: http://ftp.debian.org/debian/pool/main/a/at/at_%{major_ver}.tar.gz
 Source1: test.pl
 Source2: atd.init
 Patch0: at-3.1.7-lockfile.patch
-Patch1: at-3.1.10-man-timespec-path.patch
-Patch2: at-3.1.7-sigchld.patch
-Patch3: at-3.1.10-typo.patch
-Patch4: at-3.1.10-lexer-parser.patch
-Patch5: at-3.1.8-test.patch
-Patch6: at-3.1.8-perr.patch
-Patch7: at-3.1.10-instinet.patch
-Patch8: at-3.1.10-shell.patch
-Patch9: at-3.1.10-pie.patch
-Patch10: at-3.1.8-t_option.patch
-Patch11: at-3.1.10-usage.patch
-Patch12: at-3.1.10-fix_no_export.patch
-Patch13: at-3.1.10-pam.patch
-Patch14: at-3.1.10-dont_fork.patch
-Patch15: at-3.1.10-makefile.patch
-Patch16: at-3.1.10-daylight.patch
-Patch17: at-3.1.10-perm.patch
-Patch18: at-3.1.10-newpam.patch
-Patch19: at-3.1.10-debug.patch
+Patch1: at-3.1.10-makefile.patch
+Patch2: at-3.1.10-man-timespec-path.patch
+Patch3: at-3.1.7-sigchld.patch
+Patch4: at-3.1.10-typo.patch
+Patch7: at-3.1.8-perr.patch
+#Patch8: at-3.1.8-instinet.patch
+Patch9: at-3.1.10-shell.patch
+Patch11: at-3.1.8-t_option.patch
+Patch14: at-3.1.10-pam.patch
+Patch15: at-3.1.10-dont_fork.patch
+Patch21: at-3.1.10-perm.patch
 
 BuildRequires: fileutils chkconfig /etc/init.d
 BuildRequires: flex bison autoconf
@@ -67,25 +59,17 @@ use crontab instead.
 
 cp %{SOURCE1} .
 %patch0 -p1 -b .lockfile
-%patch1 -p1 -b .paths
-%patch2 -p1 -b .sigchld
-%patch3 -p1 -b .typo
-%patch4 -p1 -b .lexer
-%patch5 -p1 -b .test
-%patch6 -p1 -b .perr
-%patch7 -p1 -b .instinet
-%patch8 -p1 -b .shell
-%patch9 -p1 -b .pie
-%patch10 -p1 -b .t_option
-%patch11 -p1 -b .usage
-%patch12 -p1 -b .fix_no_export
-%patch13 -p1 -b .pam
-%patch14 -p1 -b .dont_fork
-%patch15 -p1 -b .makefile
-%patch16 -p1 -b .daylight
-%patch17 -p1 -b .perm
-%patch18 -p1 -b .newpam
-%patch19 -p1 -b .debug
+%patch1 -p1 -b .make
+%patch2 -p1 -b .paths
+%patch3 -p1 -b .sigchld
+%patch4 -p1 -b .typo
+%patch7 -p1 -b .perr
+#%patch8 -p1 -b .instinet #unlink unsucessful jobs, removed -> atd crash
+%patch9 -p1 -b .shell
+%patch11 -p1 -b .t_option
+%patch14 -p1 -b .pam
+%patch15 -p1 -b .dont_fork
+%patch21 -p1 -b .perm
 
 %build
 # patch10 touches configure.in
@@ -104,10 +88,10 @@ rm -f lex.yy.* y.tab.*
 make
 
 %check
-# don't run "make test" by default                                                                                            
-%{?_without_check: %define _without_check 1}                                                                                  
-%{!?_without_check: %define _without_check 1}                                                                                 
-                                                                                                                              
+# don't run "make test" by default
+%{?_without_check: %define _without_check 1}
+%{!?_without_check: %define _without_check 1}
+
 %if ! %{_without_check}                                                                                                       
 	LANG=C make test > /dev/null
 %endif
@@ -115,6 +99,7 @@ make
 %install
 make install \
 	DAEMON_USERNAME=`id -nu`\
+	DAEMON_GROUPNAME=`id -ng` \
 	DESTDIR=%{buildroot}\
 	sbindir=%{buildroot}%{_prefix}/sbin\
 	bindir=%{buildroot}%{_bindir}\
@@ -122,7 +107,6 @@ make install \
 	exec_prefix=%{buildroot}%{_prefix}\
 	docdir=%{buildroot}/usr/doc\
 	mandir=%{buildroot}%{_mandir}\
-	DAEMON_GROUPNAME=`id -ng` \
 	etcdir=%{buildroot}%{_sysconfdir} \
 	ATJOB_DIR=%{buildroot}%{_localstatedir}/spool/at \
 	ATSPOOL_DIR=%{buildroot}%{_localstatedir}/spool/at/spool \
@@ -150,6 +134,7 @@ rm -rf %{buildroot}
 
 %post
 touch %{_localstatedir}/spool/at/.SEQ
+chmod 600 %{_localstatedir}/spool/at/.SEQ
 chown daemon:daemon %{_localstatedir}/spool/at/.SEQ
 /sbin/chkconfig --add atd
 
@@ -168,11 +153,11 @@ fi
 %defattr(-,root,root,-)
 %doc docs/*
 %config(noreplace) %{_sysconfdir}/at.deny
-%attr(0755,root,root)		%{_sysconfdir}/rc.d/init.d/atd
+%attr(0700,root,root)		%{_sysconfdir}/rc.d/init.d/atd
 %attr(0700,daemon,daemon)	%dir %{_localstatedir}/spool/at
 %attr(0600,daemon,daemon)	%verify(not md5 size mtime) %ghost %{_localstatedir}/spool/at/.SEQ
 %attr(0700,daemon,daemon)	%dir %{_localstatedir}/spool/at/spool
-%attr(0644,root,root)		%config(noreplace) /etc/pam.d/atd
+%attr(0640,root,daemon)	%config(noreplace) /etc/pam.d/atd
 %{_sbindir}/atrun
 %attr(0755,root,root)	%{_sbindir}/atd
 %{_mandir}/man*/*
@@ -182,6 +167,11 @@ fi
 %attr(4755,root,root)	%{_bindir}/at
 
 %changelog
+* Tue Jul  3 2007 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-12
+- crashing atd
+- work only for root, still broken some functions
+- Resolves: rhbz#243064
+
 * Tue Mar 27 2007 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-11
 - mistake in pam_atd
 - rhbz#234120

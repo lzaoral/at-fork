@@ -1,33 +1,39 @@
---- at-3.1.10/atd.c.dont_fork	2007-01-30 11:02:37.000000000 +0100
-+++ at-3.1.10/atd.c	2007-01-30 11:07:23.000000000 +0100
-@@ -1001,7 +1001,7 @@
-     run_as_daemon = 1;
-     batch_interval = BATCH_INTERVAL_DEFAULT;
+--- at-3.1.10/atd.8.in.fork	2005-08-29 10:08:51.000000000 +0200
++++ at-3.1.10/atd.8.in	2007-07-03 14:04:05.000000000 +0200
+@@ -1,5 +1,5 @@
+ .Id $Id$
+-.TH ATD 8 "Mar 1997" local "Linux Programmer's Manual"
++.TH ATD 3 "Jun 2007" at-3.1.10 "Linux Programmer's Manual"
+ .SH NAME
+ atd \- run jobs queued for later execution
+ .SH SYNOPSIS
+@@ -10,6 +10,7 @@
+ .IR batch_interval ]
+ .RB [ -d ]
+ .RB [ -s ]
++.RB [ -n ]
+ .SH DESCRIPTION
+ .B atd
+ runs jobs queued by
+@@ -46,6 +47,9 @@
+ is installed as
+ .B @prefix@/sbin/atrun
+ for backward compatibility.
++.TP 8
++.B -n
++Don't fork option.
+ .SH WARNING
+ .B atd
+ won't work if its spool directory is mounted via NFS even if
+--- at-3.1.10/daemon.h.fork	2005-08-05 05:16:01.000000000 +0200
++++ at-3.1.10/daemon.h	2007-07-03 14:02:22.000000000 +0200
+@@ -14,3 +14,4 @@
+ perr (const char *fmt, ...);
  
--    while ((c = getopt(argc, argv, "sdl:b:")) != EOF) {
-+    while ((c = getopt(argc, argv, "sdl:b:n:")) != EOF) {
- 	switch (c) {
- 	case 'l':
- 	    if (sscanf(optarg, "%lf", &load_avg) != 1)
-@@ -1014,10 +1014,15 @@
- 	    if (sscanf(optarg, "%ud", &batch_interval) != 1)
- 		pabort("garbled option -b");
- 	    break;
-+	    
- 	case 'd':
- 	    daemon_debug++;
-+	    /* go through another option*/
-+	
-+	case 'n':
-+	    daemon_nofork++;
- 	    break;
--
-+	    
- 	case 's':
- 	    run_as_daemon = 0;
- 	    break;
---- at-3.1.10/daemon.c.dont_fork	2005-08-05 05:16:01.000000000 +0200
-+++ at-3.1.10/daemon.c	2007-01-30 11:06:19.000000000 +0100
+ extern int daemon_debug;
++extern int daemon_nofork;
+--- at-3.1.10/daemon.c.fork	2005-08-05 05:16:01.000000000 +0200
++++ at-3.1.10/daemon.c	2007-07-03 14:01:51.000000000 +0200
 @@ -50,7 +50,8 @@
  
  static const char *svnid = "$Id$";
@@ -58,30 +64,3 @@
  
      PRIV_START
  
---- at-3.1.10/daemon.h.dont_fork	2005-08-05 05:16:01.000000000 +0200
-+++ at-3.1.10/daemon.h	2007-01-30 11:07:54.000000000 +0100
-@@ -14,3 +14,4 @@
- perr (const char *fmt, ...);
- 
- extern int daemon_debug;
-+extern int daemon_nofork;
---- at-3.1.8/atd.8.in.dontfork  2002-01-18 08:41:03.000000000 +0100
-+++ at-3.1.8/atd.8.in   2007-01-30 10:51:51.000000000 +0100
-@@ -10,6 +10,7 @@
- .IR batch_interval ]
- .RB [ -d ]
- .RB [ -s ]
-+.RB [ -n ]
- .SH DESCRIPTION
- .B atd
- runs jobs queued by
-@@ -46,6 +47,9 @@
- is installed as
- .B @prefix@/sbin/atrun
- for backward compatibility.
-+.TP 8
-+.B -n
-+Don't fork option.
- .SH WARNING
- .B atd
- won't work if its spool directory is mounted via NFS even if

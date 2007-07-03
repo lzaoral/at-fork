@@ -1,29 +1,12 @@
---- at-3.1.10/at.c.perm	2006-11-14 12:26:27.000000000 +0100
-+++ at-3.1.10/at.c	2006-11-14 12:28:15.000000000 +0100
-@@ -144,17 +144,12 @@
-  */
-     if (fcreated) {
- 	/*
--        PRIV_START
--
-         We need the unprivileged uid here since the file is owned by the real
-         (not effective) uid.
-         */
-         setregid(real_gid, effective_gid);
- 	    unlink(atfile);
-         setregid(effective_gid, real_gid);
--        /*
--	PRIV_END
--        */
-     }
-     exit(EXIT_FAILURE);
- }
-@@ -314,18 +309,18 @@
+--- at-3.1.10/at.c.perm	2007-07-02 15:40:35.000000000 +0200
++++ at-3.1.10/at.c	2007-07-02 16:19:54.000000000 +0200
+@@ -314,10 +314,11 @@
  	 * bit.  Yes, this is a kluge.
  	 */
  	cmask = umask(S_IRUSR | S_IWUSR | S_IXUSR);
 -        seteuid(real_uid);
-+        seteuid(effective_uid);
++        //seteuid(real_uid);
++	seteuid(effective_uid);
  	if ((fd = open(atfile, O_CREAT | O_EXCL | O_TRUNC | O_WRONLY, S_IRUSR)) == -1)
  	    perr("Cannot create atjob file %.500s", atfile);
 -        seteuid(effective_uid);
@@ -31,53 +14,3 @@
  
  	if ((fd2 = dup(fd)) < 0)
  	    perr("Error in dup() of job file");
- 
--        /*
-+        
- 	if (fchown(fd2, real_uid, real_gid) != 0)
- 	    perr("Cannot give away file");
--        */
-+        
- 
-     PRIV_END
- 
-@@ -656,6 +651,7 @@
-                     We need the unprivileged uid here since the file is owned by the real
-                     (not effective) uid.
-                     */
-+//			PRIV_START
-                     setregid(real_gid, effective_gid);
- 
- 		    if (queue == '=') {
-@@ -668,17 +664,17 @@
- 
-                     setregid(effective_gid, real_gid);
- 		    done = 1;
--
-+//			PRIV_END
- 		    break;
- 
- 		case CAT:
- 		    {
- 			FILE *fp;
- 			int ch;
--
-+	//		PRIV_START
- 			setregid(real_gid, effective_gid);
- 			fp = fopen(dirent->d_name, "r");
--
-+	//		PRIV_END
- 			if (fp) {
- 			    while ((ch = getc(fp)) != EOF) {
- 				putchar(ch);
---- at-3.1.10/Makefile.in.perm	2006-11-14 12:26:27.000000000 +0100
-+++ at-3.1.10/Makefile.in	2006-11-14 12:26:27.000000000 +0100
-@@ -97,7 +97,7 @@
- 	$(INSTALL) -m 755 -d $(IROOT)$(atdocdir)
- 	$(INSTALL) -m 755 -d $(IROOT)$(ATJOB_DIR)
- 	$(INSTALL) -m 755 -d $(IROOT)$(etcdir)/pam.d 
--	$(INSTALL) -g $(DAEMON_GROUPNAME) -o $(DAEMON_USERNAME) -m 755 -d $(IROOT) $(ATSPOOL_DIR)
-+	$(INSTALL) -g $(DAEMON_GROUPNAME) -o $(DAEMON_USERNAME) -m 755 -d $(IROOT)$(ATSPOOL_DIR)
- 	chmod 700 $(IROOT)$(ATSPOOL_DIR) $(IROOT)$(ATJOB_DIR)
- 	touch $(IROOT)$(LFILE)
- 	chmod 600 $(IROOT)$(LFILE)
