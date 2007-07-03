@@ -68,10 +68,9 @@ cp %{SOURCE1} .
 #%patch8 -p1 -b .instinet #unlink unsucessful jobs, removed -> atd crash
 %patch9 -p1 -b .shell
 %patch11 -p1 -b .t_option
-%patch12 -p1 -b .usage
 %patch14 -p1 -b .pam
 %patch15 -p1 -b .dont_fork
-#%patch21 -p1 -b .perm
+%patch21 -p1 -b .perm
 
 %build
 # patch10 touches configure.in
