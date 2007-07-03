@@ -22,7 +22,6 @@ Patch7: at-3.1.8-perr.patch
 #Patch8: at-3.1.8-instinet.patch
 Patch9: at-3.1.10-shell.patch
 Patch11: at-3.1.8-t_option.patch
-Patch12: at-3.1.10-usage.patch
 Patch14: at-3.1.10-pam.patch
 Patch15: at-3.1.10-dont_fork.patch
 Patch21: at-3.1.10-perm.patch
