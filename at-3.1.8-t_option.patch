@@ -1,5 +1,5 @@
---- at-3.1.10/at.c.t_option	2007-06-28 14:43:51.000000000 +0200
-+++ at-3.1.10/at.c	2007-06-28 14:54:04.000000000 +0200
+--- at-3.1.10/at.c.t_option	2007-07-04 11:12:10.000000000 +0200
++++ at-3.1.10/at.c	2007-07-04 11:13:19.000000000 +0200
 @@ -396,8 +396,9 @@
  	    unsigned int i;
  	    for (i = 0; i < sizeof(no_export) / sizeof(no_export[0]); i++) {
@@ -138,7 +138,24 @@
  	default:
  	    usage();
  	    break;
-@@ -955,10 +1054,12 @@
+@@ -923,10 +1022,12 @@
+ 	break;
+ 
+     case AT:
+-	if (argc > optind) {
+-	    timer = parsetime(argc - optind, argv + optind);
+-	} else {
+-	    timer = 0;
++	if (timer == 0) {
++	      if (argc > optind) {
++	          timer = parsetime(argc - optind, argv + optind);
++	       } else {
++	          timer = 0;
++               }
+ 	}
+ 
+ 	if (timer == 0) {
+@@ -955,10 +1056,12 @@
  	else
  	    queue = DEFAULT_BATCH_QUEUE;
  
@@ -155,8 +172,8 @@
  
  	if (atverify) {
  	    struct tm *tm = localtime(&timer);
---- at-3.1.10/at.1.in.t_option	2007-06-28 14:43:51.000000000 +0200
-+++ at-3.1.10/at.1.in	2007-06-28 14:43:51.000000000 +0200
+--- at-3.1.10/at.1.in.t_option	2007-07-04 11:12:10.000000000 +0200
++++ at-3.1.10/at.1.in	2007-07-04 11:12:10.000000000 +0200
 @@ -12,6 +12,16 @@
  .RB [ -mldbv ]
  .B TIME

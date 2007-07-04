@@ -6,7 +6,7 @@
 Summary: Job spooling tools
 Name: at
 Version: 3.1.10
-Release: 12%{?dist}
+Release: 13%{?dist}
 License: GPL
 Group: System Environment/Daemons
 URL: http://ftp.debian.org/debian/pool/main/a/at
@@ -18,13 +18,12 @@ Patch1: at-3.1.10-makefile.patch
 Patch2: at-3.1.10-man-timespec-path.patch
 Patch3: at-3.1.7-sigchld.patch
 Patch4: at-3.1.10-typo.patch
-Patch7: at-3.1.8-perr.patch
-#Patch8: at-3.1.8-instinet.patch
-Patch9: at-3.1.10-shell.patch
-Patch11: at-3.1.8-t_option.patch
-Patch14: at-3.1.10-pam.patch
-Patch15: at-3.1.10-dont_fork.patch
-Patch21: at-3.1.10-perm.patch
+Patch5: at-3.1.8-perr.patch
+Patch6: at-3.1.10-shell.patch
+Patch7: at-3.1.8-t_option.patch
+Patch8: at-3.1.10-pam.patch
+Patch9: at-3.1.10-dont_fork.patch
+Patch10: at-3.1.10-perm.patch
 
 BuildRequires: fileutils chkconfig /etc/init.d
 BuildRequires: flex bison autoconf
@@ -63,13 +62,12 @@ cp %{SOURCE1} .
 %patch2 -p1 -b .paths
 %patch3 -p1 -b .sigchld
 %patch4 -p1 -b .typo
-%patch7 -p1 -b .perr
-#%patch8 -p1 -b .instinet #unlink unsucessful jobs, removed -> atd crash
-%patch9 -p1 -b .shell
-%patch11 -p1 -b .t_option
-%patch14 -p1 -b .pam
-%patch15 -p1 -b .dont_fork
-%patch21 -p1 -b .perm
+%patch5 -p1 -b .perr
+%patch6 -p1 -b .shell
+%patch7 -p1 -b .t_option
+%patch8 -p1 -b .pam
+%patch9 -p1 -b .dont_fork
+%patch10 -p1 -b .perm
 
 %build
 # patch10 touches configure.in
@@ -167,6 +165,9 @@ fi
 %attr(4755,root,root)	%{_bindir}/at
 
 %changelog
+* Tue Jul  3 2007 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-13
+- Resolves: rhbz#243064
+
 * Tue Jul  3 2007 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-12
 - crashing atd
 - work only for root, still broken some functions
