@@ -6,13 +6,14 @@
 Summary: Job spooling tools
 Name: at
 Version: 3.1.10
-Release: 13%{?dist}
+Release: 14%{?dist}
 License: GPL
 Group: System Environment/Daemons
 URL: http://ftp.debian.org/debian/pool/main/a/at
 Source: http://ftp.debian.org/debian/pool/main/a/at/at_%{major_ver}.tar.gz
 Source1: test.pl
 Source2: atd.init
+Source3: atd.sysconf
 Patch0: at-3.1.7-lockfile.patch
 Patch1: at-3.1.10-makefile.patch
 Patch2: at-3.1.10-man-timespec-path.patch
@@ -24,6 +25,7 @@ Patch7: at-3.1.8-t_option.patch
 Patch8: at-3.1.10-pam.patch
 Patch9: at-3.1.10-dont_fork.patch
 Patch10: at-3.1.10-perm.patch
+Patch11: at-3.1.10-opt_V.patch
 
 BuildRequires: fileutils chkconfig /etc/init.d
 BuildRequires: flex bison autoconf
@@ -68,6 +70,7 @@ cp %{SOURCE1} .
 %patch8 -p1 -b .pam
 %patch9 -p1 -b .dont_fork
 %patch10 -p1 -b .perm
+%patch11 -p1 -b .opt_V
 
 %build
 # patch10 touches configure.in
@@ -124,6 +127,9 @@ rm -f %{buildroot}/%{_mandir}/man5/at_deny.5
 ln -s at.allow.5 \
 	%{buildroot}/%{_mandir}/man5/at.deny.5
 
+mkdir -p %{buildroot}/etc/sysconfig
+install -m 755 %{SOURCE3} %{buildroot}/etc/sysconfig/atd
+
 # remove unpackaged files from the buildroot
 rm -r  %{buildroot}%{_prefix}/doc
 
@@ -134,6 +140,7 @@ rm -rf %{buildroot}
 touch %{_localstatedir}/spool/at/.SEQ
 chmod 600 %{_localstatedir}/spool/at/.SEQ
 chown daemon:daemon %{_localstatedir}/spool/at/.SEQ
+# must be in chkconfig on
 /sbin/chkconfig --add atd
 
 %preun
@@ -152,6 +159,7 @@ fi
 %doc docs/*
 %config(noreplace) %{_sysconfdir}/at.deny
 %attr(0700,root,root)		%{_sysconfdir}/rc.d/init.d/atd
+%attr(0700,root,root)		%{_sysconfdir}/sysconfig/atd
 %attr(0700,daemon,daemon)	%dir %{_localstatedir}/spool/at
 %attr(0600,daemon,daemon)	%verify(not md5 size mtime) %ghost %{_localstatedir}/spool/at/.SEQ
 %attr(0700,daemon,daemon)	%dir %{_localstatedir}/spool/at/spool
@@ -165,6 +173,11 @@ fi
 %attr(4755,root,root)	%{_bindir}/at
 
 %changelog
+* Tue Jul  9 2007 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-14
+- feature: add configuration file
+- fix -V option
+- fix init script
+
 * Tue Jul  3 2007 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-13
 - Resolves: rhbz#243064
 

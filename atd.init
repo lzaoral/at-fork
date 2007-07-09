@@ -13,35 +13,32 @@
 # Source function library.
 . /etc/init.d/functions
 
-test -x /usr/sbin/atd || exit 0
+# pull in sysconfig settings
+[ -f /etc/sysconfig/atd ] && . /etc/sysconfig/atd
 
 RETVAL=0
-
-#
-#	See how we were called.
-#
+prog="atd"
+ATD=/usr/sbin/atd
+LOCK_FILE=/var/lock/subsys/atd
 
 prog="atd"
 
 start() {
 	# Check if atd is already running
-	if [ ! -f /var/lock/subsys/atd ]; then
 	    echo -n $"Starting $prog: "
-	    daemon /usr/sbin/atd
+	    ##daemon /usr/sbin/atd
+		$ATD $OPTIONS && success || failure
 	    RETVAL=$?
-	    [ $RETVAL -eq 0 ] && touch /var/lock/subsys/atd
+	    [ "$RETVAL" = 0 ] && touch $LOCK_FILE
 	    echo
-	fi
-	return $RETVAL
 }
 
 stop() {
 	echo -n $"Stopping $prog: "
-	killproc /usr/sbin/atd
+	killproc $ATD 
 	RETVAL=$?
-	[ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/atd
+	[ "$RETVAL" = 0 ] && rm -f $LOCK_FILE
 	echo
-        return $RETVAL
 }
 
 
@@ -51,12 +48,15 @@ restart() {
 }	
 
 reload() {
-	restart
+	echo -n $"Reloading $prog: "
+	if [ -n "`pidfileofproc $ATD`" ]; then
+		killproc $ATD -HUP
+	else
+		failure $"Reloading $prog"
+	fi
+	RETVAL=$?
+	echo
 }	
-
-status_at() {
- 	status /usr/sbin/atd
-}
 
 case "$1" in
 start)
@@ -65,21 +65,27 @@ start)
 stop)
 	stop
 	;;
-reload|restart)
-	restart
+restart)
+	stop
+	start
+	;;
+reload)
+	reload
 	;;
 condrestart)
-	if [ -f /var/lock/subsys/atd ]; then
-	    restart
+	if [ -f  $LOCK_FILE ]; then
+		if [ "$RETVAL" = 0]; then
+			stop
+			sleep 3
+			start
+		fi
 	fi
 	;;
 status)
-	status_at
+	status $ATD
 	;;
 *)
-	echo $"Usage: $0 {start|stop|restart|condrestart|status}"
-	exit 1
+	echo $"Usage: $0 {start|stop|restart|reload|condrestart|status}"
+	RETVAL=1
 esac
-
-exit $?
 exit $RETVAL
