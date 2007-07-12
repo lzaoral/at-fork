@@ -21,24 +21,27 @@ prog="atd"
 ATD=/usr/sbin/atd
 LOCK_FILE=/var/lock/subsys/atd
 
-prog="atd"
-
+[ -f /etc/sysconfig/atd ] || exit 6
+	    
 start() {
 	# Check if atd is already running
-	    echo -n $"Starting $prog: "
-	    ##daemon /usr/sbin/atd
-		$ATD $OPTIONS && success || failure
-	    RETVAL=$?
-	    [ "$RETVAL" = 0 ] && touch $LOCK_FILE
-	    echo
+	echo -n $"Starting $prog: "
+	$ATD $OPTIONS && success || failure
+	RETVAL=$?
+	[ "$RETVAL" = 0 ] && touch $LOCK_FILE
+	echo
 }
 
 stop() {
 	echo -n $"Stopping $prog: "
-	killproc $ATD 
-	RETVAL=$?
-	[ "$RETVAL" = 0 ] && rm -f $LOCK_FILE
-	echo
+    if [ -n "`pidfileofproc $ATD`" ] ; then
+        killproc $ATD
+    else
+        failure $"Stopping $prog"
+    fi
+    RETVAL=$?
+    [ "$RETVAL" = 0 ] && rm -f $LOCK_FILE 
+    echo
 }
 
 
@@ -74,7 +77,7 @@ reload)
 	;;
 condrestart)
 	if [ -f  $LOCK_FILE ]; then
-		if [ "$RETVAL" = 0]; then
+		if [ "$RETVAL" = 0 ]; then
 			stop
 			sleep 3
 			start
@@ -86,6 +89,6 @@ status)
 	;;
 *)
 	echo $"Usage: $0 {start|stop|restart|reload|condrestart|status}"
-	RETVAL=1
+	RETVAL=3
 esac
 exit $RETVAL

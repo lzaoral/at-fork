@@ -6,7 +6,7 @@
 Summary: Job spooling tools
 Name: at
 Version: 3.1.10
-Release: 14%{?dist}
+Release: 15%{?dist}
 License: GPL
 Group: System Environment/Daemons
 URL: http://ftp.debian.org/debian/pool/main/a/at
@@ -26,6 +26,7 @@ Patch8: at-3.1.10-pam.patch
 Patch9: at-3.1.10-dont_fork.patch
 Patch10: at-3.1.10-perm.patch
 Patch11: at-3.1.10-opt_V.patch
+Patch12: at-3.1.10-session.patch
 
 BuildRequires: fileutils chkconfig /etc/init.d
 BuildRequires: flex bison autoconf
@@ -71,6 +72,7 @@ cp %{SOURCE1} .
 %patch9 -p1 -b .dont_fork
 %patch10 -p1 -b .perm
 %patch11 -p1 -b .opt_V
+%patch12 -p1 -b .session
 
 %build
 # patch10 touches configure.in
@@ -173,6 +175,11 @@ fi
 %attr(4755,root,root)	%{_bindir}/at
 
 %changelog
+* Tue Jul 11 2007 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-15
+- rewrite init script
+- add own session - setsid
+- Resolves: rhbz#247091
+
 * Tue Jul  9 2007 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-14
 - feature: add configuration file
 - fix -V option
