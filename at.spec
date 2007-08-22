@@ -6,8 +6,8 @@
 Summary: Job spooling tools
 Name: at
 Version: 3.1.10
-Release: 15%{?dist}
-License: GPL
+Release: 16%{?dist}
+License: GPLv2+
 Group: System Environment/Daemons
 URL: http://ftp.debian.org/debian/pool/main/a/at
 Source: http://ftp.debian.org/debian/pool/main/a/at/at_%{major_ver}.tar.gz
@@ -27,6 +27,7 @@ Patch9: at-3.1.10-dont_fork.patch
 Patch10: at-3.1.10-perm.patch
 Patch11: at-3.1.10-opt_V.patch
 Patch12: at-3.1.10-session.patch
+Patch13: at-3.1.10-havepam.patch
 
 BuildRequires: fileutils chkconfig /etc/init.d
 BuildRequires: flex bison autoconf
@@ -73,6 +74,7 @@ cp %{SOURCE1} .
 %patch10 -p1 -b .perm
 %patch11 -p1 -b .opt_V
 %patch12 -p1 -b .session
+%patch13 -p1 -b .havepam
 
 %build
 # patch10 touches configure.in
@@ -175,6 +177,10 @@ fi
 %attr(4755,root,root)	%{_bindir}/at
 
 %changelog
+* Wed Aug 22 2007 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-16
+- macro with_pam instead of have_pam
+- license tag is gplv2+ because of license in source files
+
 * Tue Jul 11 2007 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-15
 - rewrite init script
 - add own session - setsid
