@@ -1,0 +1,13 @@
+diff -up at-3.1.10/pam_atd.old at-3.1.10/pam_atd
+--- at-3.1.10/pam_atd.old	2007-10-05 13:32:16.000000000 +0200
++++ at-3.1.10/pam_atd	2007-10-05 13:35:31.000000000 +0200
+@@ -2,8 +2,8 @@
+ #
+ #
+ auth		sufficient	pam_rootok.so
++auth            required        pam_env.so
+ auth		include		system-auth
+-auth		required	pam_env.so
+ account		include		system-auth
+ session		required	pam_loginuid.so 
+ session		include		system-auth

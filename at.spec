@@ -6,7 +6,7 @@
 Summary: Job spooling tools
 Name: at
 Version: 3.1.10
-Release: 16%{?dist}
+Release: 17%{?dist}
 License: GPLv2+
 Group: System Environment/Daemons
 URL: http://ftp.debian.org/debian/pool/main/a/at
@@ -28,6 +28,7 @@ Patch10: at-3.1.10-perm.patch
 Patch11: at-3.1.10-opt_V.patch
 Patch12: at-3.1.10-session.patch
 Patch13: at-3.1.10-havepam.patch
+Patch14: at-3.1.10-pam_keyring.patch
 
 BuildRequires: fileutils chkconfig /etc/init.d
 BuildRequires: flex bison autoconf
@@ -75,6 +76,7 @@ cp %{SOURCE1} .
 %patch11 -p1 -b .opt_V
 %patch12 -p1 -b .session
 %patch13 -p1 -b .havepam
+%patch14 -p1 -b .pamkeyring
 
 %build
 # patch10 touches configure.in
@@ -149,13 +151,13 @@ chown daemon:daemon %{_localstatedir}/spool/at/.SEQ
 
 %preun
 if [ "$1" = 0 ] ; then
-	service atd stop >/dev/null 2>&1
+	/sbin/service atd stop >/dev/null 2>&1
 	/sbin/chkconfig --del atd
 fi
 
 %postun
 if [ "$1" -ge "1" ]; then
-	service atd condrestart >/dev/null 2>&1
+	/sbin/service atd condrestart >/dev/null 2>&1
 fi
 
 %files
@@ -177,6 +179,9 @@ fi
 %attr(4755,root,root)	%{_bindir}/at
 
 %changelog
+* Fri Oct 05 2007 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-17
+- Bug 250147: add optional support for gnome-keyring to passwd pam stack
+
 * Wed Aug 22 2007 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-16
 - macro with_pam instead of have_pam
 - license tag is gplv2+ because of license in source files
