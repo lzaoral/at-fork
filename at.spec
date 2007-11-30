@@ -6,7 +6,7 @@
 Summary: Job spooling tools
 Name: at
 Version: 3.1.10
-Release: 17%{?dist}
+Release: 18%{?dist}
 License: GPLv2+
 Group: System Environment/Daemons
 URL: http://ftp.debian.org/debian/pool/main/a/at
@@ -164,7 +164,7 @@ fi
 %defattr(-,root,root,-)
 %doc docs/*
 %config(noreplace) %{_sysconfdir}/at.deny
-%attr(0700,root,root)		%{_sysconfdir}/rc.d/init.d/atd
+%attr(0755,root,root)		%{_sysconfdir}/rc.d/init.d/atd
 %attr(0700,root,root)		%{_sysconfdir}/sysconfig/atd
 %attr(0700,daemon,daemon)	%dir %{_localstatedir}/spool/at
 %attr(0600,daemon,daemon)	%verify(not md5 size mtime) %ghost %{_localstatedir}/spool/at/.SEQ
@@ -179,6 +179,9 @@ fi
 %attr(4755,root,root)	%{_bindir}/at
 
 %changelog
+* Fri Oct 30 2007 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-18
+- Bug 398981: change on correct permissions
+
 * Fri Oct 05 2007 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-17
 - Bug 250147: add optional support for gnome-keyring to passwd pam stack
 
