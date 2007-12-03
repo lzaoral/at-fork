@@ -6,7 +6,7 @@
 Summary: Job spooling tools
 Name: at
 Version: 3.1.10
-Release: 18%{?dist}
+Release: 19%{?dist}
 License: GPLv2+
 Group: System Environment/Daemons
 URL: http://ftp.debian.org/debian/pool/main/a/at
@@ -165,7 +165,7 @@ fi
 %doc docs/*
 %config(noreplace) %{_sysconfdir}/at.deny
 %attr(0755,root,root)		%{_sysconfdir}/rc.d/init.d/atd
-%attr(0700,root,root)		%{_sysconfdir}/sysconfig/atd
+%attr(0644,root,root)		%{_sysconfdir}/sysconfig/atd
 %attr(0700,daemon,daemon)	%dir %{_localstatedir}/spool/at
 %attr(0600,daemon,daemon)	%verify(not md5 size mtime) %ghost %{_localstatedir}/spool/at/.SEQ
 %attr(0700,daemon,daemon)	%dir %{_localstatedir}/spool/at/spool
@@ -179,6 +179,9 @@ fi
 %attr(4755,root,root)	%{_bindir}/at
 
 %changelog
+* Mon Dec  3 2007 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-19
+- another problem with permission
+
 * Fri Oct 30 2007 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-18
 - Bug 398981: change on correct permissions
 
