@@ -6,7 +6,7 @@
 Summary: Job spooling tools
 Name: at
 Version: 3.1.10
-Release: 19%{?dist}
+Release: 20%{?dist}
 License: GPLv2+
 Group: System Environment/Daemons
 URL: http://ftp.debian.org/debian/pool/main/a/at
@@ -29,6 +29,9 @@ Patch11: at-3.1.10-opt_V.patch
 Patch12: at-3.1.10-session.patch
 Patch13: at-3.1.10-havepam.patch
 Patch14: at-3.1.10-pam_keyring.patch
+Patch15: at-3.1.10-PIE.patch
+Patch16: at-3.1.10-pamfix.patch
+Patch17: at-3.1.10-setuids.patch 
 
 BuildRequires: fileutils chkconfig /etc/init.d
 BuildRequires: flex bison autoconf
@@ -77,6 +80,9 @@ cp %{SOURCE1} .
 %patch12 -p1 -b .session
 %patch13 -p1 -b .havepam
 %patch14 -p1 -b .pamkeyring
+%patch15 -p1 -b .PIE
+%patch16 -p1 -b .pamfix
+%patch17 -p1 -b .setuids
 
 %build
 # patch10 touches configure.in
@@ -179,6 +185,11 @@ fi
 %attr(4755,root,root)	%{_bindir}/at
 
 %changelog
+* Tue Jan  8 2008 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-20
+- used PIE instead of pie (with pie wasn't build on 64b successful)
+- rewrite PAM fail check
+- fix checking of settings setuid(s)
+
 * Mon Dec  3 2007 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-19
 - another problem with permission
 
