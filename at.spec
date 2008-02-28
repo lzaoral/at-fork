@@ -6,7 +6,7 @@
 Summary: Job spooling tools
 Name: at
 Version: 3.1.10
-Release: 21%{?dist}
+Release: 22%{?dist}
 License: GPLv2+
 Group: System Environment/Daemons
 URL: http://ftp.debian.org/debian/pool/main/a/at
@@ -185,6 +185,9 @@ fi
 %attr(4755,root,root)	%{_bindir}/at
 
 %changelog
+* Thu Feb 28 2008 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-22
+- #435250 mixed OPTS and OPTIONS variable in sysconfig
+
 * Tue Feb 19 2008 Fedora Release Engineering <rel-eng@fedoraproject.org> - 3.1.10-21
 - Autorebuild for GCC 4.3
 
