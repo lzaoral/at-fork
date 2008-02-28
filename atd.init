@@ -26,7 +26,7 @@ LOCK_FILE=/var/lock/subsys/atd
 start() {
 	# Check if atd is already running
 	echo -n $"Starting $prog: "
-	$ATD $OPTIONS && success || failure
+	$ATD $OPTS && success || failure
 	RETVAL=$?
 	[ "$RETVAL" = 0 ] && touch $LOCK_FILE
 	echo
