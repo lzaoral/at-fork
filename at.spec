@@ -6,7 +6,7 @@
 Summary: Job spooling tools
 Name: at
 Version: 3.1.10
-Release: 22%{?dist}
+Release: 23%{?dist}
 License: GPLv2+
 Group: System Environment/Daemons
 URL: http://ftp.debian.org/debian/pool/main/a/at
@@ -32,6 +32,7 @@ Patch14: at-3.1.10-pam_keyring.patch
 Patch15: at-3.1.10-PIE.patch
 Patch16: at-3.1.10-pamfix.patch
 Patch17: at-3.1.10-setuids.patch 
+Patch18: nonposix.patch
 
 BuildRequires: fileutils chkconfig /etc/init.d
 BuildRequires: flex bison autoconf
@@ -83,6 +84,7 @@ cp %{SOURCE1} .
 %patch15 -p1 -b .PIE
 %patch16 -p1 -b .pamfix
 %patch17 -p1 -b .setuids
+%patch18 -p1 -b .nonposix
 
 %build
 # patch10 touches configure.in
@@ -185,6 +187,9 @@ fi
 %attr(4755,root,root)	%{_bindir}/at
 
 %changelog
+* Tue Mar 25 2008 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-23
+- 436952 use local instead of posix output date/time format.
+
 * Thu Feb 28 2008 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-22
 - #435250 mixed OPTS and OPTIONS variable in sysconfig
 
