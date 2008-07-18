@@ -6,7 +6,7 @@
 Summary: Job spooling tools
 Name: at
 Version: 3.1.10
-Release: 23%{?dist}
+Release: 24%{?dist}
 License: GPLv2+
 Group: System Environment/Daemons
 URL: http://ftp.debian.org/debian/pool/main/a/at
@@ -159,13 +159,13 @@ chown daemon:daemon %{_localstatedir}/spool/at/.SEQ
 
 %preun
 if [ "$1" = 0 ] ; then
-	/sbin/service atd stop >/dev/null 2>&1
+	/sbin/service atd stop >/dev/null 2>&1 ||:
 	/sbin/chkconfig --del atd
 fi
 
 %postun
 if [ "$1" -ge "1" ]; then
-	/sbin/service atd condrestart >/dev/null 2>&1
+	/sbin/service atd condrestart >/dev/null 2>&1 ||:
 fi
 
 %files
@@ -187,6 +187,9 @@ fi
 %attr(4755,root,root)	%{_bindir}/at
 
 %changelog
+* Fri Jul 18 2008 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-24
+- 446004 hope adding || into scriptlets fix removing old package after upgrade
+
 * Tue Mar 25 2008 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-23
 - 436952 use local instead of posix output date/time format.
 
