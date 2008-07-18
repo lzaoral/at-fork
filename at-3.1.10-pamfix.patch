@@ -1,6 +1,6 @@
 diff -up at-3.1.10/atd.c.pamfix at-3.1.10/atd.c
---- at-3.1.10/atd.c.pamfix	2008-01-09 14:56:57.000000000 +0100
-+++ at-3.1.10/atd.c	2008-01-09 14:56:57.000000000 +0100
+--- at-3.1.10/atd.c.pamfix	2008-07-18 16:23:11.000000000 +0200
++++ at-3.1.10/atd.c	2008-07-18 16:23:11.000000000 +0200
 @@ -131,15 +131,17 @@ static const struct pam_conv conv = {
  };
  
@@ -44,15 +44,15 @@ diff -up at-3.1.10/atd.c.pamfix at-3.1.10/atd.c
      PAM_FAIL_CHECK;
      closelog();
      openlog("atd", LOG_PID, LOG_ATD);
-@@ -610,6 +615,7 @@ run_file(const char *filename, uid_t uid
- 	int mail_pid = -1;
+@@ -612,6 +617,7 @@ run_file(const char *filename, uid_t uid
+    int mail_pid = -1;
  //add for fedora
  #ifdef  WITH_PAM
 +       pamh = NULL;
         retcode = pam_start("atd", pentry->pw_name, &conv, &pamh);
         PAM_FAIL_CHECK;
         retcode = pam_set_item(pamh, PAM_TTY, "atd");
-@@ -617,8 +623,10 @@ run_file(const char *filename, uid_t uid
+@@ -619,8 +625,10 @@ run_file(const char *filename, uid_t uid
         retcode = pam_acct_mgmt(pamh, PAM_SILENT);
         PAM_FAIL_CHECK;
         retcode = pam_open_session(pamh, PAM_SILENT);
@@ -64,9 +64,9 @@ diff -up at-3.1.10/atd.c.pamfix at-3.1.10/atd.c
          /* PAM has now re-opened our log to auth.info ! */
         closelog();
 diff -up at-3.1.10/perm.c.pamfix at-3.1.10/perm.c
---- at-3.1.10/perm.c.pamfix	2008-01-09 14:56:57.000000000 +0100
-+++ at-3.1.10/perm.c	2008-01-09 15:58:54.000000000 +0100
-@@ -134,17 +134,34 @@ check_permission()
+--- at-3.1.10/perm.c.pamfix	2008-07-18 16:23:11.000000000 +0200
++++ at-3.1.10/perm.c	2008-07-18 16:26:16.000000000 +0200
+@@ -135,34 +135,61 @@ check_permission()
   *  We must check if the atd daemon userid will be allowed to gain the job owner user's
   *  credentials with PAM . If not, the user has been denied at(1) usage, eg. with pam_access.
   */
@@ -83,7 +83,7 @@ diff -up at-3.1.10/perm.c.pamfix at-3.1.10/perm.c
  
  # define PAM_FAIL_CHECK if (retcode != PAM_SUCCESS) { \
 -                              fprintf(stderr,"PAM authentication failure: %s\n",pam_strerror(pamh, retcode)); \
--			      pam_close_session(pamh,PAM_SILENT); \
+-                 pam_close_session(pamh,PAM_SILENT); \
 -                              pam_end(pamh, retcode); \
 -                               setregid(gid,egid); \
 -                               setreuid(uid,euid); \
@@ -110,8 +110,9 @@ diff -up at-3.1.10/perm.c.pamfix at-3.1.10/perm.c
    retcode = pam_start("atd", pentry->pw_name, &conv, &pamh);
    PAM_FAIL_CHECK;
    retcode = pam_set_item(pamh, PAM_TTY, "atd");
-@@ -152,16 +169,25 @@ check_permission()
+   PAM_FAIL_CHECK;
    retcode = pam_acct_mgmt(pamh, PAM_SILENT);
++  PAM_SESSION_FAIL;
    PAM_FAIL_CHECK;
    retcode = pam_open_session(pamh, PAM_SILENT);
 +  PAM_SESSION_FAIL;

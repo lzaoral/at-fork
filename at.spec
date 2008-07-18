@@ -31,8 +31,7 @@ Patch13: at-3.1.10-havepam.patch
 Patch14: at-3.1.10-pam_keyring.patch
 Patch15: at-3.1.10-PIE.patch
 Patch16: at-3.1.10-pamfix.patch
-Patch17: at-3.1.10-setuids.patch 
-Patch18: nonposix.patch
+Patch17: nonposix.patch
 
 BuildRequires: fileutils chkconfig /etc/init.d
 BuildRequires: flex bison autoconf
@@ -83,8 +82,7 @@ cp %{SOURCE1} .
 %patch14 -p1 -b .pamkeyring
 %patch15 -p1 -b .PIE
 %patch16 -p1 -b .pamfix
-%patch17 -p1 -b .setuids
-%patch18 -p1 -b .nonposix
+%patch17 -p1 -b .nonposix
 
 %build
 # patch10 touches configure.in
@@ -189,6 +187,7 @@ fi
 %changelog
 * Fri Jul 18 2008 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-24
 - 446004 hope adding || into scriptlets fix removing old package after upgrade
+- fixes for fuzz=0
 
 * Tue Mar 25 2008 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-23
 - 436952 use local instead of posix output date/time format.
