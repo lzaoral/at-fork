@@ -6,7 +6,7 @@
 Summary: Job spooling tools
 Name: at
 Version: 3.1.10
-Release: 25%{?dist}
+Release: 26%{?dist}
 License: GPLv2+
 Group: System Environment/Daemons
 URL: http://ftp.debian.org/debian/pool/main/a/at
@@ -187,6 +187,9 @@ fi
 %attr(4755,root,root)	%{_bindir}/at
 
 %changelog
+* Fri Oct 24 2008 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.10-26
+- update init script according to SysVInitScript
+
 * Tue Sep 16 2008 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-25
 - thanks dwalsh for selinux patch, which fix #460873
 

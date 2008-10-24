@@ -1,95 +1,111 @@
-#!/bin/bash
+#!/bin/sh
 #
-#	/etc/rc.d/init.d/atd
+# atd Starts/stop the "at" daemon
 #
-# Starts the "at" daemon
-#
-# chkconfig: 345 95 5
+# chkconfig:   345 95 5
 # description: Runs commands scheduled by the "at" command at the time \
 #    specified when "at" was run, and runs batch commands when the load \
 #    average is low enough.
-# processname: atd
+
+### BEGIN INIT INFO
+# Provides: atd at batch
+# Required-Start: $local_fs
+# Required-Stop: $local_fs
+# Default-Start: 345
+# Default-Stop: 95
+# Short-Description: Starts/stop the "at" daemon
+# Description:      Runs commands scheduled by the "at" command at the time 
+#    specified when "at" was run, and runs batch commands when the load 
+#    average is low enough.
+### END INIT INFO
 
 # Source function library.
-. /etc/init.d/functions
+. /etc/rc.d/init.d/functions
 
-# pull in sysconfig settings
-[ -f /etc/sysconfig/atd ] && . /etc/sysconfig/atd
-
-RETVAL=0
+exec=/usr/sbin/atd
 prog="atd"
-ATD=/usr/sbin/atd
-LOCK_FILE=/var/lock/subsys/atd
+config=/etc/sysconfig/atd
 
-[ -f /etc/sysconfig/atd ] || exit 6
-	    
+[ -e /etc/sysconfig/$prog ] && . /etc/sysconfig/$prog
+
+lockfile=/var/lock/subsys/$prog
+
 start() {
-	# Check if atd is already running
-	echo -n $"Starting $prog: "
-	daemon $ATD $OPTS && success || failure
-	RETVAL=$?
-	[ "$RETVAL" = 0 ] && touch $LOCK_FILE
-	echo
+    [ -x $exec ] || exit 5
+    [ -f $config ] || exit 6
+    echo -n $"Starting $prog: "
+    daemon $exec $OPTS && success || failure
+    retval=$?
+    echo
+    [ $retval -eq 0 ] && touch $lockfile
+    return $retval
 }
 
 stop() {
-	echo -n $"Stopping $prog: "
-    if [ -n "`pidfileofproc $ATD`" ] ; then
-        killproc $ATD
+    echo -n $"Stopping $prog: "
+    if [ -n "`pidfileofproc $exec`" ] ; then
+        killproc $exec
 		RETVAL=3
     else
         failure $"Stopping $prog"
     fi
-    RETVAL=$?
-    [ "$RETVAL" = 0 ] && rm -f $LOCK_FILE
+    retval=$?
     echo
+    [ $retval -eq 0 ] && rm -f $lockfile
+    return $retval
+}
+
+restart() {
+    stop
+    start
+}
+
+reload() {
+    restart
+}
+
+force_reload() {
+    restart
+}
+
+rh_status() {
+    # run checks to determine if the service is running or use generic status
+    status $prog
+}
+
+rh_status_q() {
+    rh_status >/dev/null 2>&1
 }
 
 
-restart() {
-	stop
-	start
-}	
-
-reload() {
-	echo -n $"Reloading $prog: "
-	if [ -n "`pidfileofproc $ATD`" ]; then
-		killproc $ATD -HUP
-	else
-		failure $"Reloading $prog"
-	fi
-	RETVAL=$?
-	echo
-}	
-
 case "$1" in
-start)
-	start
-	;;
-stop)
-	stop
-	;;
-restart)
-	stop
-	start
-	;;
-reload)
-	reload
-	;;
-condrestart)
-	if [ -f  $LOCK_FILE ]; then
-		if [ "$RETVAL" = 0 ]; then
-			stop
-			sleep 3
-			start
-		fi
-	fi
-	;;
-status)
-	status $ATD
-	;;
-*)
-	echo $"Usage: $0 {start|stop|restart|reload|condrestart|status}"
-	RETVAL=3
+    start)
+        rh_status_q && exit 0
+        $1
+        ;;
+    stop)
+        rh_status_q || exit 0
+        $1
+        ;;
+    restart)
+        $1
+        ;;
+    reload)
+        rh_status_q || exit 7
+        $1
+        ;;
+    force-reload)
+        force_reload
+        ;;
+    status)
+        rh_status
+        ;;
+    condrestart|try-restart)
+        rh_status_q || exit 0
+        restart
+        ;;
+    *)
+        echo $"Usage: $0 {start|stop|status|restart|condrestart|try-restart|reload|force-reload}"
+        exit 2
 esac
-exit $RETVAL
+exit $?
