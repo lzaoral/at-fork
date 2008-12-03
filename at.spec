@@ -6,7 +6,7 @@
 Summary: Job spooling tools
 Name: at
 Version: 3.1.10
-Release: 24%{?dist}
+Release: 25%{?dist}
 License: GPLv2+
 Group: System Environment/Daemons
 URL: http://ftp.debian.org/debian/pool/main/a/at
@@ -14,6 +14,7 @@ Source: http://ftp.debian.org/debian/pool/main/a/at/at_%{major_ver}.tar.gz
 Source1: test.pl
 Source2: atd.init
 Source3: atd.sysconf
+Source4: 56atd
 Patch0: at-3.1.7-lockfile.patch
 Patch1: at-3.1.10-makefile.patch
 Patch2: at-3.1.10-man-timespec-path.patch
@@ -146,6 +147,9 @@ ln -s at.allow.5 \
 mkdir -p %{buildroot}/etc/sysconfig
 install -m 755 %{SOURCE3} %{buildroot}/etc/sysconfig/atd
 
+mkdir -p %{buildroot}/%{_libdir}/pm-utils/sleep.d/
+install -m 755 %{SOURCE4} %{buildroot}/%{_libdir}/pm-utils/sleep.d/56atd
+
 # remove unpackaged files from the buildroot
 rm -r  %{buildroot}%{_prefix}/doc
 
@@ -187,8 +191,13 @@ fi
 %{_bindir}/atrm
 %{_bindir}/atq
 %attr(4755,root,root)	%{_bindir}/at
+%attr(0755,root,root)	%{_libdir}/pm-utils/sleep.d/56atd
 
 %changelog
+* Wed Dec 3 2008 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.10-25
+- 464393 add script into pm-utils, because daemon wasn't taking all jobs 
+	after suspend/hibernate
+
 * Tue Sep 16 2008 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-24
 - thanks dwalsh for selinux patch, which fix #460873
 - adding || into scriptlets fix removing old package after upgrade
