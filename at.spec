@@ -6,7 +6,7 @@
 Summary: Job spooling tools
 Name: at
 Version: 3.1.10
-Release: 26%{?dist}
+Release: 27%{?dist}
 License: GPLv2+
 Group: System Environment/Daemons
 URL: http://ftp.debian.org/debian/pool/main/a/at
@@ -14,6 +14,7 @@ Source: http://ftp.debian.org/debian/pool/main/a/at/at_%{major_ver}.tar.gz
 Source1: test.pl
 Source2: atd.init
 Source3: atd.sysconf
+Source4: 56atd
 Patch0: at-3.1.7-lockfile.patch
 Patch1: at-3.1.10-makefile.patch
 Patch2: at-3.1.10-man-timespec-path.patch
@@ -37,6 +38,7 @@ Patch18: selinux_mail.patch
 BuildRequires: fileutils chkconfig /etc/init.d
 BuildRequires: flex bison autoconf
 BuildRequires: libselinux-devel >= 1.27.9
+Requires: pm-utils
 
 %if %{WITH_PAM}
 BuildRequires: pam-devel
@@ -107,7 +109,7 @@ make
 %{?_without_check: %define _without_check 1}
 %{!?_without_check: %define _without_check 1}
 
-%if ! %{_without_check}                                                                                                       
+%if ! %{_without_check}
 	LANG=C make test > /dev/null
 %endif
 
@@ -138,11 +140,13 @@ install -m 755 %{SOURCE2} %{buildroot}%{_sysconfdir}/rc.d/init.d/atd
 mv -f %{buildroot}/%{_mandir}/man5/at_allow.5 \
 	%{buildroot}/%{_mandir}/man5/at.allow.5
 rm -f %{buildroot}/%{_mandir}/man5/at_deny.5
-ln -s at.allow.5 \
-	%{buildroot}/%{_mandir}/man5/at.deny.5
+ln -s at.allow.5 %{buildroot}/%{_mandir}/man5/at.deny.5
 
 mkdir -p %{buildroot}/etc/sysconfig
 install -m 755 %{SOURCE3} %{buildroot}/etc/sysconfig/atd
+
+mkdir -p %{buildroot}/%{_libdir}/pm-utils/sleep.d/
+install -m 755 %{SOURCE4} %{buildroot}/%{_libdir}/pm-utils/sleep.d/56atd
 
 # remove unpackaged files from the buildroot
 rm -r  %{buildroot}%{_prefix}/doc
@@ -185,8 +189,13 @@ fi
 %{_bindir}/atrm
 %{_bindir}/atq
 %attr(4755,root,root)	%{_bindir}/at
+%attr(0755,root,root)	%{_libdir}/pm-utils/sleep.d/56atd
 
 %changelog
+* Wed Dec 3 2008 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.10-27
+- 464393 add script into pm-utils, because daemon wasn't taking all jobs 
+	after suspend/hibernate
+
 * Fri Oct 24 2008 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.10-26
 - update init script according to SysVInitScript
 
