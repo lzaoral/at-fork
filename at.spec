@@ -6,7 +6,7 @@
 Summary: Job spooling tools
 Name: at
 Version: 3.1.10
-Release: 27%{?dist}
+Release: 28%{?dist}
 License: GPLv2+
 Group: System Environment/Daemons
 URL: http://ftp.debian.org/debian/pool/main/a/at
@@ -34,6 +34,7 @@ Patch15: at-3.1.10-PIE.patch
 Patch16: at-3.1.10-pamfix.patch
 Patch17: nonposix.patch
 Patch18: selinux_mail.patch
+Patch19: at-3.1.10-man_hyphen.patch
 
 BuildRequires: fileutils chkconfig /etc/init.d
 BuildRequires: flex bison autoconf
@@ -87,6 +88,7 @@ cp %{SOURCE1} .
 %patch16 -p1 -b .pamfix
 %patch17 -p1 -b .nonposix
 %patch18 -p1 -b .mailselinux
+%patch19 -p1 -b .hyphen
 
 %build
 # patch10 touches configure.in
@@ -192,6 +194,9 @@ fi
 %attr(0755,root,root)	%{_libdir}/pm-utils/sleep.d/56atd
 
 %changelog
+* Thu Feb 19 2009 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.10-28
+- 486227 add hyphen date into manual page.
+
 * Wed Dec 3 2008 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.10-27
 - 464393 add script into pm-utils, because daemon wasn't taking all jobs 
 	after suspend/hibernate
