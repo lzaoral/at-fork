@@ -6,7 +6,7 @@
 Summary: Job spooling tools
 Name: at
 Version: 3.1.10
-Release: 28%{?dist}
+Release: 29%{?dist}
 License: GPLv2+
 Group: System Environment/Daemons
 URL: http://ftp.debian.org/debian/pool/main/a/at
@@ -194,6 +194,9 @@ fi
 %attr(0755,root,root)	%{_libdir}/pm-utils/sleep.d/56atd
 
 %changelog
+* Mon Feb 23 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.1.10-29
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_11_Mass_Rebuild
+
 * Thu Feb 19 2009 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.10-28
 - 486227 add hyphen date into manual page.
 
