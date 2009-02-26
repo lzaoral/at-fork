@@ -6,7 +6,7 @@
 Summary: Job spooling tools
 Name: at
 Version: 3.1.10
-Release: 29%{?dist}
+Release: 30%{?dist}
 License: GPLv2+
 Group: System Environment/Daemons
 URL: http://ftp.debian.org/debian/pool/main/a/at
@@ -35,6 +35,7 @@ Patch16: at-3.1.10-pamfix.patch
 Patch17: nonposix.patch
 Patch18: selinux_mail.patch
 Patch19: at-3.1.10-man_hyphen.patch
+Patch20: at-3.1.10-different_shell.patch
 
 BuildRequires: fileutils chkconfig /etc/init.d
 BuildRequires: flex bison autoconf
@@ -89,6 +90,7 @@ cp %{SOURCE1} .
 %patch17 -p1 -b .nonposix
 %patch18 -p1 -b .mailselinux
 %patch19 -p1 -b .hyphen
+%patch20 -p1 -b .fix
 
 %build
 # patch10 touches configure.in
@@ -194,6 +196,11 @@ fi
 %attr(0755,root,root)	%{_libdir}/pm-utils/sleep.d/56atd
 
 %changelog
+* Thu Feb 26 2009 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.10-30
+- 435765 and 486844 in some cases could be used bash for at commands
+ even if user sets different default shell. Also bash4.0 fix Here Documents
+ which breaks previous patch at-3.1.10-shell.patch.
+
 * Mon Feb 23 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.1.10-29
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_11_Mass_Rebuild
 
