@@ -6,7 +6,7 @@
 Summary: Job spooling tools
 Name: at
 Version: 3.1.10
-Release: 30%{?dist}
+Release: 33%{?dist}
 License: GPLv2+
 Group: System Environment/Daemons
 URL: http://ftp.debian.org/debian/pool/main/a/at
@@ -29,11 +29,12 @@ Patch10: at-3.1.10-perm.patch
 Patch11: at-3.1.10-opt_V.patch
 Patch12: at-3.1.10-session.patch
 Patch13: at-3.1.10-havepam.patch
-Patch14: at-3.1.10-pam_keyring.patch
+# included in another pam patch
+#Patch14: at-3.1.10-pam_keyring.patch
 Patch15: at-3.1.10-PIE.patch
 Patch16: at-3.1.10-pamfix.patch
-Patch17: nonposix.patch
-Patch18: selinux_mail.patch
+Patch17: at-3.1.10-nonposix.patch
+Patch18: at-3.1.10-selinux_mail.patch
 Patch19: at-3.1.10-man_hyphen.patch
 Patch20: at-3.1.10-different_shell.patch
 
@@ -84,7 +85,7 @@ cp %{SOURCE1} .
 %patch11 -p1 -b .opt_V
 %patch12 -p1 -b .session
 %patch13 -p1 -b .havepam
-%patch14 -p1 -b .pamkeyring
+##%patch14 -p1 -b .pamkeyring
 %patch15 -p1 -b .PIE
 %patch16 -p1 -b .pamfix
 %patch17 -p1 -b .nonposix
@@ -166,7 +167,7 @@ chown daemon:daemon %{_localstatedir}/spool/at/.SEQ
 /sbin/chkconfig --add atd
 
 %preun
-if [ "$1" = 0 ] ; then
+if [ "$1" = "0" ] ; then
 	/sbin/service atd stop >/dev/null 2>&1 ||:
 	/sbin/chkconfig --del atd
 fi
@@ -196,6 +197,15 @@ fi
 %attr(0755,root,root)	%{_libdir}/pm-utils/sleep.d/56atd
 
 %changelog
+* Mon Jun  1 2009 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.10-33
+- clean cvs, check patches
+
+* Wed Mar 18 2009 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.10-32
+- add the forgotten add delimiter thanks to Cong Ma
+
+* Thu Feb 26 2009 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.10-31
+- preun script is sometimes failing. Add apostrofs around zero.
+
 * Thu Feb 26 2009 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.10-30
 - 435765 and 486844 in some cases could be used bash for at commands
  even if user sets different default shell. Also bash4.0 fix Here Documents

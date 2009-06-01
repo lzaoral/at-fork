@@ -5,8 +5,8 @@
 +#
 +#
 +auth       sufficient  pam_rootok.so
-+auth       include     system-auth
 +auth       required    pam_env.so
++auth       include     system-auth
 +account        include     system-auth
 +session        required    pam_loginuid.so
 +session        include     system-auth
@@ -336,7 +336,7 @@ diff -up at-3.1.10/atd.c.pam at-3.1.10/atd.c
 +   if (selinux_enabled>0)
 +           if (setexeccon(NULL) < 0)
 +                   if (security_getenforce()==1)
-+                           perr("Could not resset exec context for user %s\n", pentry->pw_name);
++                           perr("Could not reset exec context for user %s\n", pentry->pw_name);
  #endif
 -	    perr("Exec failed for mail command");
  

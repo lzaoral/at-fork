@@ -1,2 +1,5 @@
 at_3.1.10.tar.gz
 56atd
+atd.init
+atd.sysconf
+test.pl
