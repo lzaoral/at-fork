@@ -6,7 +6,7 @@
 Summary: Job spooling tools
 Name: at
 Version: 3.1.10
-Release: 30%{?dist}
+Release: 31%{?dist}
 License: GPLv2+
 Group: System Environment/Daemons
 URL: http://ftp.debian.org/debian/pool/main/a/at
@@ -196,6 +196,9 @@ fi
 %attr(0755,root,root)	%{_libdir}/pm-utils/sleep.d/56atd
 
 %changelog
+* Fri Jul 17 2009 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.10-31
+- 502078 fix pm-utils script to wake up only when atd was running
+
 * Thu Feb 26 2009 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.10-30
 - 435765 and 486844 in some cases could be used bash for at commands
  even if user sets different default shell. Also bash4.0 fix Here Documents
