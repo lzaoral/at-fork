@@ -6,7 +6,7 @@
 Summary: Job spooling tools
 Name: at
 Version: 3.1.10
-Release: 33%{?dist}
+Release: 34%{?dist}
 License: GPLv2+
 Group: System Environment/Daemons
 URL: http://ftp.debian.org/debian/pool/main/a/at
@@ -41,7 +41,7 @@ Patch20: at-3.1.10-different_shell.patch
 BuildRequires: fileutils chkconfig /etc/init.d
 BuildRequires: flex bison autoconf
 BuildRequires: libselinux-devel >= 1.27.9
-Requires: pm-utils
+Requires: pm-utils-filesystem
 
 %if %{WITH_PAM}
 BuildRequires: pam-devel
@@ -145,7 +145,7 @@ install -m 755 %{SOURCE2} %{buildroot}%{_sysconfdir}/rc.d/init.d/atd
 mv -f %{buildroot}/%{_mandir}/man5/at_allow.5 \
 	%{buildroot}/%{_mandir}/man5/at.allow.5
 rm -f %{buildroot}/%{_mandir}/man5/at_deny.5
-ln -s at.allow.5 %{buildroot}/%{_mandir}/man5/at.deny.5
+#ln -s at.allow.5 %{buildroot}/%{_mandir}/man5/at.deny.5
 
 mkdir -p %{buildroot}/etc/sysconfig
 install -m 755 %{SOURCE3} %{buildroot}/etc/sysconfig/atd
@@ -197,6 +197,10 @@ fi
 %attr(0755,root,root)	%{_libdir}/pm-utils/sleep.d/56atd
 
 %changelog
+* Mon Jul  20 2009 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.10-34
+- require pm-utils-filesystem instead of pm-utils which should help
+ minimal installation.
+
 * Mon Jun  1 2009 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.10-33
 - clean cvs, check patches
 
