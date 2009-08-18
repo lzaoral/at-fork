@@ -6,7 +6,7 @@
 Summary: Job spooling tools
 Name: at
 Version: 3.1.10
-Release: 35%{?dist}
+Release: 36%{?dist}
 License: GPLv2+
 Group: System Environment/Daemons
 URL: http://ftp.debian.org/debian/pool/main/a/at
@@ -41,7 +41,6 @@ Patch20: at-3.1.10-different_shell.patch
 BuildRequires: fileutils chkconfig /etc/init.d
 BuildRequires: flex bison autoconf
 BuildRequires: libselinux-devel >= 1.27.9
-Requires: pm-utils-filesystem
 
 %if %{WITH_PAM}
 BuildRequires: pam-devel
@@ -197,6 +196,9 @@ fi
 %attr(0755,root,root)	%{_libdir}/pm-utils/sleep.d/56atd
 
 %changelog
+* Tue Aug 18 2009 Adam Jackson <ajax@redhat.com> 3.1.10-36
+- Remove Requires: pm-utils-filesystem, dead package
+
 * Fri Jul 24 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.1.10-35
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_12_Mass_Rebuild
 
