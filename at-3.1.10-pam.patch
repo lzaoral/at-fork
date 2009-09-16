@@ -1,19 +1,14 @@
 --- at-3.1.10/pam_atd.pam   2007-07-03 13:29:24.000000000 +0200
 +++ at-3.1.10/pam_atd   2007-07-03 13:29:24.000000000 +0200
-@@ -0,0 +1,13 @@
+@@ -0,0 +1,8 @@
 +# The PAM configuration file for the at daemon
 +#
 +#
-+auth       sufficient  pam_rootok.so
-+auth       required    pam_env.so
-+auth       include     system-auth
-+account        include     system-auth
-+session        required    pam_loginuid.so
-+session        include     system-auth
-+# Sets up user limits, please uncomment and read /etc/security/limits.conf
-+# to enable this functionality.
-+# session    required   pam_limits.so
-+#
++# PAM authentication not called, no auth modules needed
++account    required    pam_access.so
++account    include     password-auth
++session    required    pam_loginuid.so
++session    include     password-auth
 diff -up at-3.1.10/atd.c.pam at-3.1.10/atd.c
 --- at-3.1.10/atd.c.pam	2008-07-18 15:47:52.000000000 +0200
 +++ at-3.1.10/atd.c	2008-07-18 16:02:32.000000000 +0200
