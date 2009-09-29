@@ -6,7 +6,7 @@
 Summary: Job spooling tools
 Name: at
 Version: 3.1.10
-Release: 37%{?dist}
+Release: 38%{?dist}
 License: GPLv2+
 Group: System Environment/Daemons
 URL: http://ftp.debian.org/debian/pool/main/a/at
@@ -196,6 +196,9 @@ fi
 %attr(0755,root,root)	%{_libdir}/pm-utils/sleep.d/56atd
 
 %changelog
+* Tue Sep 29 2009 Tomas Mraz <tmraz@redhat.com> 3.1.10-38
+- authentication PAM modules have to be configured for pam_setcred()
+
 * Wed Sep 16 2009 Tomas Mraz <tmraz@redhat.com> 3.1.10-37
 - improve the PAM configuration, use password-auth common stack
 
