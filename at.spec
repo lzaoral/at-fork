@@ -6,7 +6,7 @@
 Summary: Job spooling tools
 Name: at
 Version: 3.1.10
-Release: 38%{?dist}
+Release: 39%{?dist}
 License: GPLv2+
 Group: System Environment/Daemons
 URL: http://ftp.debian.org/debian/pool/main/a/at
@@ -54,17 +54,12 @@ Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 At and batch read commands from standard input or from a specified
 file. At allows you to specify that a command will be run at a
 particular time. Batch will execute commands when the system load
-levels drop to a particular level. Both commands use /bin/sh.
+levels drop to a particular level. Both commands use user's shell.
 
 You should install the at package if you need a utility for
 time-oriented job control. Note: If it is a recurring job that will
 need to be repeated at the same time every day/week, etc. you should
 use crontab instead.
-
-#%{?_without_check: %define _without_check 1}
-#%{!?_without_check: %define _without_check 1}
-#%{!?_without_check: %define _without_check 0}
-# FIX THIS!
 
 %prep
 %setup -q
@@ -179,23 +174,26 @@ fi
 %files
 %defattr(-,root,root,-)
 %doc docs/*
-%config(noreplace) %{_sysconfdir}/at.deny
+%config(noreplace)		%{_sysconfdir}/at.deny
+%config(noreplace)		%{_sysconfdir}/sysconfig/atd
 %attr(0755,root,root)		%{_sysconfdir}/rc.d/init.d/atd
-%attr(0644,root,root)		%{_sysconfdir}/sysconfig/atd
 %attr(0700,daemon,daemon)	%dir %{_localstatedir}/spool/at
 %attr(0600,daemon,daemon)	%verify(not md5 size mtime) %ghost %{_localstatedir}/spool/at/.SEQ
 %attr(0700,daemon,daemon)	%dir %{_localstatedir}/spool/at/spool
-%attr(0640,root,daemon)	%config(noreplace) /etc/pam.d/atd
+%attr(0640,root,daemon)		%config(noreplace) /etc/pam.d/atd
 %{_sbindir}/atrun
-%attr(0755,root,root)	%{_sbindir}/atd
+%attr(0755,root,root)		%{_sbindir}/atd
 %{_mandir}/man*/*
 %{_bindir}/batch
 %{_bindir}/atrm
 %{_bindir}/atq
-%attr(4755,root,root)	%{_bindir}/at
-%attr(0755,root,root)	%{_libdir}/pm-utils/sleep.d/56atd
+%attr(4755,root,root)		%{_bindir}/at
+%attr(0755,root,root)		%{_libdir}/pm-utils/sleep.d/56atd
 
 %changelog
+* Tue Oct 13 2009 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.10-39
+- 528582 add noreplace option into files section
+
 * Tue Sep 29 2009 Tomas Mraz <tmraz@redhat.com> 3.1.10-38
 - authentication PAM modules have to be configured for pam_setcred()
 
