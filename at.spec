@@ -6,7 +6,7 @@
 Summary: Job spooling tools
 Name: at
 Version: 3.1.10
-Release: 31%{?dist}
+Release: 32%{?dist}
 License: GPLv2+
 Group: System Environment/Daemons
 URL: http://ftp.debian.org/debian/pool/main/a/at
@@ -179,23 +179,26 @@ fi
 %files
 %defattr(-,root,root,-)
 %doc docs/*
-%config(noreplace) %{_sysconfdir}/at.deny
+%config(noreplace)		%{_sysconfdir}/at.deny
+%config(noreplace)		%{_sysconfdir}/sysconfig/atd
 %attr(0755,root,root)		%{_sysconfdir}/rc.d/init.d/atd
-%attr(0644,root,root)		%{_sysconfdir}/sysconfig/atd
 %attr(0700,daemon,daemon)	%dir %{_localstatedir}/spool/at
 %attr(0600,daemon,daemon)	%verify(not md5 size mtime) %ghost %{_localstatedir}/spool/at/.SEQ
 %attr(0700,daemon,daemon)	%dir %{_localstatedir}/spool/at/spool
-%attr(0640,root,daemon)	%config(noreplace) /etc/pam.d/atd
+%attr(0640,root,daemon)		%config(noreplace) /etc/pam.d/atd
 %{_sbindir}/atrun
-%attr(0755,root,root)	%{_sbindir}/atd
+%attr(0755,root,root)		%{_sbindir}/atd
 %{_mandir}/man*/*
 %{_bindir}/batch
 %{_bindir}/atrm
 %{_bindir}/atq
-%attr(4755,root,root)	%{_bindir}/at
-%attr(0755,root,root)	%{_libdir}/pm-utils/sleep.d/56atd
+%attr(4755,root,root)		%{_bindir}/at
+%attr(0755,root,root)		%{_libdir}/pm-utils/sleep.d/56atd
 
 %changelog
+* Tue Oct 13 2009 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.10-32
+- 528582 add noreplace option into files section
+
 * Fri Jul 17 2009 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.10-31
 - 502078 fix pm-utils script to wake up only when atd was running
 
