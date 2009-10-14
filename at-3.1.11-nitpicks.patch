@@ -1,0 +1,86 @@
+diff -up at-3.1.11/at.1.in.typo at-3.1.11/at.1.in
+--- at-3.1.11/at.1.in.typo	2009-08-14 12:49:05.000000000 -0400
++++ at-3.1.11/at.1.in	2009-09-29 13:11:37.869869479 -0400
+@@ -89,7 +89,9 @@ or giving a date of the form
+ or
+ .B MM/DD/YY
+ or
+-.B DD.MM.YY.
++.B DD.MM.YY
++or
++.B YYYY-MM-DD.
+ The specification of a date
+ .I must
+ follow the specification of the time of day.
+@@ -119,7 +121,7 @@ and to run a job at 1am tomorrow, you wo
+ .B at 1am tomorrow.
+ .PP
+ The exact definition of the time specification can be found in
+-.IR @prefix@/share/doc/at/timespec .
++.IR @prefix@/share/doc/at-@VERSION@/timespec .
+ .PP
+ For both
+ .BR at " and " batch ,
+diff -up at-3.1.11/atd.c.typo at-3.1.11/atd.c
+--- at-3.1.11/atd.c.typo	2009-09-29 13:02:17.068860987 -0400
++++ at-3.1.11/atd.c	2009-09-29 13:02:17.099881137 -0400
+@@ -276,6 +276,8 @@ run_file(const char *filename, uid_t uid
+ 	free(newname);
+ 	return;
+     }
++    (void) setsid(); //own session for process
++
+     /* Let's see who we mail to.  Hopefully, we can read it from
+      * the command file; if not, send it to the owner, or, failing that,
+      * to root.
+@@ -497,7 +499,7 @@ run_file(const char *filename, uid_t uid
+ #if defined(SENDMAIL)
+ 	    execl(SENDMAIL, "sendmail", mailname, (char *) NULL);
+ #else
+-#error      "No mail command specified."
++	    perr("No mail command specified.");
+ #endif
+ 	    perr("Exec failed for mail command");
+ 
+@@ -606,6 +608,7 @@ run_loop()
+ 		 * Let's remove the lockfile and reschedule.
+ 		 */
+ 		strncpy(lock_name, dirent->d_name, sizeof(lock_name));
++		lock_name[sizeof(lock_name)-1] = '\0';
+ 		lock_name[0] = '=';
+ 		unlink(lock_name);
+ 		next_job = now;
+@@ -640,6 +643,7 @@ run_loop()
+ 	    run_batch++;
+ 	    if (strcmp(batch_name, dirent->d_name) > 0) {
+ 		strncpy(batch_name, dirent->d_name, sizeof(batch_name));
++		batch_name[sizeof(batch_name)-1] = '\0';
+ 		batch_uid = buf.st_uid;
+ 		batch_gid = buf.st_gid;
+ 		batch_queue = queue;
+
+diff -up at-3.1.11/configure.ac.aaa at-3.1.11/configure.ac
+--- at-3.1.11/configure.ac.aaa	2009-08-14 12:49:05.000000000 -0400
++++ at-3.1.11/configure.ac	2009-09-29 13:35:59.230866054 -0400
+@@ -5,7 +5,7 @@ AC_CONFIG_SRCDIR(at.c)
+ 
+ AC_PREFIX_DEFAULT(/usr)
+ AC_CONFIG_HEADER(config.h)
+-AC_PREREQ([2.64])
++AC_PREREQ([2.63])
+ 
+ VERSION=AC_PACKAGE_VERSION
+ if test "X$CFLAGS" = "X"; then
+diff -up at-3.1.11/atd.c.seg at-3.1.11/atd.c
+--- at-3.1.11/atd.c.seg	2009-08-14 12:49:05.000000000 -0400
++++ at-3.1.11/atd.c	2009-09-29 12:15:55.200864618 -0400
+@@ -435,6 +435,9 @@ run_file(const char *filename, uid_t uid
+ 	    if (setuid(uid) < 0)
+ 		perr("Cannot set user id");
+ 
++	    if (SIG_ERR == signal(SIGCHLD, SIG_DFL))
++		perr("Cannot reset signal handler to default");
++
+ 	    chdir("/");
+ 
+ 	    if (execle("/bin/sh", "sh", (char *) NULL, nenvp) != 0)

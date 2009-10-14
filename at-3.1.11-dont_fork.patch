@@ -1,0 +1,92 @@
+diff -up at-3.1.11/atd.8.in.dont_fork at-3.1.11/atd.8.in
+--- at-3.1.11/atd.8.in.dont_fork	2009-08-14 18:49:05.000000000 +0200
++++ at-3.1.11/atd.8.in	2009-10-01 13:03:18.799878107 +0200
+@@ -1,4 +1,4 @@
+-.TH ATD 8 "Mar 1997" local "Linux Programmer's Manual"
++.TH ATD 8 "Sep 2009" at-3.1.11 "Linux Programmer's Manual"
+ .SH NAME
+ atd \- run jobs queued for later execution
+ .SH SYNOPSIS
+@@ -9,6 +9,7 @@ atd \- run jobs queued for later executi
+ .IR batch_interval ]
+ .RB [ -d ]
+ .RB [ -s ]
++.RB [ -n ]
+ .SH DESCRIPTION
+ .B atd
+ runs jobs queued by
+@@ -45,6 +46,9 @@ A script invoking
+ is installed as
+ .B @prefix@/sbin/atrun
+ for backward compatibility.
+++.TP 8
+++.B -n
+++Don't fork option.
+ .SH WARNING
+ .B atd
+ won't work if its spool directory is mounted via NFS even if
+diff -up at-3.1.11/atd.c.dont_fork at-3.1.11/atd.c
+--- at-3.1.11/atd.c.dont_fork	2009-10-01 13:03:18.000000000 +0200
++++ at-3.1.11/atd.c	2009-10-01 13:04:55.289631298 +0200
+@@ -729,7 +729,7 @@ main(int argc, char *argv[])
+     run_as_daemon = 1;
+     batch_interval = BATCH_INTERVAL_DEFAULT;
+ 
+-    while ((c = getopt(argc, argv, "sdl:b:")) != EOF) {
++    while ((c = getopt(argc, argv, "sdl:b:n")) != EOF) {
+ 	switch (c) {
+ 	case 'l':
+ 	    if (sscanf(optarg, "%lf", &load_avg) != 1)
+@@ -744,7 +744,10 @@ main(int argc, char *argv[])
+ 	    break;
+ 	case 'd':
+ 	    daemon_debug++;
+-	    break;
++        /* go through another option*/
++   case 'n':
++        daemon_nofork++;
++        break;
+ 
+ 	case 's':
+ 	    run_as_daemon = 0;
+diff -up at-3.1.11/daemon.c.dont_fork at-3.1.11/daemon.c
+--- at-3.1.11/daemon.c.dont_fork	2009-08-14 18:49:05.000000000 +0200
++++ at-3.1.11/daemon.c	2009-10-01 13:03:18.800878165 +0200
+@@ -48,7 +48,8 @@
+ #include "daemon.h"
+ #include "privs.h"
+ 
+-int daemon_debug;
++int daemon_debug = 0;
++int daemon_nofork = 0;
+ 
+ static int
+ lock_fd(int fd)
+@@ -117,15 +118,18 @@ daemon_setup()
+ 	    (open("/dev/null", O_RDWR) != 2)) {
+ 	    perr("Error redirecting I/O");
+ 	}
++    }
++    if (daemon_nofork) pid = getpid();
++    else {
+ 	pid = fork();
+ 	if (pid == -1) {
+ 	    perr("Cannot fork");
+ 	} else if (pid != 0) {
+ 	    exit(0);
+ 	}
++	(void) setsid();
+     }
+     old_umask = umask(S_IWGRP | S_IWOTH);
+-    (void) setsid();
+ 
+     PRIV_START
+ 
+diff -up at-3.1.11/daemon.h.dont_fork at-3.1.11/daemon.h
+--- at-3.1.11/daemon.h.dont_fork	2009-08-14 18:49:05.000000000 +0200
++++ at-3.1.11/daemon.h	2009-10-01 13:03:18.801877593 +0200
+@@ -14,3 +14,4 @@ __attribute__((noreturn))
+ perr (const char *fmt, ...);
+ 
+ extern int daemon_debug;
++extern int daemon_nofork;

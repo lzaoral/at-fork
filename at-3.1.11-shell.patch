@@ -1,0 +1,55 @@
+diff -up at-3.1.11/at.c.shell at-3.1.11/at.c
+--- at-3.1.11/at.c.shell	2009-08-14 18:49:05.000000000 +0200
++++ at-3.1.11/at.c	2009-09-29 15:50:34.786919463 +0200
+@@ -62,11 +62,8 @@
+ #include <stdlib.h>
+ #include <string.h>
+ 
+-#ifdef TM_IN_SYS_TIME
+ #include <sys/time.h>
+-#else
+ #include <time.h>
+-#endif
+ 
+ #ifdef HAVE_UNISTD_H
+ #include <unistd.h>
+@@ -241,6 +238,12 @@ writefile(time_t runtimer, char queue)
+     int kill_errno;
+     int rc;
+     int mailsize = 128;
++    struct timeval tv;
++    struct timezone tz;
++    long int i;
++
++    gettimeofday(&tv, &tz);
++    srandom(getpid()+tv.tv_usec);
+ 
+ /* Install the signal handler for SIGINT; terminate after removing the
+  * spool file if necessary
+@@ -458,6 +461,9 @@ writefile(time_t runtimer, char queue)
+     fprintf(fp, " || {\n\t echo 'Execution directory "
+ 	    "inaccessible' >&2\n\t exit 1\n}\n");
+ 
++    i = random();
++    fprintf(fp, "${SHELL:-/bin/sh} << marcinDELIMITER%08lx\n", i);
++
+     istty = isatty(fileno(stdin));
+     if (istty) {
+ 	fprintf(stderr, "at> ");
+@@ -474,6 +480,7 @@ writefile(time_t runtimer, char queue)
+ 	fprintf(stderr, "<EOT>\n");
+     }
+     fprintf(fp, "\n");
++    fprintf(fp, "marcinDELIMITER%08lx\n", i);
+     if (ferror(fp))
+ 	panic("Output error");
+ 
+@@ -924,7 +931,7 @@ main(int argc, char **argv)
+ 	   It also alows a warning diagnostic to be printed.  Because of the
+ 	   possible variance, we always output the diagnostic. */
+ 
+-	fprintf(stderr, "warning: commands will be executed using /bin/sh\n");
++	//fprintf(stderr, "warning: commands will be executed using /bin/sh\n");
+ 
+ 	writefile(timer, queue);
+ 	break;

@@ -1,0 +1,12 @@
+--- at-3.1.10/pam_atd.pam   2007-07-03 13:29:24.000000000 +0200
++++ at-3.1.10/pam_atd   2007-07-03 13:29:24.000000000 +0200
+@@ -0,0 +1,9 @@
++# The PAM configuration file for the at daemon
++#
++#
++auth       required    pam_env.so
++auth       include     password-auth
++account    required    pam_access.so
++account    include     password-auth
++session    required    pam_loginuid.so
++session    include     password-auth

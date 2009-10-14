@@ -1,0 +1,17 @@
+diff -up at-3.1.11/at.c.opt_V at-3.1.11/at.c
+--- at-3.1.11/at.c.opt_V	2009-09-29 12:42:16.000000000 -0400
++++ at-3.1.11/at.c	2009-09-29 12:46:43.998865749 -0400
+@@ -857,10 +857,9 @@ main(int argc, char **argv)
+      */
+ 
+     if (disp_version) {
+-	fprintf(stderr, "at version " VERSION "\n"
+-	   "Please report bugs to the Debian bug tracking system (http://bugs.debian.org/)\n"
+-	   "or contact the maintainers (at@packages.debian.org).\n");
+-	exit(EXIT_SUCCESS);
++        fprintf(stderr, "at version " VERSION "\n");
++        if (argc == 2)
++            exit(EXIT_SUCCESS);
+     }
+ 
+     /* select our program

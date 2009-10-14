@@ -1,0 +1,427 @@
+diff -up at-3.1.11/at.c.pam2 at-3.1.11/at.c
+--- at-3.1.11/at.c.pam2	2009-10-13 16:47:23.277378517 +0200
++++ at-3.1.11/at.c	2009-10-13 16:47:23.321377936 +0200
+@@ -315,26 +315,19 @@ writefile(time_t runtimer, char queue)
+ 	 * bit.  Yes, this is a kluge.
+ 	 */
+ 	cmask = umask(S_IRUSR | S_IWUSR | S_IXUSR);
+-        seteuid(real_uid);
++       if ((seteuid(effective_uid)) < 0)
++	    perr("Error in seteuid: %s", errno);
+ 	if ((fd = open(atfile, O_CREAT | O_EXCL | O_TRUNC | O_WRONLY, S_IRUSR)) == -1)
+ 	    perr("Cannot create atjob file %.500s", atfile);
+-        seteuid(effective_uid);
+ 
+ 	if ((fd2 = dup(fd)) < 0)
+ 	    perr("Error in dup() of job file");
+ 
+-        /*
+ 	if (fchown(fd2, real_uid, real_gid) != 0)
+-	    perr("Cannot give away file");
+-        */
++	    perr("Cannot give real_uid and real_gid the file");
+ 
+     PRIV_END
+ 
+-    /* We no longer need suid root; now we just need to be able to write
+-     * to the directory, if necessary.
+-     */
+-
+-    REDUCE_PRIV(daemon_uid, daemon_gid)
+     /* We've successfully created the file; let's set the flag so it 
+      * gets removed in case of an interrupt or error.
+      */
+@@ -493,7 +486,7 @@ writefile(time_t runtimer, char queue)
+      */
+ 
+     if (fchmod(fd2, S_IRUSR | S_IWUSR | S_IXUSR) < 0)
+-	perr("Cannot give away file");
++	perr("Cannot change the mode of the file");
+ 
+     close(fd2);
+ 
+@@ -658,7 +651,7 @@ process_jobs(int argc, char **argv, int 
+                     We need the unprivileged uid here since the file is owned by the real
+                     (not effective) uid.
+                     */
+-                    setregid(real_gid, effective_gid);
++		    PRIV_START
+ 
+ 		    if (queue == '=') {
+ 			fprintf(stderr, "Warning: deleting running job\n");
+@@ -667,8 +660,8 @@ process_jobs(int argc, char **argv, int 
+ 			perr("Cannot unlink %.500s", dirent->d_name);
+ 			rc = EXIT_FAILURE;
+ 		    }
++		    PRIV_END
+ 
+-                    setregid(effective_gid, real_gid);
+ 		    done = 1;
+ 
+ 		    break;
+@@ -678,7 +671,7 @@ process_jobs(int argc, char **argv, int 
+ 			FILE *fp;
+ 			int ch;
+ 
+-			setregid(real_gid, effective_gid);
++			PRIV_START
+ 			fp = fopen(dirent->d_name, "r");
+ 
+ 			if (fp) {
+@@ -691,7 +684,7 @@ process_jobs(int argc, char **argv, int 
+ 			    perr("Cannot open %.500s", dirent->d_name);
+ 			    rc = EXIT_FAILURE;
+ 			}
+-			setregid(effective_gid, real_gid);
++			PRIV_END
+ 		    }
+ 		    break;
+ 
+diff -up at-3.1.11/atd.c.pam2 at-3.1.11/atd.c
+--- at-3.1.11/atd.c.pam2	2009-10-13 16:47:23.297368464 +0200
++++ at-3.1.11/atd.c	2009-10-13 16:48:21.696629698 +0200
+@@ -112,7 +112,7 @@ static int run_as_daemon = 0;
+ 
+ static volatile sig_atomic_t term_signal = 0;
+ 
+-#ifdef HAVE_PAM
++#ifdef WITH_PAM
+ #include <security/pam_appl.h>
+ 
+ static pam_handle_t *pamh = NULL;
+@@ -121,15 +121,7 @@ static const struct pam_conv conv = {
+ 	NULL
+ };
+ 
+-#define PAM_FAIL_CHECK if (retcode != PAM_SUCCESS) { \
+-	fprintf(stderr,"\n%s\n",pam_strerror(pamh, retcode)); \
+-	syslog(LOG_ERR,"%s",pam_strerror(pamh, retcode)); \
+-	pam_end(pamh, retcode); exit(1); \
+-    }
+-#define PAM_END { retcode = pam_close_session(pamh,0); \
+-		pam_end(pamh,retcode); }
+-
+-#endif /* HAVE_PAM */
++#endif /* WITH_PAM */
+ 
+ /* Signal handlers */
+ RETSIGTYPE 
+@@ -236,7 +228,7 @@ run_file(const char *filename, uid_t uid
+     char queue;
+     char fmt[64];
+     unsigned long jobno;
+-#ifdef HAVE_PAM
++#ifdef WITH_PAM
+     int retcode;
+ #endif
+ 
+@@ -396,16 +388,11 @@ run_file(const char *filename, uid_t uid
+     fstat(fd_out, &buf);
+     size = buf.st_size;
+ 
+-#ifdef HAVE_PAM
++#ifdef WITH_PAM
+     PRIV_START
+-    retcode = pam_start("atd", pentry->pw_name, &conv, &pamh);
+-    PAM_FAIL_CHECK;
+-    retcode = pam_acct_mgmt(pamh, PAM_SILENT);
+-    PAM_FAIL_CHECK;
+-    retcode = pam_open_session(pamh, PAM_SILENT);
+-    PAM_FAIL_CHECK;
+-    retcode = pam_setcred(pamh, PAM_ESTABLISH_CRED | PAM_SILENT);
+-    PAM_FAIL_CHECK;
++    PAM_HANDLING;
++    closelog(); 
++    openlog("atd", LOG_PID, LOG_ATD);
+     PRIV_END
+ #endif
+ 
+@@ -420,7 +407,15 @@ run_file(const char *filename, uid_t uid
+     else if (pid == 0) {
+ 	char *nul = NULL;
+ 	char **nenvp = &nul;
++	char **pam_envp=0L;
+ 
++	PRIV_START
++#ifdef WITH_PAM
++	pam_envp = pam_getenvlist(pamh);
++	if ( ( pam_envp != 0L ) && (pam_envp[0] != 0L) )
++		nenvp = pam_envp;
++#endif
++	PRIV_END
+ 	/* Set up things for the child; we want standard input from the
+ 	 * input file, and standard output and error sent to our output file.
+ 	 */
+@@ -461,7 +456,16 @@ run_file(const char *filename, uid_t uid
+ 
+ 	    if (execle("/bin/sh", "sh", (char *) NULL, nenvp) != 0)
+ 		perr("Exec failed for /bin/sh");
+-
++#ifdef  WITH_PAM
++	    if ( ( nenvp != &nul ) && (pam_envp != 0L)  && (*pam_envp != 0L))
++	    {
++		for( nenvp = pam_envp; *nenvp != 0L; nenvp++)
++			free(*nenvp);
++		free( pam_envp );
++		nenvp = &nul;
++		pam_envp=0L;
++	    }
++#endif
+ 	PRIV_END
+     }
+     /* We're the parent.  Let's wait.
+@@ -475,7 +479,7 @@ run_file(const char *filename, uid_t uid
+      */
+     waitpid(pid, (int *) NULL, 0);
+ 
+-#ifdef HAVE_PAM
++#ifdef WITH_PAM
+     PRIV_START
+ 	pam_setcred(pamh, PAM_DELETE_CRED | PAM_SILENT);
+ 	retcode = pam_close_session(pamh, PAM_SILENT);
+@@ -490,6 +494,13 @@ run_file(const char *filename, uid_t uid
+     if (open(filename, O_RDONLY) != STDIN_FILENO)
+ 	perr("Open of jobfile failed");
+ 
++#ifdef  WITH_PAM
++    pam_setcred(pamh, PAM_DELETE_CRED | PAM_SILENT );
++    pam_close_session(pamh, PAM_SILENT);
++    pam_end(pamh, PAM_ABORT);
++    closelog();
++    openlog("atd", LOG_PID, LOG_ATD);
++#endif
+     unlink(filename);
+ 
+     /* The job is now finished.  We can delete its input file.
+@@ -498,8 +509,19 @@ run_file(const char *filename, uid_t uid
+     unlink(newname);
+     free(newname);
+ 
++#ifdef ATD_MAIL_PROGRAM
+     if (((send_mail != -1) && (buf.st_size != size)) || (send_mail == 1)) {
++       int mail_pid = -1;
++#ifdef WITH_PAM
++       PAM_HANDLING;
++       closelog();
++       openlog("atd", LOG_PID, LOG_ATD);
++#endif
+ 
++   mail_pid = fork();
++
++   if ( mail_pid == 0 )
++   {
+ 	PRIV_START
+ 
+ 	    if (initgroups(pentry->pw_name, pentry->pw_gid))
+@@ -513,15 +535,28 @@ run_file(const char *filename, uid_t uid
+ 
+ 	    chdir ("/");
+ 
+-#if defined(SENDMAIL)
+-	    execl(SENDMAIL, "sendmail", mailname, (char *) NULL);
+-#else
+-	    perr("No mail command specified.");
+-#endif
++           execl(ATD_MAIL_PROGRAM, ATD_MAIL_NAME, mailname, (char *) NULL);
+ 	    perr("Exec failed for mail command");
++	    exit(-1);
+ 
+ 	PRIV_END
++   }
++   else if ( mail_pid == -1 ) {
++           perr("fork of mailer failed");
++   }
++   else {
++           /* Parent */
++           waitpid(mail_pid, (int *) NULL, 0);
++   }
++#ifdef WITH_PAM
++   pam_setcred(pamh, PAM_DELETE_CRED | PAM_SILENT );
++   pam_close_session(pamh, PAM_SILENT);
++   pam_end(pamh, PAM_ABORT);
++   closelog();
++   openlog("atd", LOG_PID, LOG_ATD);
++#endif
+     }
++#endif
+     exit(EXIT_SUCCESS);
+ }
+ 
+diff -up at-3.1.11/config.h.in.pam2 at-3.1.11/config.h.in
+--- at-3.1.11/config.h.in.pam2	2009-08-14 18:49:05.000000000 +0200
++++ at-3.1.11/config.h.in	2009-10-13 16:47:23.323393602 +0200
+@@ -74,8 +74,8 @@
+ /* Define to 1 if you have the <nlist.h> header file. */
+ #undef HAVE_NLIST_H
+ 
+-/* Define to 1 for PAM support */
+-#undef HAVE_PAM
++/* Define if you are building with_pam */
++#undef WITH_PAM
+ 
+ /* Define to 1 if you have the `pstat_getdynamic' function. */
+ #undef HAVE_PSTAT_GETDYNAMIC
+diff -up at-3.1.11/configure.ac.pam2 at-3.1.11/configure.ac
+--- at-3.1.11/configure.ac.pam2	2009-10-13 16:47:23.266377946 +0200
++++ at-3.1.11/configure.ac	2009-10-13 16:47:23.324393260 +0200
+@@ -84,7 +84,7 @@ AC_FUNC_GETLOADAVG
+ AC_CHECK_FUNCS(getcwd mktime strftime setreuid setresuid sigaction waitpid)
+ AC_CHECK_HEADERS(security/pam_appl.h, [
+   PAMLIB="-lpam"
+-  AC_DEFINE(HAVE_PAM, 1, [Define to 1 for PAM support])
++  AC_DEFINE(WITH_PAM, 1, [Define to 1 for PAM support])
+ ])
+ 
+ dnl Checking for programs
+@@ -301,5 +301,12 @@ AC_ARG_WITH(daemon_groupname,
+ )
+ AC_SUBST(DAEMON_GROUPNAME)
+ 
++AC_ARG_WITH(pam,
++[ --with-pam            Define to enable pam support ],
++AC_DEFINE(WITH_PAM),
++)
++AC_CHECK_LIB(pam, pam_start, PAMLIB='-lpam -lpam_misc')
++AC_SUBST(PAMLIB)
++
+ AC_CONFIG_FILES(Makefile atrun atd.8 atrun.8 at.1 batch)
+ AC_OUTPUT
+diff -up at-3.1.11/perm.c.pam2 at-3.1.11/perm.c
+--- at-3.1.11/perm.c.pam2	2009-08-14 18:49:05.000000000 +0200
++++ at-3.1.11/perm.c	2009-10-13 16:47:23.325392918 +0200
+@@ -51,6 +51,14 @@
+ #define PRIV_END while(0)
+ #endif
+ 
++#ifdef WITH_PAM
++#include <security/pam_appl.h>
++static pam_handle_t *pamh = NULL;
++static const struct pam_conv conv = {
++       NULL
++};
++#endif
++
+ /* Structures and unions */
+ 
+ 
+@@ -108,18 +116,53 @@ user_in_file(const char *path, const cha
+ int
+ check_permission()
+ {
+-  uid_t uid = geteuid();
++  uid_t euid = geteuid(), uid=getuid(), egid=getegid(), gid=getgid();
+   struct passwd *pentry;
+   int    allow = 0, deny = 1;
+ 
+-  if (uid == 0)
++  int    retcode = 0;
++  if (euid == 0)
+     return 1;
+ 
+-  if ((pentry = getpwuid(uid)) == NULL) {
++  if ((pentry = getpwuid(euid)) == NULL) {
+     perror("Cannot access user database");
+     exit(EXIT_FAILURE);
+   }
+ 
++#ifdef  WITH_PAM
++/*
++ *  We must check if the atd daemon userid will be allowed to gain the job owner user's
++ *  credentials with PAM . If not, the user has been denied at(1) usage, eg. with pam_access.
++ */
++  if (setreuid(daemon_uid, daemon_uid) != 0) {
++      fprintf(stderr, "cannot set egid: %s", strerror(errno));
++      exit(1);
++  }
++  if (setregid(daemon_gid, daemon_gid) != 0) {
++      fprintf(stderr, "cannot set euid: %s", strerror(errno));
++      exit(1);
++  }
++
++    pam_close_session(pamh,PAM_SILENT);
++
++    PAM_HANDLING;
++
++    pam_setcred(pamh, PAM_DELETE_CRED | PAM_SILENT );
++    pam_close_session(pamh,PAM_SILENT);
++    pam_end(pamh, PAM_ABORT);
++
++    if (setregid(gid,egid) != 0) {
++        fprintf(stderr, "cannot set egid: %s", strerror(errno));
++        exit(1);
++    }
++    if (setreuid(uid,euid) != 0) {
++        fprintf(stderr, "cannot set euid: %s", strerror(errno));
++        exit(1);
++    }
++
++
++#endif
++
+   allow = user_in_file(ETCDIR "/at.allow", pentry->pw_name);
+   if (allow==0 || allow==1)
+     return allow;
+diff -up at-3.1.11/privs.h.pam2 at-3.1.11/privs.h
+--- at-3.1.11/privs.h.pam2	2009-08-14 18:49:05.000000000 +0200
++++ at-3.1.11/privs.h	2009-10-13 16:47:23.326393135 +0200
+@@ -144,3 +144,60 @@ extern gid_t real_gid, effective_gid, da
+ #error "Cannot implement user ID swapping without setreuid or setresuid"
+ #endif
+ #endif
++
++#ifdef WITH_PAM
++/* PAM failed after session was open.  */
++#define PAM_SESSION_FAIL if (retcode != PAM_SUCCESS) \
++	pam_close_session(pamh,PAM_SILENT);
++
++/* syslog will be logging error messages */
++#ifdef HAVE_UNISTD_H
++#include <syslog.h>
++#endif
++
++/* PAM fail even before opening the session */
++#define PAM_FAIL_CHECK \
++	do { if (retcode != PAM_SUCCESS) { \
++		fprintf(stderr,"PAM failure: %s\n",pam_strerror(pamh, retcode)); \
++		syslog(LOG_ERR,"%s",pam_strerror(pamh, retcode)); \
++		if (pamh) \
++		    pam_end(pamh, retcode); \
++		if (setregid(getgid(),getegid()) != 0) { \
++		    fprintf(stderr, "cannot set egid: %s", strerror(errno)); \
++		    exit(1); \
++		} \
++		if (setreuid(getuid(),geteuid()) != 0) { \
++		    fprintf(stderr, "cannot set euid: %s", strerror(errno)); \
++		    exit(1); \
++		} \
++		exit(1); \
++	    } \
++	} while (0) \
++
++/* PAM - check after every operation whether they passed */
++#define PAM_HANDLING \
++	do { pamh = NULL; \
++	retcode = pam_start("atd", pentry->pw_name, &conv, &pamh); \
++	PAM_FAIL_CHECK; \
++	retcode = pam_set_item(pamh, PAM_TTY, "atd"); \
++	PAM_FAIL_CHECK; \
++	retcode = pam_acct_mgmt(pamh, PAM_SILENT); \
++	PAM_FAIL_CHECK; \
++	retcode = pam_open_session(pamh, PAM_SILENT); \
++	PAM_FAIL_CHECK; \
++	retcode = pam_setcred(pamh, PAM_ESTABLISH_CRED | PAM_SILENT); \
++	PAM_SESSION_FAIL; \
++	PAM_FAIL_CHECK; \
++	} while (0)
++
++/* OLD FAIL_CHECK ONLY FOR perm.c
++ * define PAM_FAIL_CHECK if (retcode != PAM_SUCCESS) { \
++ *         fprintf(stderr,"\nPAM failure %s\n",pam_strerror(pamh, retcode)); \
++ *         syslog(LOG_ERR,"%s",pam_strerror(pamh, retcode)); \
++ *         if (pamh) \
++ *               pam_end(pamh, retcode); \
++ *         exit(1); \
++ * }
++ */
++
++#endif

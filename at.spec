@@ -1,42 +1,30 @@
-%define major_ver 3.1.10
+%define major_ver 3.1.11
 
 %if %{?WITH_PAM:0}%{!?WITH_PAM:1}
 %define WITH_PAM 1
 %endif
 Summary: Job spooling tools
 Name: at
-Version: 3.1.10
-Release: 38%{?dist}
+Version: %{major_ver}
+Release: 1%{dist}
 License: GPLv2+
 Group: System Environment/Daemons
 URL: http://ftp.debian.org/debian/pool/main/a/at
-Source: http://ftp.debian.org/debian/pool/main/a/at/at_%{major_ver}.tar.gz
+Source: http://ftp.debian.org/debian/pool/main/a/at/at_%{major_ver}.orig.tar.gz
 Source1: test.pl
 Source2: atd.init
 Source3: atd.sysconf
 Source4: 56atd
-Patch0: at-3.1.7-lockfile.patch
-Patch1: at-3.1.10-makefile.patch
-Patch2: at-3.1.10-man-timespec-path.patch
-Patch3: at-3.1.7-sigchld.patch
-Patch4: at-3.1.10-typo.patch
-Patch5: at-3.1.8-perr.patch
-Patch6: at-3.1.10-shell.patch
-Patch7: at-3.1.8-t_option.patch
-Patch8: at-3.1.10-pam.patch
-Patch9: at-3.1.10-dont_fork.patch
-Patch10: at-3.1.10-perm.patch
-Patch11: at-3.1.10-opt_V.patch
-Patch12: at-3.1.10-session.patch
-Patch13: at-3.1.10-havepam.patch
-# included in another pam patch
-#Patch14: at-3.1.10-pam_keyring.patch
-Patch15: at-3.1.10-PIE.patch
-Patch16: at-3.1.10-pamfix.patch
-Patch17: at-3.1.10-nonposix.patch
-Patch18: at-3.1.10-selinux_mail.patch
-Patch19: at-3.1.10-man_hyphen.patch
-Patch20: at-3.1.10-different_shell.patch
+
+Patch1: at-3.1.11-makefile.patch
+Patch2: at-3.1.11-nitpicks.patch
+Patch3: at-3.1.11-shell.patch
+Patch4: at-3.1.11-opt_V.patch
+Patch5: at-3.1.11-dont_fork.patch
+Patch6: at-3.1.11-log.patch
+Patch7: at-3.1.11-pam.patch
+Patch8: at-3.1.11-pam2.patch
+Patch9: at-3.1.11-selinux.patch
 
 BuildRequires: fileutils chkconfig /etc/init.d
 BuildRequires: flex bison autoconf
@@ -54,48 +42,31 @@ Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 At and batch read commands from standard input or from a specified
 file. At allows you to specify that a command will be run at a
 particular time. Batch will execute commands when the system load
-levels drop to a particular level. Both commands use /bin/sh.
+levels drop to a particular level. Both commands use user's shell.
 
 You should install the at package if you need a utility for
 time-oriented job control. Note: If it is a recurring job that will
 need to be repeated at the same time every day/week, etc. you should
 use crontab instead.
 
-#%{?_without_check: %define _without_check 1}
-#%{!?_without_check: %define _without_check 1}
-#%{!?_without_check: %define _without_check 0}
-# FIX THIS!
-
 %prep
 %setup -q
 
 cp %{SOURCE1} .
-%patch0 -p1 -b .lockfile
 %patch1 -p1 -b .make
-%patch2 -p1 -b .paths
-%patch3 -p1 -b .sigchld
-%patch4 -p1 -b .typo
-%patch5 -p1 -b .perr
-%patch6 -p1 -b .shell
-%patch7 -p1 -b .t_option
-%patch8 -p1 -b .pam
-%patch9 -p1 -b .dont_fork
-%patch10 -p1 -b .perm
-%patch11 -p1 -b .opt_V
-%patch12 -p1 -b .session
-%patch13 -p1 -b .havepam
-##%patch14 -p1 -b .pamkeyring
-%patch15 -p1 -b .PIE
-%patch16 -p1 -b .pamfix
-%patch17 -p1 -b .nonposix
-%patch18 -p1 -b .mailselinux
-%patch19 -p1 -b .hyphen
-%patch20 -p1 -b .fix
+%patch2 -p1 -b .typo
+%patch3 -p1 -b .shell
+%patch4 -p1 -b .opt_V
+%patch5 -p1 -b .dont_fork
+%patch6 -p1 -b .log
+%patch7 -p1 -b .pam
+%patch8 -p1 -b .pam2
+%patch9 -p1 -b .selinux
 
 %build
-# patch10 touches configure.in
+# patch9 touches configure.in
 autoconf
-# for patch11
+# uselles files
 rm -f lex.yy.* y.tab.*
 %configure --with-atspool=%{_localstatedir}/spool/at/spool \
 	--with-jobdir=%{_localstatedir}/spool/at \
@@ -179,25 +150,27 @@ fi
 %files
 %defattr(-,root,root,-)
 %doc docs/*
-%config(noreplace) %{_sysconfdir}/at.deny
+%config(noreplace)		%{_sysconfdir}/at.deny
+%config(noreplace)		%{_sysconfdir}/sysconfig/atd
 %attr(0755,root,root)		%{_sysconfdir}/rc.d/init.d/atd
-%attr(0644,root,root)		%{_sysconfdir}/sysconfig/atd
 %attr(0700,daemon,daemon)	%dir %{_localstatedir}/spool/at
 %attr(0600,daemon,daemon)	%verify(not md5 size mtime) %ghost %{_localstatedir}/spool/at/.SEQ
 %attr(0700,daemon,daemon)	%dir %{_localstatedir}/spool/at/spool
-%attr(0640,root,daemon)	%config(noreplace) /etc/pam.d/atd
+%attr(0640,root,daemon)		%config(noreplace) /etc/pam.d/atd
 %{_sbindir}/atrun
-%attr(0755,root,root)	%{_sbindir}/atd
+%attr(0755,root,root)		%{_sbindir}/atd
 %{_mandir}/man*/*
 %{_bindir}/batch
 %{_bindir}/atrm
 %{_bindir}/atq
-%attr(4755,root,root)	%{_bindir}/at
-%attr(0755,root,root)	%{_libdir}/pm-utils/sleep.d/56atd
+%attr(4755,root,root)		%{_bindir}/at
+%attr(0755,root,root)		%{_libdir}/pm-utils/sleep.d/56atd
 
 %changelog
-* Tue Sep 29 2009 Tomas Mraz <tmraz@redhat.com> 3.1.10-38
-- authentication PAM modules have to be configured for pam_setcred()
+* Tue Oct 13 2009 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.11-1
+- 528582 add noreplace option into files section
+- rewrite pam2 patch - check return value, use "better" macro, etc.
+- new version of at
 
 * Wed Sep 16 2009 Tomas Mraz <tmraz@redhat.com> 3.1.10-37
 - improve the PAM configuration, use password-auth common stack
