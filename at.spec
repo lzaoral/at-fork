@@ -27,7 +27,8 @@ Patch6: at-3.1.12-selinux.patch
 BuildRequires: fileutils chkconfig /etc/init.d
 BuildRequires: flex bison autoconf
 BuildRequires: libselinux-devel >= 1.27.9
-BuildRequires: perl-Test-Harness
+BuildRequires: perl(Test::Harness)
+BuildRequires: perl(Test::More)
 
 %if %{WITH_PAM}
 BuildRequires: pam-devel
