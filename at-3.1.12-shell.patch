@@ -1,6 +1,6 @@
-diff -up at-3.1.11/at.c.shell at-3.1.11/at.c
---- at-3.1.11/at.c.shell	2009-08-14 18:49:05.000000000 +0200
-+++ at-3.1.11/at.c	2009-09-29 15:50:34.786919463 +0200
+diff -up at-3.1.12/at.c.shell at-3.1.12/at.c
+--- at-3.1.12/at.c.shell	2009-12-02 13:25:12.706989310 +0100
++++ at-3.1.12/at.c	2009-12-02 13:26:01.991966200 +0100
 @@ -62,11 +62,8 @@
  #include <stdlib.h>
  #include <string.h>
@@ -13,7 +13,7 @@ diff -up at-3.1.11/at.c.shell at-3.1.11/at.c
  
  #ifdef HAVE_UNISTD_H
  #include <unistd.h>
-@@ -241,6 +238,12 @@ writefile(time_t runtimer, char queue)
+@@ -244,6 +241,12 @@ writefile(time_t runtimer, char queue)
      int kill_errno;
      int rc;
      int mailsize = 128;
@@ -26,7 +26,7 @@ diff -up at-3.1.11/at.c.shell at-3.1.11/at.c
  
  /* Install the signal handler for SIGINT; terminate after removing the
   * spool file if necessary
-@@ -458,6 +461,9 @@ writefile(time_t runtimer, char queue)
+@@ -461,6 +464,9 @@ writefile(time_t runtimer, char queue)
      fprintf(fp, " || {\n\t echo 'Execution directory "
  	    "inaccessible' >&2\n\t exit 1\n}\n");
  
@@ -36,7 +36,7 @@ diff -up at-3.1.11/at.c.shell at-3.1.11/at.c
      istty = isatty(fileno(stdin));
      if (istty) {
  	fprintf(stderr, "at> ");
-@@ -474,6 +480,7 @@ writefile(time_t runtimer, char queue)
+@@ -477,6 +483,7 @@ writefile(time_t runtimer, char queue)
  	fprintf(stderr, "<EOT>\n");
      }
      fprintf(fp, "\n");
@@ -44,7 +44,7 @@ diff -up at-3.1.11/at.c.shell at-3.1.11/at.c
      if (ferror(fp))
  	panic("Output error");
  
-@@ -924,7 +931,7 @@ main(int argc, char **argv)
+@@ -926,7 +933,7 @@ main(int argc, char **argv)
  	   It also alows a warning diagnostic to be printed.  Because of the
  	   possible variance, we always output the diagnostic. */
  

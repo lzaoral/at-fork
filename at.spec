@@ -1,4 +1,4 @@
-%define major_ver 3.1.11
+%define major_ver 3.1.12
 
 %if %{?WITH_PAM:0}%{!?WITH_PAM:1}
 %define WITH_PAM 1
@@ -11,20 +11,18 @@ License: GPLv2+
 Group: System Environment/Daemons
 URL: http://ftp.debian.org/debian/pool/main/a/at
 Source: http://ftp.debian.org/debian/pool/main/a/at/at_%{major_ver}.orig.tar.gz
-Source1: test.pl
+# git upstream source git://git.debian.org/git/collab-maint/at.git
+Source1: pam_atd
 Source2: atd.init
 Source3: atd.sysconf
 Source4: 56atd
 
-Patch1: at-3.1.11-makefile.patch
-Patch2: at-3.1.11-nitpicks.patch
-Patch3: at-3.1.11-shell.patch
-Patch4: at-3.1.11-opt_V.patch
-Patch5: at-3.1.11-dont_fork.patch
-Patch6: at-3.1.11-log.patch
-Patch7: at-3.1.11-pam.patch
-Patch8: at-3.1.11-pam2.patch
-Patch9: at-3.1.11-selinux.patch
+Patch1: at-3.1.12-makefile.patch
+Patch2: at-3.1.12-opt_V.patch
+Patch3: at-3.1.12-shell.patch
+Patch4: at-3.1.12-nitpicks.patch
+Patch5: at-3.1.12-pam.patch
+Patch6: at-3.1.12-selinux.patch
 
 BuildRequires: fileutils chkconfig /etc/init.d
 BuildRequires: flex bison autoconf
@@ -51,17 +49,13 @@ use crontab instead.
 
 %prep
 %setup -q
-
 cp %{SOURCE1} .
 %patch1 -p1 -b .make
-%patch2 -p1 -b .typo
+%patch2 -p1 -b .opt_V
 %patch3 -p1 -b .shell
-%patch4 -p1 -b .opt_V
-%patch5 -p1 -b .dont_fork
-%patch6 -p1 -b .log
-%patch7 -p1 -b .pam
-%patch8 -p1 -b .pam2
-%patch9 -p1 -b .selinux
+%patch4 -p1 -b .nit
+%patch5 -p1 -b .pam
+%patch6 -p1 -b .selinux
 
 %build
 # patch9 touches configure.in
@@ -78,15 +72,6 @@ rm -f lex.yy.* y.tab.*
 %endif
 
 make
-
-%check
-# don't run "make test" by default
-%{?_without_check: %define _without_check 1}
-%{!?_without_check: %define _without_check 1}
-
-%if ! %{_without_check}
-	LANG=C make test > /dev/null
-%endif
 
 %install
 make install \
@@ -109,13 +94,15 @@ echo > %{buildroot}%{_sysconfdir}/at.deny
 mkdir docs
 cp  %{buildroot}/%{_prefix}/doc/at/* docs/
 
+mkdir -p %{buildroot}%{_sysconfdir}/pam.d
+install -m 755 %{SOURCE1} %{buildroot}%{_sysconfdir}/pam.d/atd
+
 mkdir -p %{buildroot}%{_sysconfdir}/rc.d/init.d
 install -m 755 %{SOURCE2} %{buildroot}%{_sysconfdir}/rc.d/init.d/atd
 
 mv -f %{buildroot}/%{_mandir}/man5/at_allow.5 \
 	%{buildroot}/%{_mandir}/man5/at.allow.5
 rm -f %{buildroot}/%{_mandir}/man5/at_deny.5
-#ln -s at.allow.5 %{buildroot}/%{_mandir}/man5/at.deny.5
 
 mkdir -p %{buildroot}/etc/sysconfig
 install -m 755 %{SOURCE3} %{buildroot}/etc/sysconfig/atd
@@ -125,6 +112,9 @@ install -m 755 %{SOURCE4} %{buildroot}/%{_libdir}/pm-utils/sleep.d/56atd
 
 # remove unpackaged files from the buildroot
 rm -r  %{buildroot}%{_prefix}/doc
+
+%check
+make test
 
 %clean
 rm -rf %{buildroot}
@@ -156,7 +146,7 @@ fi
 %attr(0700,daemon,daemon)	%dir %{_localstatedir}/spool/at
 %attr(0600,daemon,daemon)	%verify(not md5 size mtime) %ghost %{_localstatedir}/spool/at/.SEQ
 %attr(0700,daemon,daemon)	%dir %{_localstatedir}/spool/at/spool
-%attr(0640,root,daemon)		%config(noreplace) /etc/pam.d/atd
+%attr(0640,root,daemon)		%config(noreplace) %{_sysconfdir}/pam.d/atd
 %{_sbindir}/atrun
 %attr(0755,root,root)		%{_sbindir}/atd
 %{_mandir}/man*/*
@@ -167,6 +157,13 @@ fi
 %attr(0755,root,root)		%{_libdir}/pm-utils/sleep.d/56atd
 
 %changelog
+* Thu Dec  3 2009 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.12-1
+- update to the new version of at
+- adapt patches for new version
+- change our pam config to source
+- start using new upstream test instead of our nonfunctinal
+- upstream changed nofork option -n to foreground option -f
+
 * Tue Oct 13 2009 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.11-1
 - 528582 add noreplace option into files section
 - rewrite pam2 patch - check return value, use "better" macro, etc.

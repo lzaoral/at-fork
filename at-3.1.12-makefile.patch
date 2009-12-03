@@ -1,16 +1,7 @@
-diff -up at-3.1.11/Makefile.in.make at-3.1.11/Makefile.in
---- at-3.1.11/Makefile.in.make	2009-08-14 18:49:05.000000000 +0200
-+++ at-3.1.11/Makefile.in	2009-10-02 10:36:24.104162973 +0200
-@@ -50,6 +51,8 @@ HEADERS 	= at.h panic.h parsetime.h perm
- 
- OTHERS		= parsetime.l parsetime.y
- 
-+TEST_VERBOSE	= 0
-+
- DOCS =  Problems Copyright README ChangeLog timespec
- 
- MISC =  COPYING  Makefile.in configure acconfig.h install-sh \
-@@ -65,13 +68,13 @@ LIST = Filelist Filelist.asc
+diff -up at-3.1.12/Makefile.in.make at-3.1.12/Makefile.in
+--- at-3.1.12/Makefile.in.make	2009-11-23 16:11:52.000000000 +0100
++++ at-3.1.12/Makefile.in	2009-12-03 13:23:08.794258910 +0100
+@@ -65,13 +65,13 @@ LIST = Filelist Filelist.asc
  all: at atd atrun
  
  at: $(ATOBJECTS)
@@ -26,7 +17,7 @@ diff -up at-3.1.11/Makefile.in.make at-3.1.11/Makefile.in
  
  y.tab.c y.tab.h: parsetime.y
  	$(YACC) -d parsetime.y
-@@ -83,38 +86,42 @@ atrun: atrun.in
+@@ -83,38 +83,42 @@ atrun: atrun.in
  	configure
  
  .c.o:
@@ -90,13 +81,3 @@ diff -up at-3.1.11/Makefile.in.make at-3.1.11/Makefile.in
  	rm -f $(IROOT)$(mandir)/cat1/at.1* $(IROOT)$(mandir)/cat1/batch.1* \
  		$(IROOT)$(mandir)/cat1/atq.1*
  	rm -f $(IROOT)$(mandir)/cat1/atd.8*
-@@ -148,6 +155,9 @@ Filelist.asc: Filelist
- parsetest: lex.yy.c y.tab.c
- 	$(CC) -o parsetest $(CFLAGS) $(DEFS) -DTEST_PARSER -DNEED_YYWRAP lex.yy.c y.tab.c
- 
-+test: parsetest
-+	PERL_DL_NONLAZY=1 perl -e 'use Test::Harness qw(&runtests $$verbose); $$verbose=$(TEST_VERBOSE); runtests @ARGV;' test.pl
-+
- .depend: $(CSRCS)
- 	gcc $(CFLAGS) $(DEFS) -MM $(CSRCS) > .depend
- 
