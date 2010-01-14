@@ -6,7 +6,7 @@
 Summary: Job spooling tools
 Name: at
 Version: 3.1.10
-Release: 39%{?dist}
+Release: 40%{?dist}
 License: GPLv2+
 Group: System Environment/Daemons
 URL: http://ftp.debian.org/debian/pool/main/a/at
@@ -85,7 +85,7 @@ cp %{SOURCE1} .
 %patch17 -p1 -b .nonposix
 %patch18 -p1 -b .mailselinux
 %patch19 -p1 -b .hyphen
-%patch20 -p1 -b .fix
+%patch20 -p1 -b .fixshell
 
 %build
 # patch10 touches configure.in
@@ -191,6 +191,9 @@ fi
 %attr(0755,root,root)		%{_libdir}/pm-utils/sleep.d/56atd
 
 %changelog
+* Thu Jan 14 2010 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.10-40
+- 546103 there were missing apostrophes around delimiter
+
 * Tue Oct 13 2009 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.10-39
 - 528582 add noreplace option into files section
 

@@ -34,7 +34,7 @@ diff -up at-3.1.10/at.c.fix at-3.1.10/at.c
  
 -    fprintf(fp, "${SHELL:-/bin/sh} << `(dd if=/dev/urandom count=200 bs=1 2>/dev/null|LC_ALL=C tr -d -c '[:alnum:]')`\n\n");
 +    i = random();
-+    fprintf(fp, "${SHELL:-/bin/sh} << marcinDELIMITER%08lx\n", i);
++    fprintf(fp, "${SHELL:-/bin/sh} << \'marcinDELIMITER%08lx\'\n", i);
  
      istty = isatty(fileno(stdin));
      if (istty) {
@@ -42,7 +42,7 @@ diff -up at-3.1.10/at.c.fix at-3.1.10/at.c
  	fprintf(stderr, "<EOT>\n");
      }
      fprintf(fp, "\n");
-+	fprintf(fp, "marcinDELIMITER%08lx\n", i);
++    fprintf(fp, "marcinDELIMITER%08lx\n", i);
      if (ferror(fp))
  	panic("Output error");
  
