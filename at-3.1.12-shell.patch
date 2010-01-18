@@ -31,7 +31,7 @@ diff -up at-3.1.12/at.c.shell at-3.1.12/at.c
  	    "inaccessible' >&2\n\t exit 1\n}\n");
  
 +    i = random();
-+    fprintf(fp, "${SHELL:-/bin/sh} << marcinDELIMITER%08lx\n", i);
++    fprintf(fp, "${SHELL:-/bin/sh} << \'marcinDELIMITER%08lx\'\n", i);
 +
      istty = isatty(fileno(stdin));
      if (istty) {

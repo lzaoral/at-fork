@@ -6,7 +6,7 @@
 Summary: Job spooling tools
 Name: at
 Version: %{major_ver}
-Release: 1%{dist}
+Release: 2%{dist}
 License: GPLv2+
 Group: System Environment/Daemons
 URL: http://ftp.debian.org/debian/pool/main/a/at
@@ -23,6 +23,7 @@ Patch3: at-3.1.12-shell.patch
 Patch4: at-3.1.12-nitpicks.patch
 Patch5: at-3.1.12-pam.patch
 Patch6: at-3.1.12-selinux.patch
+Patch7: at-3.1.12-fix.patch
 
 BuildRequires: fileutils chkconfig /etc/init.d
 BuildRequires: flex bison autoconf
@@ -58,6 +59,7 @@ cp %{SOURCE1} .
 %patch4 -p1 -b .nit
 %patch5 -p1 -b .pam
 %patch6 -p1 -b .selinux
+%patch7 -p1 -b .fix
 
 %build
 # patch9 touches configure.in
@@ -159,6 +161,9 @@ fi
 %attr(0755,root,root)		%{_libdir}/pm-utils/sleep.d/56atd
 
 %changelog
+* Mon Jan 18 2010 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.12-2
+- polish pam in atd again
+
 * Thu Dec  3 2009 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.12-1
 - update to the new version of at
 - adapt patches for new version
