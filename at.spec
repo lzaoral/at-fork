@@ -6,7 +6,7 @@
 Summary: Job spooling tools
 Name: at
 Version: %{major_ver}
-Release: 3%{dist}
+Release: 5%{dist}
 License: GPLv2+
 Group: System Environment/Daemons
 URL: http://ftp.debian.org/debian/pool/main/a/at
@@ -163,7 +163,13 @@ fi
 %attr(0755,root,root)		%{_libdir}/pm-utils/sleep.d/56atd
 
 %changelog
-* Fri Feb 12 2010 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.10-41
+* Mon Mar 15 2010 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.12-5
+- 568222 interrupted 'at' job creates empty job for non-root 
+
+* Mon Mar  1 2010 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.12-4
+- 568779 atd is alway runnig after suspend/resume
+
+* Fri Feb 12 2010 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.12-3
 - prevent arbitrary destruction of at jobs (based on 564243)
 
 * Mon Jan 18 2010 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.12-2
