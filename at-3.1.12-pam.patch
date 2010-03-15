@@ -1,7 +1,28 @@
 diff -up at-3.1.12/at.c.pam at-3.1.12/at.c
---- at-3.1.12/at.c.pam	2009-12-03 10:34:52.714284767 +0100
-+++ at-3.1.12/at.c	2009-12-03 10:36:38.736257590 +0100
-@@ -318,26 +318,19 @@ writefile(time_t runtimer, char queue)
+--- at-3.1.12/at.c.pam	2010-03-15 09:57:27.043438000 +0100
++++ at-3.1.12/at.c	2010-03-15 09:58:12.426689166 +0100
+@@ -141,18 +141,13 @@ sigc(int signo)
+ /* If the user presses ^C, remove the spool file and exit 
+  */
+     if (fcreated) {
+-	/*
+         PRIV_START
+-
++        /*
+         We need the unprivileged uid here since the file is owned by the real
+         (not effective) uid.
+         */
+-        setregid(real_gid, effective_gid);
+-	    unlink(atfile);
+-        setregid(effective_gid, real_gid);
+-        /*
++	unlink(atfile);
+ 	PRIV_END
+-        */
+     }
+     exit(EXIT_FAILURE);
+ }
+@@ -318,26 +313,19 @@ writefile(time_t runtimer, char queue)
  	 * bit.  Yes, this is a kluge.
  	 */
  	cmask = umask(S_IRUSR | S_IWUSR | S_IXUSR);
@@ -31,7 +52,7 @@ diff -up at-3.1.12/at.c.pam at-3.1.12/at.c
      /* We've successfully created the file; let's set the flag so it 
       * gets removed in case of an interrupt or error.
       */
-@@ -661,7 +654,7 @@ process_jobs(int argc, char **argv, int 
+@@ -661,7 +649,7 @@ process_jobs(int argc, char **argv, int 
                      We need the unprivileged uid here since the file is owned by the real
                      (not effective) uid.
                      */
@@ -40,7 +61,7 @@ diff -up at-3.1.12/at.c.pam at-3.1.12/at.c
  
  		    if (queue == '=') {
  			fprintf(stderr, "Warning: deleting running job\n");
-@@ -670,8 +663,8 @@ process_jobs(int argc, char **argv, int 
+@@ -670,8 +658,8 @@ process_jobs(int argc, char **argv, int 
  			perr("Cannot unlink %.500s", dirent->d_name);
  			rc = EXIT_FAILURE;
  		    }
@@ -50,7 +71,7 @@ diff -up at-3.1.12/at.c.pam at-3.1.12/at.c
  		    done = 1;
  
  		    break;
-@@ -681,7 +674,7 @@ process_jobs(int argc, char **argv, int 
+@@ -681,7 +669,7 @@ process_jobs(int argc, char **argv, int 
  			FILE *fp;
  			int ch;
  
@@ -59,7 +80,7 @@ diff -up at-3.1.12/at.c.pam at-3.1.12/at.c
  			fp = fopen(dirent->d_name, "r");
  
  			if (fp) {
-@@ -694,7 +687,7 @@ process_jobs(int argc, char **argv, int 
+@@ -694,7 +682,7 @@ process_jobs(int argc, char **argv, int 
  			    perr("Cannot open %.500s", dirent->d_name);
  			    rc = EXIT_FAILURE;
  			}
@@ -69,8 +90,8 @@ diff -up at-3.1.12/at.c.pam at-3.1.12/at.c
  		    break;
  
 diff -up at-3.1.12/atd.c.pam at-3.1.12/atd.c
---- at-3.1.12/atd.c.pam	2009-12-03 10:36:45.265284508 +0100
-+++ at-3.1.12/atd.c	2009-12-03 10:38:52.276261175 +0100
+--- at-3.1.12/atd.c.pam	2010-03-15 09:57:27.047513895 +0100
++++ at-3.1.12/atd.c	2010-03-15 09:57:27.053437466 +0100
 @@ -111,7 +111,7 @@ static int run_as_daemon = 0;
  
  static volatile sig_atomic_t term_signal = 0;
@@ -231,7 +252,7 @@ diff -up at-3.1.12/atd.c.pam at-3.1.12/atd.c
  
 diff -up at-3.1.12/config.h.in.pam at-3.1.12/config.h.in
 --- at-3.1.12/config.h.in.pam	2009-11-23 16:11:52.000000000 +0100
-+++ at-3.1.12/config.h.in	2009-12-03 10:34:36.373265254 +0100
++++ at-3.1.12/config.h.in	2010-03-15 09:57:27.054437183 +0100
 @@ -68,8 +68,8 @@
  /* Define to 1 if you have the <nlist.h> header file. */
  #undef HAVE_NLIST_H
@@ -245,7 +266,7 @@ diff -up at-3.1.12/config.h.in.pam at-3.1.12/config.h.in
  #undef HAVE_PSTAT_GETDYNAMIC
 diff -up at-3.1.12/configure.ac.pam at-3.1.12/configure.ac
 --- at-3.1.12/configure.ac.pam	2009-11-23 16:11:52.000000000 +0100
-+++ at-3.1.12/configure.ac	2009-12-03 10:34:36.373265254 +0100
++++ at-3.1.12/configure.ac	2010-03-15 09:57:27.055443883 +0100
 @@ -84,7 +84,7 @@ AC_FUNC_GETLOADAVG
  AC_CHECK_FUNCS(getcwd mktime strftime setreuid setresuid sigaction waitpid)
  AC_CHECK_HEADERS(security/pam_appl.h, [
@@ -271,7 +292,7 @@ diff -up at-3.1.12/configure.ac.pam at-3.1.12/configure.ac
  [ --with-daemon_groupname=DAEMON_GROUPNAME	Groupname to run under (default daemon) ],
 diff -up at-3.1.12/perm.c.pam at-3.1.12/perm.c
 --- at-3.1.12/perm.c.pam	2009-11-23 16:11:52.000000000 +0100
-+++ at-3.1.12/perm.c	2009-12-03 10:34:36.373265254 +0100
++++ at-3.1.12/perm.c	2010-03-15 09:57:27.055443883 +0100
 @@ -51,6 +51,14 @@
  #define PRIV_END while(0)
  #endif
@@ -344,7 +365,7 @@ diff -up at-3.1.12/perm.c.pam at-3.1.12/perm.c
      return allow;
 diff -up at-3.1.12/privs.h.pam at-3.1.12/privs.h
 --- at-3.1.12/privs.h.pam	2009-11-23 16:11:52.000000000 +0100
-+++ at-3.1.12/privs.h	2009-12-03 10:34:36.374266484 +0100
++++ at-3.1.12/privs.h	2010-03-15 09:57:27.060442603 +0100
 @@ -144,3 +144,61 @@ extern gid_t real_gid, effective_gid, da
  #error "Cannot implement user ID swapping without setreuid or setresuid"
  #endif
