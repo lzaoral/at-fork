@@ -3,3 +3,4 @@ b117781fd68e393443b2a8e478c7c22f  atd.init
 ac1471fe22f63f666dc7d31173f47ea0  atd.sysconf
 1e67991776148fb319fd77a2e599a765  at_3.1.12.orig.tar.gz
 000d2f30379d2bf8af09f51416e863ec  pam_atd
+0e763d641e33ad468bd8f5ef05da395a  atd.systemd

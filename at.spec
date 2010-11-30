@@ -6,7 +6,7 @@
 Summary: Job spooling tools
 Name: at
 Version: %{major_ver}
-Release: 5%{dist}
+Release: 6%{dist}
 License: GPLv2+
 Group: System Environment/Daemons
 URL: http://ftp.debian.org/debian/pool/main/a/at
@@ -16,6 +16,7 @@ Source1: pam_atd
 Source2: atd.init
 Source3: atd.sysconf
 Source4: 56atd
+Source5: atd.systemd
 
 Patch1: at-3.1.12-makefile.patch
 Patch2: at-3.1.12-opt_V.patch
@@ -38,7 +39,10 @@ BuildRequires: pam-devel
 Conflicts: crontabs <= 1.5
 # No, I'm not kidding
 BuildRequires: smtpdaemon
-Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+# systemd compatibility
+Requires(post): systemd-units
+Requires(preun): systemd-units
+Requires(postun): systemd-units
 
 %description
 At and batch read commands from standard input or from a specified
@@ -116,6 +120,10 @@ install -m 755 %{SOURCE3} %{buildroot}/etc/sysconfig/atd
 mkdir -p %{buildroot}/%{_libdir}/pm-utils/sleep.d/
 install -m 755 %{SOURCE4} %{buildroot}/%{_libdir}/pm-utils/sleep.d/56atd
 
+# install systemd initscript
+mkdir -p $RPM_BUILD_ROOT/lib/systemd/system/
+install -m 644 %{SOURCE5} $RPM_BUILD_ROOT/lib/systemd/system/atd.service
+
 # remove unpackaged files from the buildroot
 rm -r  %{buildroot}%{_prefix}/doc
 
@@ -131,16 +139,23 @@ chmod 600 %{_localstatedir}/spool/at/.SEQ
 chown daemon:daemon %{_localstatedir}/spool/at/.SEQ
 # must be in chkconfig on
 /sbin/chkconfig --add atd
+# systemd
+/bin/systemctl enable atd.service >/dev/null 2>&1 || :
 
 %preun
 if [ "$1" = "0" ] ; then
 	/sbin/service atd stop >/dev/null 2>&1 ||:
 	/sbin/chkconfig --del atd
+	# systemd
+	/bin/systemctl disable atd.service >/dev/null 2>&1 || :
+	/bin/systemctl stop atd.service > /dev/null 2>&1 || :
 fi
 
 %postun
 if [ "$1" -ge "1" ]; then
 	/sbin/service atd condrestart >/dev/null 2>&1 ||:
+	# systemd
+	/bin/systemctl try-restart atd.service >/dev/null 2>&1 || :
 fi
 
 %files
@@ -161,8 +176,12 @@ fi
 %{_bindir}/atq
 %attr(4755,root,root)		%{_bindir}/at
 %attr(0755,root,root)		%{_libdir}/pm-utils/sleep.d/56atd
+%attr(0644,root,root)		/lib/systemd/system/atd.service
 
 %changelog
+* Tue Nov 30 2010 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.12-6
+- 617320 systemd init script replacement
+
 * Mon Mar 15 2010 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.12-5
 - 568222 interrupted 'at' job creates empty job for non-root 
 
