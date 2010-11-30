@@ -28,7 +28,7 @@ Patch7: at-3.1.12-fix.patch
 Patch8: at-3.1.12-nowrap.patch
 
 BuildRequires: fileutils chkconfig /etc/init.d
-BuildRequires: flex bison autoconf
+BuildRequires: flex flex-static bison autoconf
 BuildRequires: libselinux-devel >= 1.27.9
 BuildRequires: perl(Test::Harness)
 BuildRequires: perl(Test::More)
