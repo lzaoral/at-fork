@@ -1,3 +1,4 @@
+# needed because of _ in upstream tarball
 %define major_ver 3.1.12
 
 %if %{?WITH_PAM:0}%{!?WITH_PAM:1}
@@ -6,7 +7,7 @@
 Summary: Job spooling tools
 Name: at
 Version: %{major_ver}
-Release: 6%{dist}
+Release: 7%{dist}
 License: GPLv2+
 Group: System Environment/Daemons
 URL: http://ftp.debian.org/debian/pool/main/a/at
@@ -161,13 +162,13 @@ fi
 %files
 %defattr(-,root,root,-)
 %doc docs/*
-%config(noreplace)		%{_sysconfdir}/at.deny
-%config(noreplace)		%{_sysconfdir}/sysconfig/atd
+%attr(0644,root,root)		%config(noreplace) %{_sysconfdir}/at.deny
+%attr(0644,root,root)		%config(noreplace) %{_sysconfdir}/sysconfig/atd
 %attr(0755,root,root)		%{_sysconfdir}/rc.d/init.d/atd
 %attr(0700,daemon,daemon)	%dir %{_localstatedir}/spool/at
 %attr(0600,daemon,daemon)	%verify(not md5 size mtime) %ghost %{_localstatedir}/spool/at/.SEQ
 %attr(0700,daemon,daemon)	%dir %{_localstatedir}/spool/at/spool
-%attr(0640,root,daemon)		%config(noreplace) %{_sysconfdir}/pam.d/atd
+%attr(0644,root,root)		%config(noreplace) %{_sysconfdir}/pam.d/atd
 %{_sbindir}/atrun
 %attr(0755,root,root)		%{_sbindir}/atd
 %{_mandir}/man*/*
@@ -179,6 +180,10 @@ fi
 %attr(0644,root,root)		/lib/systemd/system/atd.service
 
 %changelog
+* Tue Dec  7 2010 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.12-7
+- fix typo in systemd configuration
+- fix permissions of config files
+
 * Tue Nov 30 2010 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.12-6
 - 617320 systemd init script replacement
 
