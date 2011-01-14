@@ -106,17 +106,17 @@ mkdir docs
 cp  %{buildroot}/%{_prefix}/doc/at/* docs/
 
 mkdir -p %{buildroot}%{_sysconfdir}/pam.d
-install -m 755 %{SOURCE1} %{buildroot}%{_sysconfdir}/pam.d/atd
+install -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/pam.d/atd
 
 mkdir -p %{buildroot}%{_sysconfdir}/rc.d/init.d
-install -m 755 %{SOURCE2} %{buildroot}%{_sysconfdir}/rc.d/init.d/atd
+install -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/rc.d/init.d/atd
 
 mv -f %{buildroot}/%{_mandir}/man5/at_allow.5 \
 	%{buildroot}/%{_mandir}/man5/at.allow.5
 rm -f %{buildroot}/%{_mandir}/man5/at_deny.5
 
 mkdir -p %{buildroot}/etc/sysconfig
-install -m 755 %{SOURCE3} %{buildroot}/etc/sysconfig/atd
+install -m 644 %{SOURCE3} %{buildroot}/etc/sysconfig/atd
 
 mkdir -p %{buildroot}/%{_libdir}/pm-utils/sleep.d/
 install -m 755 %{SOURCE4} %{buildroot}/%{_libdir}/pm-utils/sleep.d/56atd
