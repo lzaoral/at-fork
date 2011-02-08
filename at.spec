@@ -7,7 +7,7 @@
 Summary: Job spooling tools
 Name: at
 Version: %{major_ver}
-Release: 7%{dist}
+Release: 8%{dist}
 License: GPLv2+
 Group: System Environment/Daemons
 URL: http://ftp.debian.org/debian/pool/main/a/at
@@ -180,6 +180,9 @@ fi
 %attr(0644,root,root)		/lib/systemd/system/atd.service
 
 %changelog
+* Mon Feb 07 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.1.12-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
+
 * Tue Dec  7 2010 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.12-7
 - fix typo in systemd configuration
 - fix permissions of config files
