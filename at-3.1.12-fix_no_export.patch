@@ -9,7 +9,7 @@ diff -up at-3.1.12/at.c.noexport at-3.1.12/at.c
 -				(size_t) (eqp - *atenv)) != 0);
 +		    && ((((size_t) (eqp - *atenv)) != strlen(no_export[i]))
 +			||(strncmp(*atenv, no_export[i],(size_t) (eqp - *atenv)) != 0)
-+			)
++			);
  	    }
  	    eqp++;
  	}
