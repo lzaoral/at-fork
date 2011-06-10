@@ -6,7 +6,7 @@
 Summary: Job spooling tools
 Name: at
 Version: %{major_ver}
-Release: 5%{dist}
+Release: 6%{dist}.testcsh
 License: GPLv2+
 Group: System Environment/Daemons
 URL: http://ftp.debian.org/debian/pool/main/a/at
@@ -25,6 +25,7 @@ Patch5: at-3.1.12-pam.patch
 Patch6: at-3.1.12-selinux.patch
 Patch7: at-3.1.12-fix.patch
 Patch8: at-3.1.12-nowrap.patch
+Patch9: at-3.1.12-fix_no_export.patch
 
 BuildRequires: fileutils chkconfig /etc/init.d
 BuildRequires: flex bison autoconf
@@ -62,6 +63,7 @@ cp %{SOURCE1} .
 %patch6 -p1 -b .selinux
 %patch7 -p1 -b .fix
 %patch8 -p1 -b .nowrap
+%patch9 -p1 -b .noexport
 
 %build
 # patch9 touches configure.in
@@ -163,6 +165,9 @@ fi
 %attr(0755,root,root)		%{_libdir}/pm-utils/sleep.d/56atd
 
 %changelog
+* Fri Jun 10 2011 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.12-6.testcsh
+- 674426 testing droped patch for noexport of shell
+
 * Mon Mar 15 2010 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.12-5
 - 568222 interrupted 'at' job creates empty job for non-root 
 
