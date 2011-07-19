@@ -1,23 +1,20 @@
 # needed because of _ in upstream tarball
 %define major_ver 3.1.12
+%bcond_without pam
 
-%if %{?WITH_PAM:0}%{!?WITH_PAM:1}
-%define WITH_PAM 1
-%endif
 Summary: Job spooling tools
 Name: at
 Version: %{major_ver}
-Release: 8%{dist}
+Release: 9%{dist}
 License: GPLv2+
 Group: System Environment/Daemons
 URL: http://ftp.debian.org/debian/pool/main/a/at
 Source: http://ftp.debian.org/debian/pool/main/a/at/at_%{major_ver}.orig.tar.gz
 # git upstream source git://git.debian.org/git/collab-maint/at.git
 Source1: pam_atd
-Source2: atd.init
-Source3: atd.sysconf
-Source4: 56atd
-Source5: atd.systemd
+Source2: atd.sysconf
+Source3: 56atd
+Source4: atd.systemd
 
 Patch1: at-3.1.12-makefile.patch
 Patch2: at-3.1.12-opt_V.patch
@@ -27,20 +24,21 @@ Patch5: at-3.1.12-pam.patch
 Patch6: at-3.1.12-selinux.patch
 Patch7: at-3.1.12-fix.patch
 Patch8: at-3.1.12-nowrap.patch
+Patch9: at-3.1.12-fix_no_export.patch 
 
-BuildRequires: fileutils chkconfig /etc/init.d
+BuildRequires: fileutils /etc/init.d
 BuildRequires: flex flex-static bison autoconf
 BuildRequires: libselinux-devel >= 1.27.9
 BuildRequires: perl(Test::Harness)
 BuildRequires: perl(Test::More)
 
-%if %{WITH_PAM}
+%if %{with pam}
 BuildRequires: pam-devel
 %endif
 Conflicts: crontabs <= 1.5
 # No, I'm not kidding
 BuildRequires: smtpdaemon
-# systemd compatibility
+
 Requires(post): systemd-units
 Requires(preun): systemd-units
 Requires(postun): systemd-units
@@ -67,6 +65,7 @@ cp %{SOURCE1} .
 %patch6 -p1 -b .selinux
 %patch7 -p1 -b .fix
 %patch8 -p1 -b .nowrap
+%patch9 -p1 -b .export
 
 %build
 # patch9 touches configure.in
@@ -78,7 +77,7 @@ rm -f lex.yy.* y.tab.*
 	--with-daemon_username=root  \
 	--with-daemon_groupname=root \
 	--with-selinux \
-%if %{WITH_PAM}
+%if %{with pam}
 	--with-pam
 %endif
 
@@ -108,22 +107,19 @@ cp  %{buildroot}/%{_prefix}/doc/at/* docs/
 mkdir -p %{buildroot}%{_sysconfdir}/pam.d
 install -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/pam.d/atd
 
-mkdir -p %{buildroot}%{_sysconfdir}/rc.d/init.d
-install -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/rc.d/init.d/atd
-
 mv -f %{buildroot}/%{_mandir}/man5/at_allow.5 \
 	%{buildroot}/%{_mandir}/man5/at.allow.5
 rm -f %{buildroot}/%{_mandir}/man5/at_deny.5
 
 mkdir -p %{buildroot}/etc/sysconfig
-install -m 644 %{SOURCE3} %{buildroot}/etc/sysconfig/atd
+install -m 644 %{SOURCE2} %{buildroot}/etc/sysconfig/atd
 
 mkdir -p %{buildroot}/%{_libdir}/pm-utils/sleep.d/
-install -m 755 %{SOURCE4} %{buildroot}/%{_libdir}/pm-utils/sleep.d/56atd
+install -m 755 %{SOURCE3} %{buildroot}/%{_libdir}/pm-utils/sleep.d/56atd
 
 # install systemd initscript
 mkdir -p $RPM_BUILD_ROOT/lib/systemd/system/
-install -m 644 %{SOURCE5} $RPM_BUILD_ROOT/lib/systemd/system/atd.service
+install -m 644 %{SOURCE4} $RPM_BUILD_ROOT/lib/systemd/system/atd.service
 
 # remove unpackaged files from the buildroot
 rm -r  %{buildroot}%{_prefix}/doc
@@ -131,40 +127,27 @@ rm -r  %{buildroot}%{_prefix}/doc
 %check
 make test
 
-%clean
-rm -rf %{buildroot}
-
 %post
 touch %{_localstatedir}/spool/at/.SEQ
 chmod 600 %{_localstatedir}/spool/at/.SEQ
 chown daemon:daemon %{_localstatedir}/spool/at/.SEQ
-# must be in chkconfig on
-/sbin/chkconfig --add atd
-# systemd
 /bin/systemctl enable atd.service >/dev/null 2>&1 || :
 
 %preun
 if [ "$1" = "0" ] ; then
-	/sbin/service atd stop >/dev/null 2>&1 ||:
-	/sbin/chkconfig --del atd
-	# systemd
 	/bin/systemctl disable atd.service >/dev/null 2>&1 || :
 	/bin/systemctl stop atd.service > /dev/null 2>&1 || :
 fi
 
 %postun
 if [ "$1" -ge "1" ]; then
-	/sbin/service atd condrestart >/dev/null 2>&1 ||:
-	# systemd
 	/bin/systemctl try-restart atd.service >/dev/null 2>&1 || :
 fi
 
 %files
-%defattr(-,root,root,-)
 %doc docs/*
 %attr(0644,root,root)		%config(noreplace) %{_sysconfdir}/at.deny
 %attr(0644,root,root)		%config(noreplace) %{_sysconfdir}/sysconfig/atd
-%attr(0755,root,root)		%{_sysconfdir}/rc.d/init.d/atd
 %attr(0700,daemon,daemon)	%dir %{_localstatedir}/spool/at
 %attr(0600,daemon,daemon)	%verify(not md5 size mtime) %ghost %{_localstatedir}/spool/at/.SEQ
 %attr(0700,daemon,daemon)	%dir %{_localstatedir}/spool/at/spool
@@ -180,6 +163,11 @@ fi
 %attr(0644,root,root)		/lib/systemd/system/atd.service
 
 %changelog
+* Tue Jul 19 2011 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.12-9
+- re-add missing export SHELL 674426
+- remove sysvinit scripts 714642
+- clean specfile (use bcond, remove defattr)
+
 * Mon Feb 07 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.1.12-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
 
