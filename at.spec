@@ -1,16 +1,15 @@
 %define major_ver 3.1.12
 
-%if %{?WITH_PAM:0}%{!?WITH_PAM:1}
-%define WITH_PAM 1
-%endif
-Summary: Job spooling tools
-Name: at
-Version: %{major_ver}
-Release: 6%{dist}.testcsh
-License: GPLv2+
-Group: System Environment/Daemons
-URL: http://ftp.debian.org/debian/pool/main/a/at
-Source: http://ftp.debian.org/debian/pool/main/a/at/at_%{major_ver}.orig.tar.gz
+%bcond_without pam
+
+Summary:	Job spooling tools
+Name:		at
+Version:	%{major_ver}
+Release:	6%{dist}
+License:	GPLv2+
+Group:		System Environment/Daemons
+URL:		http://ftp.debian.org/debian/pool/main/a/at
+Source:		http://ftp.debian.org/debian/pool/main/a/at/at_%{major_ver}.orig.tar.gz
 # git upstream source git://git.debian.org/git/collab-maint/at.git
 Source1: pam_atd
 Source2: atd.init
@@ -33,7 +32,7 @@ BuildRequires: libselinux-devel >= 1.27.9
 BuildRequires: perl(Test::Harness)
 BuildRequires: perl(Test::More)
 
-%if %{WITH_PAM}
+%if %{with pam}
 BuildRequires: pam-devel
 %endif
 Conflicts: crontabs <= 1.5
@@ -75,7 +74,7 @@ rm -f lex.yy.* y.tab.*
 	--with-daemon_username=root  \
 	--with-daemon_groupname=root \
 	--with-selinux \
-%if %{WITH_PAM}
+%if %{with pam}
 	--with-pam
 %endif
 
@@ -103,17 +102,17 @@ mkdir docs
 cp  %{buildroot}/%{_prefix}/doc/at/* docs/
 
 mkdir -p %{buildroot}%{_sysconfdir}/pam.d
-install -m 755 %{SOURCE1} %{buildroot}%{_sysconfdir}/pam.d/atd
+install -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/pam.d/atd
 
 mkdir -p %{buildroot}%{_sysconfdir}/rc.d/init.d
-install -m 755 %{SOURCE2} %{buildroot}%{_sysconfdir}/rc.d/init.d/atd
+install -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/rc.d/init.d/atd
 
 mv -f %{buildroot}/%{_mandir}/man5/at_allow.5 \
 	%{buildroot}/%{_mandir}/man5/at.allow.5
 rm -f %{buildroot}/%{_mandir}/man5/at_deny.5
 
 mkdir -p %{buildroot}/etc/sysconfig
-install -m 755 %{SOURCE3} %{buildroot}/etc/sysconfig/atd
+install -m 644 %{SOURCE3} %{buildroot}/etc/sysconfig/atd
 
 mkdir -p %{buildroot}/%{_libdir}/pm-utils/sleep.d/
 install -m 755 %{SOURCE4} %{buildroot}/%{_libdir}/pm-utils/sleep.d/56atd
@@ -148,13 +147,12 @@ fi
 %files
 %defattr(-,root,root,-)
 %doc docs/*
-%config(noreplace)		%{_sysconfdir}/at.deny
-%config(noreplace)		%{_sysconfdir}/sysconfig/atd
-%attr(0755,root,root)		%{_sysconfdir}/rc.d/init.d/atd
+%attr(0644,root,root)		%config(noreplace) %{_sysconfdir}/at.deny
+%attr(0644,root,root)		%config(noreplace) %{_sysconfdir}/sysconfig/atd
 %attr(0700,daemon,daemon)	%dir %{_localstatedir}/spool/at
 %attr(0600,daemon,daemon)	%verify(not md5 size mtime) %ghost %{_localstatedir}/spool/at/.SEQ
 %attr(0700,daemon,daemon)	%dir %{_localstatedir}/spool/at/spool
-%attr(0640,root,daemon)		%config(noreplace) %{_sysconfdir}/pam.d/atd
+%attr(0644,root,root)		%config(noreplace) %{_sysconfdir}/pam.d/atd
 %{_sbindir}/atrun
 %attr(0755,root,root)		%{_sbindir}/atd
 %{_mandir}/man*/*
@@ -165,8 +163,9 @@ fi
 %attr(0755,root,root)		%{_libdir}/pm-utils/sleep.d/56atd
 
 %changelog
-* Fri Jun 10 2011 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.12-6.testcsh
-- 674426 testing droped patch for noexport of shell
+* Wed Jul 20 2011 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.12-6
+- 674426 droped patch for noexport of shell is back
+- fix permission of sysconfig, pam and atd init script, which should be 644
 
 * Mon Mar 15 2010 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.12-5
 - 568222 interrupted 'at' job creates empty job for non-root 
