@@ -1,17 +1,16 @@
 # needed because of _ in upstream tarball
 %define major_ver 3.1.12
 
-%if %{?WITH_PAM:0}%{!?WITH_PAM:1}
-%define WITH_PAM 1
-%endif
-Summary: Job spooling tools
-Name: at
-Version: %{major_ver}
-Release: 8%{dist}
-License: GPLv2+
-Group: System Environment/Daemons
-URL: http://ftp.debian.org/debian/pool/main/a/at
-Source: http://ftp.debian.org/debian/pool/main/a/at/at_%{major_ver}.orig.tar.gz
+%bcond_without pam
+
+Summary:	Job spooling tools
+Name:		at
+Version:	%{major_ver}
+Release:	9%{dist}
+License:	GPLv2+
+Group:		System Environment/Daemons
+URL:		http://ftp.debian.org/debian/pool/main/a/at
+Source:		http://ftp.debian.org/debian/pool/main/a/at/at_%{major_ver}.orig.tar.gz
 # git upstream source git://git.debian.org/git/collab-maint/at.git
 Source1: pam_atd
 Source2: atd.init
@@ -27,6 +26,7 @@ Patch5: at-3.1.12-pam.patch
 Patch6: at-3.1.12-selinux.patch
 Patch7: at-3.1.12-fix.patch
 Patch8: at-3.1.12-nowrap.patch
+Patch9: at-3.1.12-fix_no_export.patch
 
 BuildRequires: fileutils chkconfig /etc/init.d
 BuildRequires: flex flex-static bison autoconf
@@ -34,7 +34,7 @@ BuildRequires: libselinux-devel >= 1.27.9
 BuildRequires: perl(Test::Harness)
 BuildRequires: perl(Test::More)
 
-%if %{WITH_PAM}
+%if %{with pam}
 BuildRequires: pam-devel
 %endif
 Conflicts: crontabs <= 1.5
@@ -67,6 +67,7 @@ cp %{SOURCE1} .
 %patch6 -p1 -b .selinux
 %patch7 -p1 -b .fix
 %patch8 -p1 -b .nowrap
+%patch9 -p1 -b .noexport
 
 %build
 # patch9 touches configure.in
@@ -78,7 +79,7 @@ rm -f lex.yy.* y.tab.*
 	--with-daemon_username=root  \
 	--with-daemon_groupname=root \
 	--with-selinux \
-%if %{WITH_PAM}
+%if %{with pam}
 	--with-pam
 %endif
 
@@ -122,17 +123,14 @@ mkdir -p %{buildroot}/%{_libdir}/pm-utils/sleep.d/
 install -m 755 %{SOURCE4} %{buildroot}/%{_libdir}/pm-utils/sleep.d/56atd
 
 # install systemd initscript
-mkdir -p $RPM_BUILD_ROOT/lib/systemd/system/
-install -m 644 %{SOURCE5} $RPM_BUILD_ROOT/lib/systemd/system/atd.service
+mkdir -p %{buildroot}/lib/systemd/system/
+install -m 644 %{SOURCE5} %{buildroot}/lib/systemd/system/atd.service
 
 # remove unpackaged files from the buildroot
 rm -r  %{buildroot}%{_prefix}/doc
 
 %check
 make test
-
-%clean
-rm -rf %{buildroot}
 
 %post
 touch %{_localstatedir}/spool/at/.SEQ
@@ -180,6 +178,10 @@ fi
 %attr(0644,root,root)		/lib/systemd/system/atd.service
 
 %changelog
+* Wed Jul 20 2011 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.12-9
+- 674426 droped patch for noexport of shell is back
+- clean spec file
+
 * Mon Feb 07 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.1.12-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
 
