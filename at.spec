@@ -1,20 +1,22 @@
 # needed because of _ in upstream tarball
 %define major_ver 3.1.12
+
 %bcond_without pam
 
-Summary: Job spooling tools
-Name: at
-Version: %{major_ver}
-Release: 9%{dist}
-License: GPLv2+
-Group: System Environment/Daemons
-URL: http://ftp.debian.org/debian/pool/main/a/at
-Source: http://ftp.debian.org/debian/pool/main/a/at/at_%{major_ver}.orig.tar.gz
+Summary:	Job spooling tools
+Name:		at
+Version:	%{major_ver}
+Release:	10%{dist}
+License:	GPLv2+
+Group:		System Environment/Daemons
+URL:		http://ftp.debian.org/debian/pool/main/a/at
+Source:		http://ftp.debian.org/debian/pool/main/a/at/at_%{major_ver}.orig.tar.gz
 # git upstream source git://git.debian.org/git/collab-maint/at.git
 Source1: pam_atd
-Source2: atd.sysconf
-Source3: 56atd
-Source4: atd.systemd
+Source2: atd.init
+Source3: atd.sysconf
+Source4: 56atd
+Source5: atd.systemd
 
 Patch1: at-3.1.12-makefile.patch
 Patch2: at-3.1.12-opt_V.patch
@@ -53,6 +55,16 @@ You should install the at package if you need a utility for
 time-oriented job control. Note: If it is a recurring job that will
 need to be repeated at the same time every day/week, etc. you should
 use crontab instead.
+
+%package sysvinit
+Summary:	SysV init script for at
+Group:		System Environment/Base
+Requires:	%{name} = %{version}-%{release}
+Requires(post): /sbin/chkconfig
+
+%description sysvinit
+SysV style init script for at. It needs to be installed only if systemd
+is not used as the system init process.
 
 %prep
 %setup -q
@@ -107,19 +119,22 @@ cp  %{buildroot}/%{_prefix}/doc/at/* docs/
 mkdir -p %{buildroot}%{_sysconfdir}/pam.d
 install -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/pam.d/atd
 
+mkdir -p %{buildroot}%{_sysconfdir}/rc.d/init.d
+install -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/rc.d/init.d/atd
+
 mv -f %{buildroot}/%{_mandir}/man5/at_allow.5 \
 	%{buildroot}/%{_mandir}/man5/at.allow.5
 rm -f %{buildroot}/%{_mandir}/man5/at_deny.5
 
 mkdir -p %{buildroot}/etc/sysconfig
-install -m 644 %{SOURCE2} %{buildroot}/etc/sysconfig/atd
+install -m 644 %{SOURCE3} %{buildroot}/etc/sysconfig/atd
 
 mkdir -p %{buildroot}/%{_libdir}/pm-utils/sleep.d/
-install -m 755 %{SOURCE3} %{buildroot}/%{_libdir}/pm-utils/sleep.d/56atd
+install -m 755 %{SOURCE4} %{buildroot}/%{_libdir}/pm-utils/sleep.d/56atd
 
 # install systemd initscript
-mkdir -p $RPM_BUILD_ROOT/lib/systemd/system/
-install -m 644 %{SOURCE4} $RPM_BUILD_ROOT/lib/systemd/system/atd.service
+mkdir -p %{buildroot}/lib/systemd/system/
+install -m 644 %{SOURCE5} %{buildroot}/lib/systemd/system/atd.service
 
 # remove unpackaged files from the buildroot
 rm -r  %{buildroot}%{_prefix}/doc
@@ -144,6 +159,22 @@ if [ "$1" -ge "1" ]; then
 	/bin/systemctl try-restart atd.service >/dev/null 2>&1 || :
 fi
 
+%triggerun -- at < 3.1.12-6
+# Save the current service runlevel info
+# User must manually run systemd-sysv-convert --apply atd
+# to migrate them to systemd targets
+/usr/bin/systemd-sysv-convert --save atd
+
+# The package is allowed to autostart:
+/bin/systemctl enable atd.service >/dev/null 2>&1
+
+/sbin/chkconfig --del atd >/dev/null 2>&1 || :
+/bin/systemctl try-restart atd.service >/dev/null 2>&1 || :
+/bin/systemctl daemon-reload >/dev/null 2>&1 || :
+
+%triggerpostun -n at-sysvinit -- at < 3.1.12-9
+/sbin/chkconfig --add atd >/dev/null 2>&1 || :
+
 %files
 %doc docs/*
 %attr(0644,root,root)		%config(noreplace) %{_sysconfdir}/at.deny
@@ -162,7 +193,14 @@ fi
 %attr(0755,root,root)		%{_libdir}/pm-utils/sleep.d/56atd
 %attr(0644,root,root)		/lib/systemd/system/atd.service
 
+%files sysvinit
+%attr(0644,root,root)		%{_initrddir}/atd
+
 %changelog
+* Wed Jul 20 2011 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.12-10
+- create sysvinit script 714642 (inspired by cronie)
+- clean specfile, consistent macros, tab/spaces
+
 * Tue Jul 19 2011 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.12-9
 - re-add missing export SHELL 674426
 - remove sysvinit scripts 714642
