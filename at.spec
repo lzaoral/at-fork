@@ -133,8 +133,8 @@ mkdir -p %{buildroot}/%{_libdir}/pm-utils/sleep.d/
 install -m 755 %{SOURCE4} %{buildroot}/%{_libdir}/pm-utils/sleep.d/56atd
 
 # install systemd initscript
-mkdir -p %{buildroot}/lib/systemd/system/
-install -m 644 %{SOURCE5} %{buildroot}/lib/systemd/system/atd.service
+mkdir -p %{buildroot}/%{_unitdir}/
+install -m 644 %{SOURCE5} %{buildroot}/%{_unitdir}/atd.service
 
 # remove unpackaged files from the buildroot
 rm -r  %{buildroot}%{_prefix}/doc
@@ -191,7 +191,7 @@ fi
 %{_bindir}/atq
 %attr(4755,root,root)		%{_bindir}/at
 %attr(0755,root,root)		%{_libdir}/pm-utils/sleep.d/56atd
-%attr(0644,root,root)		/lib/systemd/system/atd.service
+%attr(0644,root,root)		/%{_unitdir}/atd.service
 
 %files sysvinit
 %attr(0644,root,root)		%{_initrddir}/atd
