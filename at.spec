@@ -147,6 +147,7 @@ fi
 %files
 %defattr(-,root,root,-)
 %doc docs/*
+%attr(0755,root,root)		%{_sysconfdir}/rc.d/init.d/atd
 %attr(0644,root,root)		%config(noreplace) %{_sysconfdir}/at.deny
 %attr(0644,root,root)		%config(noreplace) %{_sysconfdir}/sysconfig/atd
 %attr(0700,daemon,daemon)	%dir %{_localstatedir}/spool/at
