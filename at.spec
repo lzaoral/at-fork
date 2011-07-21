@@ -6,7 +6,7 @@
 Summary:	Job spooling tools
 Name:		at
 Version:	%{major_ver}
-Release:	10%{dist}
+Release:	11%{dist}
 License:	GPLv2+
 Group:		System Environment/Daemons
 URL:		http://ftp.debian.org/debian/pool/main/a/at
@@ -120,7 +120,7 @@ mkdir -p %{buildroot}%{_sysconfdir}/pam.d
 install -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/pam.d/atd
 
 mkdir -p %{buildroot}%{_sysconfdir}/rc.d/init.d
-install -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/rc.d/init.d/atd
+install -m 755 %{SOURCE2} %{buildroot}%{_sysconfdir}/rc.d/init.d/atd
 
 mv -f %{buildroot}/%{_mandir}/man5/at_allow.5 \
 	%{buildroot}/%{_mandir}/man5/at.allow.5
@@ -194,9 +194,12 @@ fi
 %attr(0644,root,root)		/%{_unitdir}/atd.service
 
 %files sysvinit
-%attr(0644,root,root)		%{_initrddir}/atd
+%attr(0755,root,root)		%{_initrddir}/atd
 
 %changelog
+* Thu Jul 21 2011 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.12-11
+- fix permission of init.d/atd
+
 * Wed Jul 20 2011 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.12-10
 - create sysvinit script 714642 (inspired by cronie)
 - clean specfile, consistent macros, tab/spaces
