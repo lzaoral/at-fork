@@ -1,32 +1,28 @@
-# needed because of _ in upstream tarball
-%define major_ver 3.1.12
-
 %bcond_without pam
 
 Summary:	Job spooling tools
 Name:		at
-Version:	%{major_ver}
-Release:	11%{dist}
+Version:	3.1.13
+Release:	1%{dist}
 License:	GPLv2+
 Group:		System Environment/Daemons
 URL:		http://ftp.debian.org/debian/pool/main/a/at
-Source:		http://ftp.debian.org/debian/pool/main/a/at/at_%{major_ver}.orig.tar.gz
+Source:		http://ftp.debian.org/debian/pool/main/a/at/at_%{version}.orig.tar.gz
 # git upstream source git://git.debian.org/git/collab-maint/at.git
-Source1: pam_atd
-Source2: atd.init
-Source3: atd.sysconf
-Source4: 56atd
-Source5: atd.systemd
+Source1:	pam_atd
+Source2:	atd.init
+Source3:	atd.sysconf
+Source4:	56atd
+Source5:	atd.systemd
 
-Patch1: at-3.1.12-makefile.patch
-Patch2: at-3.1.12-opt_V.patch
-Patch3: at-3.1.12-shell.patch
-Patch4: at-3.1.12-nitpicks.patch
-Patch5: at-3.1.12-pam.patch
-Patch6: at-3.1.12-selinux.patch
-Patch7: at-3.1.12-fix.patch
-Patch8: at-3.1.12-nowrap.patch
-Patch9: at-3.1.12-fix_no_export.patch 
+Patch1:		at-3.1.13-makefile.patch
+Patch2:		at-3.1.12-opt_V.patch
+Patch3:		at-3.1.12-shell.patch
+Patch4:		at-3.1.13-nitpicks.patch
+Patch5:		at-3.1.13-pam.patch
+Patch6:		at-3.1.13-selinux.patch
+Patch7:		at-3.1.12-nowrap.patch
+Patch8:		at-3.1.12-fix_no_export.patch 
 
 BuildRequires: fileutils /etc/init.d
 BuildRequires: flex flex-static bison autoconf
@@ -75,9 +71,8 @@ cp %{SOURCE1} .
 %patch4 -p1 -b .nit
 %patch5 -p1 -b .pam
 %patch6 -p1 -b .selinux
-%patch7 -p1 -b .fix
-%patch8 -p1 -b .nowrap
-%patch9 -p1 -b .export
+%patch7 -p1 -b .nowrap
+%patch8 -p1 -b .export
 
 %build
 # patch9 touches configure.in
@@ -121,10 +116,6 @@ install -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/pam.d/atd
 
 mkdir -p %{buildroot}%{_sysconfdir}/rc.d/init.d
 install -m 755 %{SOURCE2} %{buildroot}%{_sysconfdir}/rc.d/init.d/atd
-
-mv -f %{buildroot}/%{_mandir}/man5/at_allow.5 \
-	%{buildroot}/%{_mandir}/man5/at.allow.5
-rm -f %{buildroot}/%{_mandir}/man5/at_deny.5
 
 mkdir -p %{buildroot}/etc/sysconfig
 install -m 644 %{SOURCE3} %{buildroot}/etc/sysconfig/atd
@@ -197,6 +188,10 @@ fi
 %attr(0755,root,root)		%{_initrddir}/atd
 
 %changelog
+* Fri Jul 29 2011 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.13-1
+- update to 3.1.13
+- rewrite patches to be applicable
+
 * Thu Jul 21 2011 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.12-11
 - fix permission of init.d/atd
 
