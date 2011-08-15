@@ -3,7 +3,7 @@
 Summary:	Job spooling tools
 Name:		at
 Version:	3.1.13
-Release:	1%{dist}
+Release:	2%{dist}
 License:	GPLv2+
 Group:		System Environment/Daemons
 URL:		http://ftp.debian.org/debian/pool/main/a/at
@@ -188,6 +188,10 @@ fi
 %attr(0755,root,root)		%{_initrddir}/atd
 
 %changelog
+* Mon Aug 15 2011 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.13-2
+- rebuilt with new rpm
+- Related: rhbz#728707
+
 * Fri Jul 29 2011 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.13-1
 - update to 3.1.13
 - rewrite patches to be applicable
