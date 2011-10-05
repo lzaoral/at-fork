@@ -1,0 +1,18 @@
+#!/bin/sh
+# 
+
+. "${PM_FUNCTIONS}"
+
+case "$1" in
+	hibernate|suspend)
+		;;
+	thaw|resume)
+		if [ -d /etc/init.d/atd ]; then
+			/etc/init.d/atd restart
+		elif
+			systemctl try-restart atd.service
+		fi
+		;;
+	*) exit $NA
+		;;
+esac
