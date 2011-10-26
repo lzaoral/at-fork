@@ -3,7 +3,7 @@
 Summary:	Job spooling tools
 Name:		at
 Version:	3.1.13
-Release:	3%{dist}
+Release:	4%{dist}
 License:	GPLv2+
 Group:		System Environment/Daemons
 URL:		http://ftp.debian.org/debian/pool/main/a/at
@@ -188,6 +188,9 @@ fi
 %attr(0755,root,root)		%{_initrddir}/atd
 
 %changelog
+* Wed Oct 26 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.1.13-4
+- Rebuilt for glibc bug#747377
+
 * Wed Sep  4 2011 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.13-3
 - 729742 fix 56atd script for systemd
 
