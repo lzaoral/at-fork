@@ -9,7 +9,7 @@ case "$1" in
 	thaw|resume)
 		if [ -f /etc/init.d/atd ]; then
 			/etc/init.d/atd restart
-		elif
+		else
 			systemctl try-restart atd.service
 		fi
 		;;
