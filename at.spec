@@ -12,7 +12,6 @@ Source:		http://ftp.debian.org/debian/pool/main/a/at/at_%{version}.orig.tar.gz
 Source1:	pam_atd
 Source2:	atd.init
 Source3:	atd.sysconf
-Source4:	56atd
 Source5:	atd.systemd
 
 Patch1:		at-3.1.13-makefile.patch
@@ -24,6 +23,7 @@ Patch6:		at-3.1.13-selinux.patch
 Patch7:		at-3.1.12-nowrap.patch
 Patch8:		at-3.1.12-fix_no_export.patch 
 Patch9:         at-3.1.13-mailwithhostname.patch
+Patch10:        at-3.1.13-usePOSIXtimers.patch
 
 BuildRequires: fileutils /etc/init.d
 BuildRequires: flex flex-static bison autoconf
@@ -75,6 +75,7 @@ cp %{SOURCE1} .
 %patch7 -p1 -b .nowrap
 %patch8 -p1 -b .export
 %patch9 -p1 -b .mail
+%patch10 -p1 -b .posix
 
 %build
 # patch9 touches configure.in
@@ -121,9 +122,6 @@ install -m 755 %{SOURCE2} %{buildroot}%{_sysconfdir}/rc.d/init.d/atd
 
 mkdir -p %{buildroot}/etc/sysconfig
 install -m 644 %{SOURCE3} %{buildroot}/etc/sysconfig/atd
-
-mkdir -p %{buildroot}/%{_libdir}/pm-utils/sleep.d/
-install -m 755 %{SOURCE4} %{buildroot}/%{_libdir}/pm-utils/sleep.d/56atd
 
 # install systemd initscript
 mkdir -p %{buildroot}/%{_unitdir}/
@@ -183,7 +181,6 @@ fi
 %{_bindir}/atrm
 %{_bindir}/atq
 %attr(4755,root,root)		%{_bindir}/at
-%attr(0755,root,root)		%{_libdir}/pm-utils/sleep.d/56atd
 %attr(0644,root,root)		/%{_unitdir}/atd.service
 
 %files sysvinit
@@ -192,6 +189,8 @@ fi
 %changelog
 * Tue Apr 17 2012 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.13-7
 - at-3.1.13-mailwithhostname.patch in email mention also hostname address
+- at-3.1.13-usePOSIXtimers.patch use POSIX timers, so we won't need
+  pm-utils hack anymore
 
 * Thu Jan 12 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.1.13-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
