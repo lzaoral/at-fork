@@ -24,6 +24,7 @@ Patch7:		at-3.1.12-nowrap.patch
 Patch8:		at-3.1.12-fix_no_export.patch 
 Patch9:         at-3.1.13-mailwithhostname.patch
 Patch10:        at-3.1.13-usePOSIXtimers.patch
+Patch11:        at-3.1.13-help.patch
 
 BuildRequires: fileutils /etc/init.d
 BuildRequires: flex flex-static bison autoconf
@@ -76,6 +77,7 @@ cp %{SOURCE1} .
 %patch8 -p1 -b .export
 %patch9 -p1 -b .mail
 %patch10 -p1 -b .posix
+%patch11 -p1 -b .help
 
 %build
 # patch9 touches configure.in
@@ -191,6 +193,7 @@ fi
 - at-3.1.13-mailwithhostname.patch in email mention also hostname address
 - at-3.1.13-usePOSIXtimers.patch use POSIX timers, so we won't need
   pm-utils hack anymore
+- at-3.1.13-help.patch update usage
 
 * Thu Jan 12 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.1.13-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
