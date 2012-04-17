@@ -3,7 +3,7 @@
 Summary:	Job spooling tools
 Name:		at
 Version:	3.1.13
-Release:	5%{dist}
+Release:	6%{dist}
 License:	GPLv2+
 Group:		System Environment/Daemons
 URL:		http://ftp.debian.org/debian/pool/main/a/at
@@ -23,6 +23,7 @@ Patch5:		at-3.1.13-pam.patch
 Patch6:		at-3.1.13-selinux.patch
 Patch7:		at-3.1.12-nowrap.patch
 Patch8:		at-3.1.12-fix_no_export.patch 
+Patch9:         at-3.1.13-mailwithhostname.patch
 
 BuildRequires: fileutils /etc/init.d
 BuildRequires: flex flex-static bison autoconf
@@ -73,6 +74,7 @@ cp %{SOURCE1} .
 %patch6 -p1 -b .selinux
 %patch7 -p1 -b .nowrap
 %patch8 -p1 -b .export
+%patch9 -p1 -b .mail
 
 %build
 # patch9 touches configure.in
@@ -188,6 +190,9 @@ fi
 %attr(0755,root,root)		%{_initrddir}/atd
 
 %changelog
+* Tue Apr 17 2012 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.13-6
+- at-3.1.13-mailwithhostname.patch in email mention also hostname address
+
 * Mon Nov 14 2011 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.13-5
 - 754156 fix typo in script 
 
