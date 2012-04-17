@@ -23,6 +23,7 @@ Patch5:		at-3.1.13-pam.patch
 Patch6:		at-3.1.13-selinux.patch
 Patch7:		at-3.1.12-nowrap.patch
 Patch8:		at-3.1.12-fix_no_export.patch 
+Patch9:         at-3.1.13-mailwithhostname.patch
 
 BuildRequires: fileutils /etc/init.d
 BuildRequires: flex flex-static bison autoconf
@@ -73,6 +74,7 @@ cp %{SOURCE1} .
 %patch6 -p1 -b .selinux
 %patch7 -p1 -b .nowrap
 %patch8 -p1 -b .export
+%patch9 -p1 -b .mail
 
 %build
 # patch9 touches configure.in
@@ -188,10 +190,13 @@ fi
 %attr(0755,root,root)		%{_initrddir}/atd
 
 %changelog
+* Tue Apr 17 2012 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.13-7
+- at-3.1.13-mailwithhostname.patch in email mention also hostname address
+
 * Thu Jan 12 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.1.13-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
 
-* Mon Nov 14 2011 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.13-6
+* Mon Nov 14 2011 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.13-5
 - 754156 fix typo in script 
 
 * Mon Nov 14 2011 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.13-5
