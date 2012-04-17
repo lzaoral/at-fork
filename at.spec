@@ -194,6 +194,8 @@ fi
 - at-3.1.13-usePOSIXtimers.patch use POSIX timers, so we won't need
   pm-utils hack anymore
 - at-3.1.13-help.patch update usage
+- systemd-user-sessions.service is used in unit file, so the atd should be
+  started after almost all services are up and running
 
 * Thu Jan 12 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.1.13-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
