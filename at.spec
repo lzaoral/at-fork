@@ -3,7 +3,7 @@
 Summary:	Job spooling tools
 Name:		at
 Version:	3.1.13
-Release:	7%{dist}
+Release:	8%{dist}
 License:	GPLv2+
 Group:		System Environment/Daemons
 URL:		http://ftp.debian.org/debian/pool/main/a/at
@@ -189,13 +189,14 @@ fi
 %attr(0755,root,root)		%{_initrddir}/atd
 
 %changelog
-* Tue Apr 17 2012 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.13-7
+* Tue Apr 17 2012 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.13-8
 - at-3.1.13-mailwithhostname.patch in email mention also hostname address
 - at-3.1.13-usePOSIXtimers.patch use POSIX timers, so we won't need
   pm-utils hack anymore
 - at-3.1.13-help.patch update usage
 - systemd-user-sessions.service is used in unit file, so the atd should be
   started after almost all services are up and running
+- 812682 pam support work with new systemd defaults
 
 * Thu Jan 12 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.1.13-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
