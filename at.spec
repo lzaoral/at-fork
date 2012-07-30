@@ -3,7 +3,7 @@
 Summary:	Job spooling tools
 Name:		at
 Version:	3.1.13
-Release:	8%{dist}
+Release:	9%{dist}
 License:	GPLv2+
 Group:		System Environment/Daemons
 URL:		http://ftp.debian.org/debian/pool/main/a/at
@@ -189,6 +189,9 @@ fi
 %attr(0755,root,root)		%{_initrddir}/atd
 
 %changelog
+* Fri Jul 27 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.1.13-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
+
 * Tue Apr 17 2012 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.13-8
 - at-3.1.13-mailwithhostname.patch in email mention also hostname address
 - at-3.1.13-usePOSIXtimers.patch use POSIX timers, so we won't need
