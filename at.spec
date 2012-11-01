@@ -3,8 +3,9 @@
 Summary:	Job spooling tools
 Name:		at
 Version:	3.1.13
-Release:	9%{dist}
-License:	GPLv2+
+Release:	10%{dist}
+# parsetime.pl is under ISC
+License:	GPLv2+ and ISC
 Group:		System Environment/Daemons
 URL:		http://ftp.debian.org/debian/pool/main/a/at
 Source:		http://ftp.debian.org/debian/pool/main/a/at/at_%{version}.orig.tar.gz
@@ -139,18 +140,13 @@ make test
 touch %{_localstatedir}/spool/at/.SEQ
 chmod 600 %{_localstatedir}/spool/at/.SEQ
 chown daemon:daemon %{_localstatedir}/spool/at/.SEQ
-/bin/systemctl enable atd.service >/dev/null 2>&1 || :
+%systemd_post atd.service
 
 %preun
-if [ "$1" = "0" ] ; then
-	/bin/systemctl disable atd.service >/dev/null 2>&1 || :
-	/bin/systemctl stop atd.service > /dev/null 2>&1 || :
-fi
+%systemd_preun atd.service
 
 %postun
-if [ "$1" -ge "1" ]; then
-	/bin/systemctl try-restart atd.service >/dev/null 2>&1 || :
-fi
+%systemd_postun_with_restart atd.service
 
 %triggerun -- at < 3.1.12-6
 # Save the current service runlevel info
@@ -189,6 +185,10 @@ fi
 %attr(0755,root,root)		%{_initrddir}/atd
 
 %changelog
+* Thu Nov  1 2012 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.13-10
+- fix license field
+- fix systemd macros in scriptlets part of the specfile
+
 * Fri Jul 27 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.1.13-9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
 
