@@ -188,6 +188,7 @@ chown daemon:daemon %{_localstatedir}/spool/at/.SEQ
 * Thu Nov  1 2012 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.13-10
 - fix license field
 - fix systemd macros in scriptlets part of the specfile
+- fix selinux patch to apply without fuzz=2
 
 * Fri Jul 27 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.1.13-9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
