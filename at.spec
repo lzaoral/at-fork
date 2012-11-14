@@ -3,9 +3,10 @@
 Summary:	Job spooling tools
 Name:		at
 Version:	3.1.13
-Release:	10%{dist}
-# parsetime.pl is under ISC
-License:	GPLv2+ and ISC
+Release:	11%{dist}
+# http://packages.debian.org/changelogs/pool/main/a/at/current/copyright
+# + install-sh is MIT license with changes under Public Domain
+License:	GPLv3+ and GPLv2+ and ISC and MIT and Public Domain
 Group:		System Environment/Daemons
 URL:		http://ftp.debian.org/debian/pool/main/a/at
 Source:		http://ftp.debian.org/debian/pool/main/a/at/at_%{version}.orig.tar.gz
@@ -185,6 +186,9 @@ chown daemon:daemon %{_localstatedir}/spool/at/.SEQ
 %attr(0755,root,root)		%{_initrddir}/atd
 
 %changelog
+* Wed Nov 14 2012 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.13-11
+- fix license field again
+
 * Thu Nov  1 2012 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.13-10
 - fix license field
 - fix systemd macros in scriptlets part of the specfile
