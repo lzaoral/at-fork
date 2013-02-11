@@ -3,12 +3,13 @@
 Summary:	Job spooling tools
 Name:		at
 Version:	3.1.13
-Release:	11%{dist}
+Release:	12%{dist}
 # http://packages.debian.org/changelogs/pool/main/a/at/current/copyright
 # + install-sh is MIT license with changes under Public Domain
 License:	GPLv3+ and GPLv2+ and ISC and MIT and Public Domain
 Group:		System Environment/Daemons
 URL:		http://ftp.debian.org/debian/pool/main/a/at
+
 Source:		http://ftp.debian.org/debian/pool/main/a/at/at_%{version}.orig.tar.gz
 # git upstream source git://git.debian.org/git/collab-maint/at.git
 Source1:	pam_atd
@@ -95,7 +96,7 @@ rm -f lex.yy.* y.tab.*
 	--with-pam
 %endif
 
-make
+make %{?_smp_mflags} V=1
 
 %install
 make install \
@@ -186,6 +187,9 @@ chown daemon:daemon %{_localstatedir}/spool/at/.SEQ
 %attr(0755,root,root)		%{_initrddir}/atd
 
 %changelog
+* Mon Feb 11 2013 Peter Robinson <pbrobinson@fedoraproject.org> 3.1.13-12
+- Fix patch to fix FTBFS with gcc 4.8
+
 * Wed Nov 14 2012 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.13-11
 - fix license field again
 
