@@ -346,7 +346,7 @@ chown daemon:daemon %{_localstatedir}/spool/at/.SEQ
 * Mon Dec  3 2007 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-19
 - another problem with permission
 
-* Fri Oct 30 2007 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-18
+* Tue Oct 30 2007 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-18
 - Bug 398981: change on correct permissions
 
 * Fri Oct 05 2007 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-17
@@ -356,12 +356,12 @@ chown daemon:daemon %{_localstatedir}/spool/at/.SEQ
 - macro with_pam instead of have_pam
 - license tag is gplv2+ because of license in source files
 
-* Tue Jul 11 2007 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-15
+* Wed Jul 11 2007 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-15
 - rewrite init script
 - add own session - setsid
 - Resolves: rhbz#247091
 
-* Tue Jul  9 2007 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-14
+* Mon Jul  9 2007 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-14
 - feature: add configuration file
 - fix -V option
 - fix init script
@@ -378,13 +378,13 @@ chown daemon:daemon %{_localstatedir}/spool/at/.SEQ
 - mistake in pam_atd
 - rhbz#234120
 
-* Tue Mar 05 2007 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-10
+* Mon Mar 05 2007 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-10
 - rhbz#224597
 
-* Mon Mar 03 2007 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-9
+* Sat Mar 03 2007 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-9
 - review
 
-* Wed Feb 20 2007 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-8
+* Tue Feb 20 2007 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-8
 - review
 - rhbz#225288
 
@@ -393,7 +393,7 @@ chown daemon:daemon %{_localstatedir}/spool/at/.SEQ
 - new pam configuration
 - rhbz#224597
 
-* Tue Oct 27 2006 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-6
+* Fri Oct 27 2006 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-6
 - fix daylight-saving again 
 - fix #214759 - problem with seteuid
 
@@ -403,7 +403,7 @@ chown daemon:daemon %{_localstatedir}/spool/at/.SEQ
 * Tue Oct 24 2006 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-3
 - new version from upstream 3.1.10
 
-* Thu Aug 23 2006 Marcela Maslanova <mmaslano@redhat.com> - 3.1.8-82.fc6
+* Wed Aug 23 2006 Marcela Maslanova <mmaslano@redhat.com> - 3.1.8-82.fc6
 - #176486 don't fork option added (patch from Enrico Scholz)
 
 * Wed Jul 12 2006 Jesse Keating <jkeating@redhat.com> - 3.1.8-81.2
@@ -416,7 +416,7 @@ chown daemon:daemon %{_localstatedir}/spool/at/.SEQ
 - rebuild for new gcc, glibc, glibc-kernheaders
 - workaround new refusal of /usr/bin/install to chown
 
-* Fri Dec 18 2005 Jason Vas Dias<jvdias@redhat.com> - 3.1.8-80.2
+* Sun Dec 18 2005 Jason Vas Dias<jvdias@redhat.com> - 3.1.8-80.2
 - rebuild for new flex
 
 * Fri Dec 16 2005 Jesse Keating <jkeating@redhat.com>
@@ -556,7 +556,7 @@ chown daemon:daemon %{_localstatedir}/spool/at/.SEQ
 * Wed Nov 27 2002 Tim Powers <timp@redhat.com> 3.1.8-32
 - remove unpackaged files from the buildroot
 
-* Tue Jul 25 2002 Bill Huang <bhuang@redhat.com>
+* Thu Jul 25 2002 Bill Huang <bhuang@redhat.com>
 - Fixed delaying job execution and missing starting jobs..(bug#69595)
   (Thanks Bujor D Silaghi <bujor@cs.umd.edu> for his patch.)
 
@@ -594,7 +594,7 @@ chown daemon:daemon %{_localstatedir}/spool/at/.SEQ
 * Thu Aug  2 2001 Crutcher Dunnavant <crutcher@redhat.com> 3.1.8-20
 - updated patch update, still bug #46546
 
-* Mon Jul 18 2001 Crutcher Dunnavant <crutcher@redhat.com>
+* Wed Jul 18 2001 Crutcher Dunnavant <crutcher@redhat.com>
 - applied enrico.scholz@informatik.tu-chemnitz.de's change to the env patch to 
 - address bug #46546
 
@@ -614,7 +614,7 @@ chown daemon:daemon %{_localstatedir}/spool/at/.SEQ
 * Fri Feb  2 2001 Trond Eivind Glomsrød <teg@redhat.com>
 - i18nize initscript
 
-* Wed Dec 12 2000 Bill Nottingham <notting@redhat.com>
+* Tue Dec 12 2000 Bill Nottingham <notting@redhat.com>
 - fix documentation of which shell commands will be run with (#22216)
 
 * Wed Aug 23 2000 Crutcher Dunnavant <crutcher@redhat.com>
