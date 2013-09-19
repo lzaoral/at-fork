@@ -2,8 +2,8 @@
 
 Summary:	Job spooling tools
 Name:		at
-Version:	3.1.13
-Release:	13%{?dist}
+Version:	3.1.14
+Release:	1%{?dist}
 # http://packages.debian.org/changelogs/pool/main/a/at/current/copyright
 # + install-sh is MIT license with changes under Public Domain
 License:	GPLv3+ and GPLv2+ and ISC and MIT and Public Domain
@@ -17,7 +17,7 @@ Source2:	atd.init
 Source3:	atd.sysconf
 Source5:	atd.systemd
 
-Patch1:		at-3.1.13-makefile.patch
+Patch1:		at-3.1.14-makefile.patch
 Patch2:		at-3.1.12-opt_V.patch
 Patch3:		at-3.1.12-shell.patch
 Patch4:		at-3.1.13-nitpicks.patch
@@ -71,16 +71,16 @@ is not used as the system init process.
 %setup -q
 cp %{SOURCE1} .
 %patch1 -p1 -b .make
-%patch2 -p1 -b .opt_V
-%patch3 -p1 -b .shell
-%patch4 -p1 -b .nit
-%patch5 -p1 -b .pam
-%patch6 -p1 -b .selinux
-%patch7 -p1 -b .nowrap
-%patch8 -p1 -b .export
-%patch9 -p1 -b .mail
-%patch10 -p1 -b .posix
-%patch11 -p1 -b .help
+#%%patch2 -p1 -b .opt_V
+#%%patch3 -p1 -b .shell
+#%%patch4 -p1 -b .nit
+#%%patch5 -p1 -b .pam
+#%%patch6 -p1 -b .selinux
+#%%patch7 -p1 -b .nowrap
+#%%patch8 -p1 -b .export
+#%%patch9 -p1 -b .mail
+#%%patch10 -p1 -b .posix
+#%%patch11 -p1 -b .help
 
 %build
 # patch9 touches configure.in
