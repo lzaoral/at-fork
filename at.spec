@@ -20,11 +20,9 @@ Source5:	atd.systemd
 Patch1:		at-3.1.14-makefile.patch
 Patch2:		at-3.1.14-pam.patch
 Patch3:         at-3.1.14-selinux.patch
-#Patch2:		at-3.1.12-opt_V.patch
-#Patch3:		at-3.1.12-shell.patch
+Patch4:		at-3.1.14-opt_V.patch
+Patch5:		at-3.1.14-shell.patch
 #Patch4:		at-3.1.13-nitpicks.patch
-#Patch5:		at-3.1.13-pam.patch
-#Patch6:		at-3.1.13-selinux.patch
 #Patch7:		at-3.1.12-nowrap.patch
 #Patch8:		at-3.1.12-fix_no_export.patch 
 #Patch9:         at-3.1.13-mailwithhostname.patch
@@ -75,8 +73,8 @@ cp %{SOURCE1} .
 %patch1 -p1 -b .make
 %patch2 -p1 -b .pam
 %patch3 -p1 -b .selinux
-#%%patch2 -p1 -b .opt_V
-#%%patch3 -p1 -b .shell
+%patch4 -p1 -b .opt_V
+%patch5 -p1 -b .shell
 #%%patch4 -p1 -b .nit
 #%%patch7 -p1 -b .nowrap
 #%%patch8 -p1 -b .export
