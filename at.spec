@@ -74,7 +74,7 @@ is not used as the system init process.
 cp %{SOURCE1} .
 %patch1 -p1 -b .make
 %patch2 -p1 -b .pam
-#%%patch3 -p1 -b .selinux
+%patch3 -p1 -b .selinux
 #%%patch2 -p1 -b .opt_V
 #%%patch3 -p1 -b .shell
 #%%patch4 -p1 -b .nit
