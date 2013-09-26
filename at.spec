@@ -18,16 +18,18 @@ Source3:	atd.sysconf
 Source5:	atd.systemd
 
 Patch1:		at-3.1.14-makefile.patch
-Patch2:		at-3.1.12-opt_V.patch
-Patch3:		at-3.1.12-shell.patch
-Patch4:		at-3.1.13-nitpicks.patch
-Patch5:		at-3.1.13-pam.patch
-Patch6:		at-3.1.13-selinux.patch
-Patch7:		at-3.1.12-nowrap.patch
-Patch8:		at-3.1.12-fix_no_export.patch 
-Patch9:         at-3.1.13-mailwithhostname.patch
-Patch10:        at-3.1.13-usePOSIXtimers.patch
-Patch11:        at-3.1.13-help.patch
+Patch2:		at-3.1.14-pam.patch
+Patch3:         at-3.1.14-selinux.patch
+#Patch2:		at-3.1.12-opt_V.patch
+#Patch3:		at-3.1.12-shell.patch
+#Patch4:		at-3.1.13-nitpicks.patch
+#Patch5:		at-3.1.13-pam.patch
+#Patch6:		at-3.1.13-selinux.patch
+#Patch7:		at-3.1.12-nowrap.patch
+#Patch8:		at-3.1.12-fix_no_export.patch 
+#Patch9:         at-3.1.13-mailwithhostname.patch
+#Patch10:        at-3.1.13-usePOSIXtimers.patch
+#Patch11:        at-3.1.13-help.patch
 
 BuildRequires: fileutils /etc/init.d
 BuildRequires: flex flex-static bison autoconf
@@ -71,6 +73,8 @@ is not used as the system init process.
 %setup -q
 cp %{SOURCE1} .
 %patch1 -p1 -b .make
+#%%patch2 -p1 -b .pam
+#%%patch3 -p1 -b .selinux
 #%%patch2 -p1 -b .opt_V
 #%%patch3 -p1 -b .shell
 #%%patch4 -p1 -b .nit
@@ -187,6 +191,10 @@ chown daemon:daemon %{_localstatedir}/spool/at/.SEQ
 %attr(0755,root,root)		%{_initrddir}/atd
 
 %changelog
+* Mon Sep 23 2013 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.14-1
+- new release 3.1.14
+- all Fedora specifics backported
+
 * Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.1.13-13
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
 
@@ -225,7 +233,7 @@ chown daemon:daemon %{_localstatedir}/spool/at/.SEQ
 * Wed Oct 26 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.1.13-4
 - Rebuilt for glibc bug#747377
 
-* Wed Sep  4 2011 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.13-3
+* Sun Sep  4 2011 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.13-3
 - 729742 fix 56atd script for systemd
 
 * Mon Aug 15 2011 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.13-2

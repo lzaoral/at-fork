@@ -6,7 +6,7 @@ diff -up at-3.1.14/Makefile.in.make at-3.1.14/Makefile.in
  
  at: $(ATOBJECTS)
 -	$(CC) $(LDFLAGS) -o at $(ATOBJECTS) $(LIBS) $(LEXLIB)
-+	$(CC) $(LDFLAGS) -o at pie $(ATOBJECTS) $(LIBS) $(LEXLIB) $(SELINUXLIB) $(PAMLIB)
++	$(CC) $(LDFLAGS) -o at -pie $(ATOBJECTS) $(LIBS) $(LEXLIB) $(SELINUXLIB) $(PAMLIB)
  	rm -f $(CLONES)
  	$(LN_S) -f at atq
  	$(LN_S) -f at atrm
