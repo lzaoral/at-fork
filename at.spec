@@ -26,7 +26,7 @@ Patch6:		at-3.1.14-nitpicks.patch
 Patch7:		at-3.1.14-nowrap.patch
 Patch8:		at-3.1.14-fix_no_export.patch 
 Patch9:		at-3.1.14-mailwithhostname.patch
-#Patch10:        at-3.1.13-usePOSIXtimers.patch
+Patch10:	at-3.1.14-usePOSIXtimers.patch
 #Patch11:        at-3.1.13-help.patch
 
 BuildRequires: fileutils /etc/init.d
@@ -80,7 +80,7 @@ cp %{SOURCE1} .
 %patch8 -p1 -b .export
 
 %patch9 -p1 -b .mail
-#%%patch10 -p1 -b .posix
+%patch10 -p1 -b .posix
 #%%patch11 -p1 -b .help
 
 %build
