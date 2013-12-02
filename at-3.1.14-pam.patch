@@ -1,6 +1,6 @@
 diff -up at-3.1.14/at.c.pam at-3.1.14/at.c
 --- at-3.1.14/at.c.pam	2013-09-08 14:43:53.000000000 +0200
-+++ at-3.1.14/at.c	2013-09-26 14:28:40.549603545 +0200
++++ at-3.1.14/at.c	2013-10-07 14:39:15.670837532 +0200
 @@ -144,18 +144,14 @@ sigc(int signo)
  /* If the user presses ^C, remove the spool file and exit 
   */
@@ -91,7 +91,7 @@ diff -up at-3.1.14/at.c.pam at-3.1.14/at.c
  
 diff -up at-3.1.14/atd.c.pam at-3.1.14/atd.c
 --- at-3.1.14/atd.c.pam	2013-09-08 14:43:53.000000000 +0200
-+++ at-3.1.14/atd.c	2013-09-26 15:04:28.762185123 +0200
++++ at-3.1.14/atd.c	2013-10-07 14:40:22.102988905 +0200
 @@ -83,6 +83,10 @@
  #include "getloadavg.h"
  #endif
@@ -239,10 +239,12 @@ diff -up at-3.1.14/atd.c.pam at-3.1.14/atd.c
  
  	PRIV_START
  
-@@ -511,7 +523,20 @@ run_file(const char *filename, uid_t uid
+@@ -511,7 +523,22 @@ run_file(const char *filename, uid_t uid
  	    perr("Exec failed for mail command");
  
  	PRIV_END
++
++   }
 +   else if ( mail_pid == -1 ) {
 +           perr("fork of mailer failed");
 +   }
@@ -260,7 +262,7 @@ diff -up at-3.1.14/atd.c.pam at-3.1.14/atd.c
      exit(EXIT_SUCCESS);
  }
  
-@@ -727,7 +752,7 @@ main(int argc, char *argv[])
+@@ -727,7 +754,7 @@ main(int argc, char *argv[])
  #define LOG_CRON	LOG_DAEMON
  #endif
  
@@ -271,7 +273,7 @@ diff -up at-3.1.14/atd.c.pam at-3.1.14/atd.c
      errno = 0;
 diff -up at-3.1.14/config.h.in.pam at-3.1.14/config.h.in
 --- at-3.1.14/config.h.in.pam	2013-09-08 14:43:53.000000000 +0200
-+++ at-3.1.14/config.h.in	2013-09-26 14:28:40.550603546 +0200
++++ at-3.1.14/config.h.in	2013-10-07 14:39:15.670837532 +0200
 @@ -68,8 +68,8 @@
  /* Define to 1 if you have the <nlist.h> header file. */
  #undef HAVE_NLIST_H
@@ -285,7 +287,7 @@ diff -up at-3.1.14/config.h.in.pam at-3.1.14/config.h.in
  #undef HAVE_PSTAT_GETDYNAMIC
 diff -up at-3.1.14/configure.ac.pam at-3.1.14/configure.ac
 --- at-3.1.14/configure.ac.pam	2013-09-08 14:43:53.000000000 +0200
-+++ at-3.1.14/configure.ac	2013-09-26 14:28:40.550603546 +0200
++++ at-3.1.14/configure.ac	2013-10-07 14:39:15.671837535 +0200
 @@ -78,7 +78,7 @@ AC_FUNC_GETLOADAVG
  AC_CHECK_FUNCS(getcwd mktime strftime setreuid setresuid sigaction waitpid)
  AC_CHECK_HEADERS(security/pam_appl.h, [
@@ -311,7 +313,7 @@ diff -up at-3.1.14/configure.ac.pam at-3.1.14/configure.ac
  [ --with-daemon_groupname=DAEMON_GROUPNAME	Groupname to run under (default daemon) ],
 diff -up at-3.1.14/perm.c.pam at-3.1.14/perm.c
 --- at-3.1.14/perm.c.pam	2013-09-08 14:43:53.000000000 +0200
-+++ at-3.1.14/perm.c	2013-09-26 14:28:40.550603546 +0200
++++ at-3.1.14/perm.c	2013-10-07 14:39:15.671837535 +0200
 @@ -51,6 +51,14 @@
  #define PRIV_END while(0)
  #endif
@@ -378,7 +380,7 @@ diff -up at-3.1.14/perm.c.pam at-3.1.14/perm.c
      return allow;
 diff -up at-3.1.14/privs.h.pam at-3.1.14/privs.h
 --- at-3.1.14/privs.h.pam	2013-09-08 14:43:53.000000000 +0200
-+++ at-3.1.14/privs.h	2013-09-26 14:28:40.551603547 +0200
++++ at-3.1.14/privs.h	2013-10-07 14:39:15.671837535 +0200
 @@ -144,3 +144,64 @@ extern gid_t real_gid, effective_gid, da
  #error "Cannot implement user ID swapping without setreuid or setresuid"
  #endif

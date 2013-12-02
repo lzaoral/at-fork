@@ -22,9 +22,9 @@ Patch2:		at-3.1.14-pam.patch
 Patch3:         at-3.1.14-selinux.patch
 Patch4:		at-3.1.14-opt_V.patch
 Patch5:		at-3.1.14-shell.patch
-#Patch4:		at-3.1.13-nitpicks.patch
-#Patch7:		at-3.1.12-nowrap.patch
-#Patch8:		at-3.1.12-fix_no_export.patch 
+Patch6:		at-3.1.14-nitpicks.patch
+Patch7:		at-3.1.14-nowrap.patch
+Patch8:		at-3.1.14-fix_no_export.patch 
 #Patch9:         at-3.1.13-mailwithhostname.patch
 #Patch10:        at-3.1.13-usePOSIXtimers.patch
 #Patch11:        at-3.1.13-help.patch
@@ -75,9 +75,10 @@ cp %{SOURCE1} .
 %patch3 -p1 -b .selinux
 %patch4 -p1 -b .opt_V
 %patch5 -p1 -b .shell
-#%%patch4 -p1 -b .nit
-#%%patch7 -p1 -b .nowrap
-#%%patch8 -p1 -b .export
+%patch6 -p1 -b .nit
+%patch7 -p1 -b .nowrap
+%patch8 -p1 -b .export
+
 #%%patch9 -p1 -b .mail
 #%%patch10 -p1 -b .posix
 #%%patch11 -p1 -b .help
