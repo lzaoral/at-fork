@@ -27,7 +27,7 @@ Patch7:		at-3.1.14-nowrap.patch
 Patch8:		at-3.1.14-fix_no_export.patch 
 Patch9:		at-3.1.14-mailwithhostname.patch
 Patch10:	at-3.1.14-usePOSIXtimers.patch
-#Patch11:        at-3.1.13-help.patch
+Patch11:        at-3.1.14-help.patch
 
 BuildRequires: fileutils /etc/init.d
 BuildRequires: flex flex-static bison autoconf
@@ -81,7 +81,7 @@ cp %{SOURCE1} .
 
 %patch9 -p1 -b .mail
 %patch10 -p1 -b .posix
-#%%patch11 -p1 -b .help
+%patch11 -p1 -b .help
 
 %build
 # patch9 touches configure.in
