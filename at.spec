@@ -17,6 +17,7 @@ Source2:	atd.init
 Source3:	atd.sysconf
 Source5:	atd.systemd
 
+Patch0:		at-aarch64.patch
 Patch1:		at-3.1.14-makefile.patch
 Patch2:		at-3.1.14-pam.patch
 Patch3:		at-3.1.14-selinux.patch
@@ -71,6 +72,7 @@ is not used as the system init process.
 %prep
 %setup -q
 cp %{SOURCE1} .
+%patch0 -p1 -b .arm
 %patch1 -p1 -b .make
 %patch2 -p1 -b .pam
 %patch3 -p1 -b .selinux
@@ -193,6 +195,7 @@ chown daemon:daemon %{_localstatedir}/spool/at/.SEQ
 - new release 3.1.14
 - all Fedora specifics backported
 - 718422 File a0000f0149b7f3 is in wrong format - aborting
+- 925041 Does not support aarch64 in f19 and rawhide
 
 * Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.1.13-13
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
