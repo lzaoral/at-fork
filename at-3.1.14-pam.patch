@@ -1,15 +1,14 @@
 diff -up at-3.1.14/at.c.pam at-3.1.14/at.c
 --- at-3.1.14/at.c.pam	2013-09-08 14:43:53.000000000 +0200
-+++ at-3.1.14/at.c	2013-10-07 14:39:15.670837532 +0200
-@@ -144,18 +144,14 @@ sigc(int signo)
++++ at-3.1.14/at.c	2013-12-04 11:09:56.165752053 +0100
+@@ -144,18 +144,13 @@ sigc(int signo)
  /* If the user presses ^C, remove the spool file and exit 
   */
      if (fcreated) {
 -	/*
-+	
          PRIV_START
 -
-+	/*
++        /*
          We need the unprivileged uid here since the file is owned by the real
          (not effective) uid.
          */
@@ -17,19 +16,19 @@ diff -up at-3.1.14/at.c.pam at-3.1.14/at.c
 -	    unlink(atfile);
 -        setregid(effective_gid, real_gid);
 -        /*
-+        unlink(atfile);    
++	unlink(atfile);
  	PRIV_END
 -        */
      }
      exit(EXIT_FAILURE);
  }
-@@ -315,26 +311,19 @@ writefile(time_t runtimer, char queue)
+@@ -315,26 +310,19 @@ writefile(time_t runtimer, char queue)
  	 * bit.  Yes, this is a kluge.
  	 */
  	cmask = umask(S_IRUSR | S_IWUSR | S_IXUSR);
 -        seteuid(real_uid);
-+	if ((seteuid(effective_uid)) < 0)
-+		perr("Error in seteuid: %s", errno);
++       if ((seteuid(effective_uid)) < 0)
++	    perr("Error in seteuid: %s", errno);
  	if ((fd = open(atfile, O_CREAT | O_EXCL | O_TRUNC | O_WRONLY, S_IRUSR)) == -1)
  	    perr("Cannot create atjob file %.500s", atfile);
 -        seteuid(effective_uid);
@@ -53,7 +52,7 @@ diff -up at-3.1.14/at.c.pam at-3.1.14/at.c
      /* We've successfully created the file; let's set the flag so it 
       * gets removed in case of an interrupt or error.
       */
-@@ -654,7 +643,7 @@ process_jobs(int argc, char **argv, int
+@@ -654,7 +642,7 @@ process_jobs(int argc, char **argv, int
                      We need the unprivileged uid here since the file is owned by the real
                      (not effective) uid.
                      */
@@ -62,16 +61,17 @@ diff -up at-3.1.14/at.c.pam at-3.1.14/at.c
  
  		    if (queue == '=') {
  			fprintf(stderr, "Warning: deleting running job\n");
-@@ -664,7 +653,7 @@ process_jobs(int argc, char **argv, int
+@@ -663,8 +651,8 @@ process_jobs(int argc, char **argv, int
+ 			perr("Cannot unlink %.500s", dirent->d_name);
  			rc = EXIT_FAILURE;
  		    }
++		    PRIV_END
  
 -                    setregid(effective_gid, real_gid);
-+		    PRIV_END
  		    done = 1;
  
  		    break;
-@@ -674,7 +663,7 @@ process_jobs(int argc, char **argv, int
+@@ -674,7 +662,7 @@ process_jobs(int argc, char **argv, int
  			FILE *fp;
  			int ch;
  
@@ -80,7 +80,7 @@ diff -up at-3.1.14/at.c.pam at-3.1.14/at.c
  			fp = fopen(dirent->d_name, "r");
  
  			if (fp) {
-@@ -687,7 +676,7 @@ process_jobs(int argc, char **argv, int
+@@ -687,7 +675,7 @@ process_jobs(int argc, char **argv, int
  			    perr("Cannot open %.500s", dirent->d_name);
  			    rc = EXIT_FAILURE;
  			}
@@ -91,7 +91,7 @@ diff -up at-3.1.14/at.c.pam at-3.1.14/at.c
  
 diff -up at-3.1.14/atd.c.pam at-3.1.14/atd.c
 --- at-3.1.14/atd.c.pam	2013-09-08 14:43:53.000000000 +0200
-+++ at-3.1.14/atd.c	2013-10-07 14:40:22.102988905 +0200
++++ at-3.1.14/atd.c	2013-12-04 11:14:31.780617480 +0100
 @@ -83,6 +83,10 @@
  #include "getloadavg.h"
  #endif
@@ -134,7 +134,7 @@ diff -up at-3.1.14/atd.c.pam at-3.1.14/atd.c
      unsigned long jobno;
      int rc;
 -#ifdef HAVE_PAM
-+#ifdef WTIH_PAM
++#ifdef WITH_PAM
      int retcode;
  #endif
  
@@ -161,22 +161,22 @@ diff -up at-3.1.14/atd.c.pam at-3.1.14/atd.c
  #endif
  
      close(STDIN_FILENO);
-@@ -401,6 +391,14 @@ run_file(const char *filename, uid_t uid
+@@ -401,7 +391,14 @@ run_file(const char *filename, uid_t uid
      else if (pid == 0) {
  	char *nul = NULL;
  	char **nenvp = &nul;
 +	char **pam_envp=0L;
-+
+ 
 +	PRIV_START
 +#ifdef WITH_PAM
 +	pam_envp = pam_getenvlist(pamh);
 +	if ( ( pam_envp != 0L ) && (pam_envp[0] != 0L) )
 +		nenvp = pam_envp;
 +#endif
- 
  	/* Set up things for the child; we want standard input from the
  	 * input file, and standard output and error sent to our output file.
-@@ -420,8 +418,6 @@ run_file(const char *filename, uid_t uid
+ 	 */
+@@ -420,8 +417,6 @@ run_file(const char *filename, uid_t uid
  	close(fd_in);
  	close(fd_out);
  
@@ -185,25 +185,20 @@ diff -up at-3.1.14/atd.c.pam at-3.1.14/atd.c
  	    nice((tolower((int) queue) - 'a' + 1) * 2);
  
  	    if (initgroups(pentry->pw_name, pentry->pw_gid))
-@@ -438,6 +434,17 @@ run_file(const char *filename, uid_t uid
- 	    if (execle("/bin/sh", "sh", (char *) NULL, nenvp) != 0)
- 		perr("Exec failed for /bin/sh");
+@@ -435,9 +430,9 @@ run_file(const char *filename, uid_t uid
  
-+#ifdef  WITH_PAM
-+           if ( ( nenvp != &nul ) && (pam_envp != 0L)  && (*pam_envp != 0L))
-+           {
-+               for( nenvp = pam_envp; *nenvp != 0L; nenvp++)
-+                       free(*nenvp);
-+               free( pam_envp );
-+               nenvp = &nul;
-+               pam_envp=0L;
-+           }
-+#endif
-+
+ 	    chdir("/");
+ 
+-	    if (execle("/bin/sh", "sh", (char *) NULL, nenvp) != 0)
+-		perr("Exec failed for /bin/sh");
+-
++	    execle("/bin/sh", "sh", (char *) NULL, nenvp);
++	    perr("Exec failed for /bin/sh");
++            /* perr exits, the PRIV_END is just for nice form */
  	PRIV_END
      }
      /* We're the parent.  Let's wait.
-@@ -450,14 +457,6 @@ run_file(const char *filename, uid_t uid
+@@ -450,14 +445,6 @@ run_file(const char *filename, uid_t uid
       */
      waitpid(pid, (int *) NULL, 0);
  
@@ -218,62 +213,44 @@ diff -up at-3.1.14/atd.c.pam at-3.1.14/atd.c
      /* Send mail.  Unlink the output file after opening it, so it
       * doesn't hang around after the run.
       */
-@@ -488,7 +487,20 @@ run_file(const char *filename, uid_t uid
+@@ -488,8 +475,13 @@ run_file(const char *filename, uid_t uid
      unlink(newname);
      free(newname);
  
 +#ifdef ATD_MAIL_PROGRAM
      if (((send_mail != -1) && (buf.st_size != size)) || (send_mail == 1)) {
 +       int mail_pid = -1;
-+#ifdef WITH_PAM
-+       AT_START_PAM;
-+       AT_OPEN_PAM_SESSION;
-+       closelog();
-+       openlog("atd", LOG_PID, LOG_ATD);
-+#endif
-+
-+   mail_pid = fork();
-+
-+   if ( mail_pid == 0 )
-+   {
  
++     mail_pid = fork();
++
++     if ( mail_pid == 0 ) {
  	PRIV_START
  
-@@ -511,7 +523,22 @@ run_file(const char *filename, uid_t uid
+ 	    if (initgroups(pentry->pw_name, pentry->pw_gid))
+@@ -511,7 +503,20 @@ run_file(const char *filename, uid_t uid
  	    perr("Exec failed for mail command");
  
  	PRIV_END
-+
-+   }
-+   else if ( mail_pid == -1 ) {
-+           perr("fork of mailer failed");
-+   }
-+   else {
-+           /* Parent */
-+           waitpid(mail_pid, (int *) NULL, 0);
-+   }
-+#ifdef WITH_PAM
-+   AT_CLOSE_PAM;
-+   closelog();
-+   openlog("atd", LOG_PID, LOG_ATD);
-+#endif
++     }
++     else if ( mail_pid == -1 ) {
++           syslog(LOG_ERR, "fork of mailer failed: %m");
++     }
++     /* Parent */
++     waitpid(mail_pid, (int *) NULL, 0);
      }
-+#endif /* ATD_MAIL_PROGRAM */
++
++#ifdef WITH_PAM
++    AT_CLOSE_PAM;
++    closelog();
++    openlog("atd", LOG_PID, LOG_ATD);
++#endif
++#endif
      exit(EXIT_SUCCESS);
  }
  
-@@ -727,7 +754,7 @@ main(int argc, char *argv[])
- #define LOG_CRON	LOG_DAEMON
- #endif
- 
--    openlog("atd", LOG_PID, LOG_CRON);
-+    openlog("atd", LOG_PID, LOG_ATD);
- 
-     opterr = 0;
-     errno = 0;
 diff -up at-3.1.14/config.h.in.pam at-3.1.14/config.h.in
 --- at-3.1.14/config.h.in.pam	2013-09-08 14:43:53.000000000 +0200
-+++ at-3.1.14/config.h.in	2013-10-07 14:39:15.670837532 +0200
++++ at-3.1.14/config.h.in	2013-12-04 11:09:56.165752053 +0100
 @@ -68,8 +68,8 @@
  /* Define to 1 if you have the <nlist.h> header file. */
  #undef HAVE_NLIST_H
@@ -287,7 +264,7 @@ diff -up at-3.1.14/config.h.in.pam at-3.1.14/config.h.in
  #undef HAVE_PSTAT_GETDYNAMIC
 diff -up at-3.1.14/configure.ac.pam at-3.1.14/configure.ac
 --- at-3.1.14/configure.ac.pam	2013-09-08 14:43:53.000000000 +0200
-+++ at-3.1.14/configure.ac	2013-10-07 14:39:15.671837535 +0200
++++ at-3.1.14/configure.ac	2013-12-04 11:09:56.165752053 +0100
 @@ -78,7 +78,7 @@ AC_FUNC_GETLOADAVG
  AC_CHECK_FUNCS(getcwd mktime strftime setreuid setresuid sigaction waitpid)
  AC_CHECK_HEADERS(security/pam_appl.h, [
@@ -313,7 +290,7 @@ diff -up at-3.1.14/configure.ac.pam at-3.1.14/configure.ac
  [ --with-daemon_groupname=DAEMON_GROUPNAME	Groupname to run under (default daemon) ],
 diff -up at-3.1.14/perm.c.pam at-3.1.14/perm.c
 --- at-3.1.14/perm.c.pam	2013-09-08 14:43:53.000000000 +0200
-+++ at-3.1.14/perm.c	2013-10-07 14:39:15.671837535 +0200
++++ at-3.1.14/perm.c	2013-12-04 11:09:56.165752053 +0100
 @@ -51,6 +51,14 @@
  #define PRIV_END while(0)
  #endif
@@ -380,14 +357,13 @@ diff -up at-3.1.14/perm.c.pam at-3.1.14/perm.c
      return allow;
 diff -up at-3.1.14/privs.h.pam at-3.1.14/privs.h
 --- at-3.1.14/privs.h.pam	2013-09-08 14:43:53.000000000 +0200
-+++ at-3.1.14/privs.h	2013-10-07 14:39:15.671837535 +0200
-@@ -144,3 +144,64 @@ extern gid_t real_gid, effective_gid, da
++++ at-3.1.14/privs.h	2013-12-04 11:09:56.166752054 +0100
+@@ -144,3 +144,63 @@ extern gid_t real_gid, effective_gid, da
  #error "Cannot implement user ID swapping without setreuid or setresuid"
  #endif
  #endif
 +
 +#ifdef WITH_PAM
-+int retcode;
 +/* PAM failed after session was open.  */
 +#define PAM_SESSION_FAIL if (retcode != PAM_SUCCESS) \
 +       pam_close_session(pamh,PAM_SILENT);
