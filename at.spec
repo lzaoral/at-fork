@@ -28,6 +28,7 @@ Patch8:		at-3.1.12-fix_no_export.patch
 Patch9:         at-3.1.13-mailwithhostname.patch
 Patch10:        at-3.1.13-usePOSIXtimers.patch
 Patch11:        at-3.1.13-help.patch
+Patch12:        at-3.1.14-wrong_format.patch
 
 BuildRequires: fileutils /etc/init.d
 BuildRequires: flex flex-static bison autoconf
@@ -81,6 +82,7 @@ cp %{SOURCE1} .
 %patch9 -p1 -b .mail
 %patch10 -p1 -b .posix
 %patch11 -p1 -b .help
+%patch12 -p1 -b .wrong
 
 %build
 # patch9 touches configure.in
@@ -189,6 +191,7 @@ chown daemon:daemon %{_localstatedir}/spool/at/.SEQ
 %changelog
 * Wed Dec  4 2013 Marcela Mašláňová <mmaslano@redhat.com> 3.1.13-13
 - 989201 PAM issue prevents atd sending mail
+- 718422 File a0000f0149b7f3 is in wrong format
 
 * Mon Feb 11 2013 Peter Robinson <pbrobinson@fedoraproject.org> 3.1.13-12
 - Fix patch to fix FTBFS with gcc 4.8
