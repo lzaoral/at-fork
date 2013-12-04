@@ -76,7 +76,6 @@ cp %{SOURCE1} .
 %patch1 -p1 -b .make
 %patch2 -p1 -b .pam
 %patch3 -p1 -b .selinux
-%patch100 -p1 -b .selinux2
 %patch4 -p1 -b .opt_V
 %patch5 -p1 -b .shell
 %patch6 -p1 -b .nit
