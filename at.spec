@@ -3,7 +3,7 @@
 Summary:	Job spooling tools
 Name:		at
 Version:	3.1.13
-Release:	13%{?dist}
+Release:	14%{?dist}
 # http://packages.debian.org/changelogs/pool/main/a/at/current/copyright
 # + install-sh is MIT license with changes under Public Domain
 License:	GPLv3+ and GPLv2+ and ISC and MIT and Public Domain
@@ -28,6 +28,7 @@ Patch8:		at-3.1.12-fix_no_export.patch
 Patch9:         at-3.1.13-mailwithhostname.patch
 Patch10:        at-3.1.13-usePOSIXtimers.patch
 Patch11:        at-3.1.13-help.patch
+Patch12:        at-3.1.14-wrong_format.patch
 
 BuildRequires: fileutils /etc/init.d
 BuildRequires: flex flex-static bison autoconf
@@ -81,6 +82,7 @@ cp %{SOURCE1} .
 %patch9 -p1 -b .mail
 %patch10 -p1 -b .posix
 %patch11 -p1 -b .help
+%patch12 -p1 -b .wrong
 
 %build
 # patch9 touches configure.in
@@ -187,6 +189,10 @@ chown daemon:daemon %{_localstatedir}/spool/at/.SEQ
 %attr(0755,root,root)		%{_initrddir}/atd
 
 %changelog
+* Wed Dec  4 2013 Marcela Mašláňová <mmaslano@redhat.com> 3.1.13-14
+- 989201 PAM issue prevents atd sending mail
+- 718422 File a0000f0149b7f3 is in wrong format
+
 * Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.1.13-13
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
 
