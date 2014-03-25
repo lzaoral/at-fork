@@ -3,7 +3,7 @@
 Summary:	Job spooling tools
 Name:		at
 Version:	3.1.14
-Release:	2%{?dist}
+Release:	3%{?dist}
 # http://packages.debian.org/changelogs/pool/main/a/at/current/copyright
 # + install-sh is MIT license with changes under Public Domain
 License:	GPLv3+ and GPLv2+ and ISC and MIT and Public Domain
@@ -191,6 +191,9 @@ chown daemon:daemon %{_localstatedir}/spool/at/.SEQ
 %attr(0755,root,root)		%{_initrddir}/atd
 
 %changelog
+* Tue Mar 25 2014 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.14-3
+- 1079304 remove part of patch, which is not needed anymore
+
 * Tue Jan 28 2014 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.14-2
 - remove parallel build -> it fails on secondary arches 1058686
 
