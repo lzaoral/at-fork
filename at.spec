@@ -2,8 +2,8 @@
 
 Summary:	Job spooling tools
 Name:		at
-Version:	3.1.14
-Release:	5%{?dist}
+Version:	3.1.16
+Release:	1%{?dist}
 # http://packages.debian.org/changelogs/pool/main/a/at/current/copyright
 # + install-sh is MIT license with changes under Public Domain
 License:	GPLv3+ and GPLv2+ and ISC and MIT and Public Domain
@@ -58,16 +58,6 @@ You should install the at package if you need a utility for
 time-oriented job control. Note: If it is a recurring job that will
 need to be repeated at the same time every day/week, etc. you should
 use crontab instead.
-
-%package sysvinit
-Summary:	SysV init script for at
-Group:		System Environment/Base
-Requires:	%{name} = %{version}-%{release}
-Requires(post): /sbin/chkconfig
-
-%description sysvinit
-SysV style init script for at. It needs to be installed only if systemd
-is not used as the system init process.
 
 %prep
 %setup -q
@@ -126,9 +116,6 @@ cp  %{buildroot}/%{_prefix}/doc/at/* docs/
 mkdir -p %{buildroot}%{_sysconfdir}/pam.d
 install -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/pam.d/atd
 
-mkdir -p %{buildroot}%{_sysconfdir}/rc.d/init.d
-install -m 755 %{SOURCE2} %{buildroot}%{_sysconfdir}/rc.d/init.d/atd
-
 mkdir -p %{buildroot}/etc/sysconfig
 install -m 644 %{SOURCE3} %{buildroot}/etc/sysconfig/atd
 
@@ -167,9 +154,6 @@ chown daemon:daemon %{_localstatedir}/spool/at/.SEQ
 /bin/systemctl try-restart atd.service >/dev/null 2>&1 || :
 /bin/systemctl daemon-reload >/dev/null 2>&1 || :
 
-%triggerpostun -n at-sysvinit -- at < 3.1.12-9
-/sbin/chkconfig --add atd >/dev/null 2>&1 || :
-
 %files
 %doc docs/*
 %attr(0644,root,root)		%config(noreplace) %{_sysconfdir}/at.deny
@@ -187,10 +171,11 @@ chown daemon:daemon %{_localstatedir}/spool/at/.SEQ
 %attr(4755,root,root)		%{_bindir}/at
 %attr(0644,root,root)		/%{_unitdir}/atd.service
 
-%files sysvinit
-%attr(0755,root,root)		%{_initrddir}/atd
-
 %changelog
+* Thu Oct  2 2014 Tomáš Mráz <tmraz@redhat.com> - 3.1.16-1
+- new upstream release fixing regression from security fix in bash
+- drop sysvinit subpackage
+
 * Fri Aug 15 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.1.14-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
 
