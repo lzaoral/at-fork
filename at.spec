@@ -13,7 +13,6 @@ URL:		http://ftp.debian.org/debian/pool/main/a/at
 Source:		http://ftp.debian.org/debian/pool/main/a/at/at_%{version}.orig.tar.gz
 # git upstream source git://git.debian.org/git/collab-maint/at.git
 Source1:	pam_atd
-Source2:	atd.init
 Source3:	atd.sysconf
 Source5:	atd.systemd
 
