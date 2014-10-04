@@ -100,7 +100,7 @@ rm -f lex.yy.* y.tab.*
 	--with-pam
 %endif
 
-make %{?_smp_mflags} V=1
+make V=1
 
 %install
 make install \
