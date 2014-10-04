@@ -3,7 +3,7 @@
 Summary:	Job spooling tools
 Name:		at
 Version:	3.1.13
-Release:	13%{dist}
+Release:	15%{?dist}
 # http://packages.debian.org/changelogs/pool/main/a/at/current/copyright
 # + install-sh is MIT license with changes under Public Domain
 License:	GPLv3+ and GPLv2+ and ISC and MIT and Public Domain
@@ -29,6 +29,7 @@ Patch9:         at-3.1.13-mailwithhostname.patch
 Patch10:        at-3.1.13-usePOSIXtimers.patch
 Patch11:        at-3.1.13-help.patch
 Patch12:        at-3.1.14-wrong_format.patch
+Patch13:        at-3.1.10-filter-environment.patch
 
 BuildRequires: fileutils /etc/init.d
 BuildRequires: flex flex-static bison autoconf
@@ -83,6 +84,7 @@ cp %{SOURCE1} .
 %patch10 -p1 -b .posix
 %patch11 -p1 -b .help
 %patch12 -p1 -b .wrong
+%patch13 -p1 -b .filter-environment
 
 %build
 # patch9 touches configure.in
@@ -98,7 +100,7 @@ rm -f lex.yy.* y.tab.*
 	--with-pam
 %endif
 
-make %{?_smp_mflags} V=1
+make V=1
 
 %install
 make install \
@@ -189,6 +191,9 @@ chown daemon:daemon %{_localstatedir}/spool/at/.SEQ
 %attr(0755,root,root)		%{_initrddir}/atd
 
 %changelog
+* Sat Oct  4 2014 Tomáš Mráz <tmraz@redhat.com> - 3.1.13-15
+- filter environment variables not acceptable in bash input (#1147043)
+
 * Wed Dec  4 2013 Marcela Mašláňová <mmaslano@redhat.com> 3.1.13-13
 - 989201 PAM issue prevents atd sending mail
 - 718422 File a0000f0149b7f3 is in wrong format

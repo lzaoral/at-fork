@@ -1,0 +1,26 @@
+diff -up at-3.1.10/at.c.filter-environment at-3.1.10/at.c
+--- at-3.1.10/at.c.filter-environment	2014-10-02 10:21:01.684890331 +0200
++++ at-3.1.10/at.c	2014-10-02 10:21:40.678770635 +0200
+@@ -388,6 +388,22 @@ writefile(time_t runtimer, char queue)
+ 	int export = 1;
+ 	char *eqp;
+ 
++        /* Only accept alphanumerics and underscore in variable names.
++         * Also require the name to not start with a digit.
++         * Some shells don't like other variable names.
++         */
++        {
++            char *p = *atenv;
++            if (isdigit(*p))
++                export = 0;
++            for (; *p != '=' && *p != '\0'; ++p) {
++                if (!isalnum(*p) && *p != '_') {
++                    export = 0;
++                    break;
++                }
++            }
++        }
++
+ 	eqp = strchr(*atenv, '=');
+ 	if (ap == NULL)
+ 	    eqp = *atenv;
