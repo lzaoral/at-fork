@@ -3,7 +3,7 @@
 Summary:	Job spooling tools
 Name:		at
 Version:	3.1.16
-Release:	1%{?dist}
+Release:	2%{?dist}
 # http://packages.debian.org/changelogs/pool/main/a/at/current/copyright
 # + install-sh is MIT license with changes under Public Domain
 License:	GPLv3+ and GPLv2+ and ISC and MIT and Public Domain
@@ -46,6 +46,9 @@ BuildRequires: smtpdaemon
 Requires(post): systemd-units
 Requires(preun): systemd-units
 Requires(postun): systemd-units
+
+# at-sysvinit subpackage dropped
+Obsoletes: at-sysvinit < 3.1.16-1
 
 %description
 At and batch read commands from standard input or from a specified
@@ -171,6 +174,9 @@ chown daemon:daemon %{_localstatedir}/spool/at/.SEQ
 %attr(0644,root,root)		/%{_unitdir}/atd.service
 
 %changelog
+* Fri Oct 10 2014 Tomáš Mráz <tmraz@redhat.com> - 3.1.16-2
+- add proper Obsoletes for the sysvinit subpackage
+
 * Thu Oct  2 2014 Tomáš Mráz <tmraz@redhat.com> - 3.1.16-1
 - new upstream release fixing regression from security fix in bash
 - drop sysvinit subpackage
