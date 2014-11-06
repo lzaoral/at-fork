@@ -1,0 +1,157 @@
+diff -up at-3.1.16/atd.c.noabort at-3.1.16/atd.c
+--- at-3.1.16/atd.c.noabort	2014-10-02 11:08:26.000000000 +0200
++++ at-3.1.16/atd.c	2014-11-06 16:07:54.851652541 +0100
+@@ -221,7 +221,7 @@ static int set_selinux_context(const cha
+        security_context_t user_context=NULL;
+        security_context_t  file_context=NULL;
+        struct av_decision avd;
+-       int retval=-1;
++       int retval=0;
+        char *seuser=NULL;
+        char *level=NULL;
+ 
+@@ -230,12 +230,9 @@ static int set_selinux_context(const cha
+                free(seuser);
+                free(level);
+                if (retval) {
+-                       if (security_getenforce()==1) {
+-                               perr("execle: couldn't get security context for user %s\n", name);
+-                       } else {
+-                               syslog(LOG_ERR, "execle: couldn't get security context for user %s\n", name);
+-                               return -1;
+-                       }
++                       lerr("execle: couldn't get security context for user %s\n", name);
++                       retval = -1;
++                       goto err;
+                }
+        }
+ 
+@@ -246,8 +243,11 @@ static int set_selinux_context(const cha
+        * the user cron job.  It performs an entrypoint
+        * permission check for this purpose.
+        */
+-       if (fgetfilecon(STDIN_FILENO, &file_context) < 0)
+-               perr("fgetfilecon FAILED %s", filename);
++       if (fgetfilecon(STDIN_FILENO, &file_context) < 0) {
++               lerr("fgetfilecon FAILED %s", filename);
++               retval = -1;
++               goto err;
++       }
+ 
+        retval = security_compute_av(user_context,
+                                     file_context,
+@@ -256,25 +256,21 @@ static int set_selinux_context(const cha
+                                     &avd);
+        freecon(file_context);
+        if (retval || ((FILE__ENTRYPOINT & avd.allowed) != FILE__ENTRYPOINT)) {
+-               if (security_getenforce()==1) {
+-                       perr("Not allowed to set exec context to %s for user  %s\n", user_context,name);
+-               } else {
+-                       syslog(LOG_ERR, "Not allowed to set exec context to %s for user  %s\n", user_context,name);
+-                       retval = -1;
+-                       goto err;
+-               }
++               lerr("Not allowed to set exec context to %s for user  %s\n", user_context,name);
++               retval = -1;
++               goto err;
+        }
+        if (setexeccon(user_context) < 0) {
+-               if (security_getenforce()==1) {
+-                       perr("Could not set exec context to %s for user  %s\n", user_context,name);
+-                       retval = -1;
+-               } else {
+-                       syslog(LOG_ERR, "Could not set exec context to %s for user  %s\n", user_context,name);
+-               }
++               lerr("Could not set exec context to %s for user  %s\n", user_context,name);
++               retval = -1;
++               goto err;
+        }
+   err:
+-       freecon(user_context);
+-       return 0;
++       if (retval < 0 && security_getenforce() != 1)
++               retval = 0;
++       if (user_context)
++               freecon(user_context);
++       return retval;
+ }
+ #endif
+ 
+@@ -347,9 +343,12 @@ run_file(const char *filename, uid_t uid
+      */
+ 
+     pid = fork();
+-    if (pid == -1)
+-	perr("Cannot fork");
+-
++    if (pid == -1) {
++	lerr("Cannot fork for job execution");
++	free(mailname);
++	free(newname);
++	return;
++    }
+     else if (pid != 0) {
+ 	free(mailname);
+ 	free(newname);
+@@ -667,15 +666,19 @@ run_loop()
+      * up.
+      */
+ 
+-    if (stat(".", &buf) == -1)
+-	perr("Cannot stat " ATJOB_DIR);
++    if (stat(".", &buf) == -1) {
++	lerr("Cannot stat " ATJOB_DIR);
++        return next_job;
++    }
+ 
+     if (nothing_to_do && buf.st_mtime <= last_chg)
+ 	return next_job;
+     last_chg = buf.st_mtime;
+ 
+-    if ((spool = opendir(".")) == NULL)
+-	perr("Cannot read " ATJOB_DIR);
++    if ((spool = opendir(".")) == NULL) {
++	lerr("Cannot read " ATJOB_DIR);
++        return next_job;
++    }
+ 
+     run_batch = 0;
+     nothing_to_do = 1;
+diff -up at-3.1.16/daemon.c.noabort at-3.1.16/daemon.c
+--- at-3.1.16/daemon.c.noabort	2014-09-30 08:29:02.000000000 +0200
++++ at-3.1.16/daemon.c	2014-11-06 15:37:22.109277583 +0100
+@@ -83,6 +83,22 @@ perr(const char *fmt,...)
+ }
+ 
+ void
++lerr(const char *fmt,...)
++{
++    char buf[1024];
++    va_list args;
++
++    va_start(args, fmt);
++    vsnprintf(buf, sizeof(buf), fmt, args);
++    va_end(args);
++
++    if (daemon_debug) {
++	perror(buf);
++    } else
++	syslog(LOG_ERR, "%s: %m", buf);
++}
++
++void
+ pabort(const char *fmt,...)
+ {
+     char buf[1024];
+diff -up at-3.1.16/daemon.h.noabort at-3.1.16/daemon.h
+--- at-3.1.16/daemon.h.noabort	2014-09-30 08:29:02.000000000 +0200
++++ at-3.1.16/daemon.h	2014-11-06 15:36:10.461660104 +0100
+@@ -13,5 +13,8 @@ __attribute__((noreturn))
+ #endif
+ perr (const char *fmt, ...);
+ 
++void
++lerr (const char *fmt, ...);
++
+ extern int daemon_debug;
+ extern int daemon_foreground;
