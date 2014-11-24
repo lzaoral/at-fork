@@ -3,7 +3,7 @@
 Summary:	Job spooling tools
 Name:		at
 Version:	3.1.16
-Release:	3%{?dist}
+Release:	4%{?dist}
 # http://packages.debian.org/changelogs/pool/main/a/at/current/copyright
 # + install-sh is MIT license with changes under Public Domain
 License:	GPLv3+ and GPLv2+ and ISC and MIT and Public Domain
@@ -23,13 +23,13 @@ Patch3:		at-3.1.14-selinux.patch
 Patch4:		at-3.1.14-opt_V.patch
 Patch5:		at-3.1.14-shell.patch
 Patch6:		at-3.1.14-nitpicks.patch
-Patch7:		at-3.1.14-nowrap.patch
 Patch8:		at-3.1.14-fix_no_export.patch 
 Patch9:		at-3.1.14-mailwithhostname.patch
 Patch10:	at-3.1.14-usePOSIXtimers.patch
 Patch11:	at-3.1.14-help.patch
 Patch12:	at-3.1.14-wrong_format.patch
 Patch13:	at-3.1.16-noabort.patch
+Patch14:	at-3.1.16-fclose-error.patch
 
 BuildRequires: fileutils /etc/init.d
 BuildRequires: flex flex-static bison autoconf
@@ -72,13 +72,13 @@ cp %{SOURCE1} .
 %patch4 -p1 -b .opt_V
 %patch5 -p1 -b .shell
 %patch6 -p1 -b .nit
-%patch7 -p1 -b .nowrap
 %patch8 -p1 -b .export
 %patch9 -p1 -b .mail
 %patch10 -p1 -b .posix
 %patch11 -p1 -b .help
 %patch12 -p1 -b .wrong
 %patch13 -p1 -b .noabort
+%patch14 -p1 -b .fclose
 
 %build
 # patch9 touches configure.in
@@ -176,6 +176,9 @@ chown daemon:daemon %{_localstatedir}/spool/at/.SEQ
 %attr(0644,root,root)		/%{_unitdir}/atd.service
 
 %changelog
+* Mon Nov 24 2014 Tomáš Mráz <tmraz@redhat.com> - 3.1.16-4
+- test for write error on fclose (#1166882)
+
 * Thu Nov  6 2014 Tomáš Mráz <tmraz@redhat.com> - 3.1.16-3
 - make atd less abort prone
 
