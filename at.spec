@@ -3,7 +3,7 @@
 Summary:	Job spooling tools
 Name:		at
 Version:	3.1.16
-Release:	6%{?dist}
+Release:	7%{?dist}
 # http://packages.debian.org/changelogs/pool/main/a/at/current/copyright
 # + install-sh is MIT license with changes under Public Domain
 License:	GPLv3+ and GPLv2+ and ISC and MIT and Public Domain
@@ -29,6 +29,7 @@ Patch10:	at-3.1.14-usePOSIXtimers.patch
 Patch12:	at-3.1.14-wrong_format.patch
 Patch13:	at-3.1.16-noabort.patch
 Patch14:	at-3.1.16-fclose-error.patch
+Patch15:	at-3.1.16-clear-nonjobs.patch
 
 BuildRequires: fileutils /etc/init.d
 BuildRequires: flex flex-static bison autoconf
@@ -77,6 +78,7 @@ cp %{SOURCE1} .
 %patch12 -p1 -b .wrong
 %patch13 -p1 -b .noabort
 %patch14 -p1 -b .fclose
+%patch15 -p1 -b .clear-nojobs
 
 %build
 # patch9 touches configure.in
@@ -174,6 +176,9 @@ chown daemon:daemon %{_localstatedir}/spool/at/.SEQ
 %attr(0644,root,root)		/%{_unitdir}/atd.service
 
 %changelog
+* Wed Sep  9 2015 Tomáš Mráz <tmraz@redhat.com> - 3.1.16-7
+- clear non-job files from at dir
+
 * Wed Jun 17 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.1.16-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
 
