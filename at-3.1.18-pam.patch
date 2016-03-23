@@ -1,6 +1,6 @@
-diff -up at-3.1.14/at.c.pam at-3.1.14/at.c
---- at-3.1.14/at.c.pam	2013-09-08 14:43:53.000000000 +0200
-+++ at-3.1.14/at.c	2013-12-04 11:09:56.165752053 +0100
+diff -up at-3.1.18/at.c.pam at-3.1.18/at.c
+--- at-3.1.18/at.c.pam	2015-12-06 16:45:10.000000000 +0100
++++ at-3.1.18/at.c	2016-03-23 12:40:10.694447117 +0100
 @@ -144,18 +144,13 @@ sigc(int signo)
  /* If the user presses ^C, remove the spool file and exit 
   */
@@ -52,7 +52,7 @@ diff -up at-3.1.14/at.c.pam at-3.1.14/at.c
      /* We've successfully created the file; let's set the flag so it 
       * gets removed in case of an interrupt or error.
       */
-@@ -654,7 +642,7 @@ process_jobs(int argc, char **argv, int
+@@ -670,7 +658,7 @@ process_jobs(int argc, char **argv, int
                      We need the unprivileged uid here since the file is owned by the real
                      (not effective) uid.
                      */
@@ -61,7 +61,7 @@ diff -up at-3.1.14/at.c.pam at-3.1.14/at.c
  
  		    if (queue == '=') {
  			fprintf(stderr, "Warning: deleting running job\n");
-@@ -663,8 +651,8 @@ process_jobs(int argc, char **argv, int
+@@ -679,8 +667,8 @@ process_jobs(int argc, char **argv, int
  			perr("Cannot unlink %.500s", dirent->d_name);
  			rc = EXIT_FAILURE;
  		    }
@@ -71,7 +71,7 @@ diff -up at-3.1.14/at.c.pam at-3.1.14/at.c
  		    done = 1;
  
  		    break;
-@@ -674,7 +662,7 @@ process_jobs(int argc, char **argv, int
+@@ -690,7 +678,7 @@ process_jobs(int argc, char **argv, int
  			FILE *fp;
  			int ch;
  
@@ -80,7 +80,7 @@ diff -up at-3.1.14/at.c.pam at-3.1.14/at.c
  			fp = fopen(dirent->d_name, "r");
  
  			if (fp) {
-@@ -687,7 +675,7 @@ process_jobs(int argc, char **argv, int
+@@ -703,7 +691,7 @@ process_jobs(int argc, char **argv, int
  			    perr("Cannot open %.500s", dirent->d_name);
  			    rc = EXIT_FAILURE;
  			}
@@ -89,21 +89,21 @@ diff -up at-3.1.14/at.c.pam at-3.1.14/at.c
  		    }
  		    break;
  
-diff -up at-3.1.14/atd.c.pam at-3.1.14/atd.c
---- at-3.1.14/atd.c.pam	2013-09-08 14:43:53.000000000 +0200
-+++ at-3.1.14/atd.c	2013-12-04 11:14:31.780617480 +0100
-@@ -83,6 +83,10 @@
- #include "getloadavg.h"
- #endif
+diff -up at-3.1.18/atd.c.pam at-3.1.18/atd.c
+--- at-3.1.18/atd.c.pam	2015-12-06 16:45:10.000000000 +0100
++++ at-3.1.18/atd.c	2016-03-23 12:43:31.990906478 +0100
+@@ -91,6 +91,10 @@ int selinux_enabled = 0;
+ 
+ /* Macros */
  
 +#ifndef LOG_ATD
 +#define LOG_ATD        LOG_DAEMON
 +#endif
 +
- /* Macros */
- 
  #define BATCH_INTERVAL_DEFAULT 60
-@@ -108,7 +112,7 @@ static int run_as_daemon = 0;
+ #define CHECK_INTERVAL 3600
+ 
+@@ -114,7 +118,7 @@ static int run_as_daemon = 0;
  
  static volatile sig_atomic_t term_signal = 0;
  
@@ -112,7 +112,7 @@ diff -up at-3.1.14/atd.c.pam at-3.1.14/atd.c
  #include <security/pam_appl.h>
  
  static pam_handle_t *pamh = NULL;
-@@ -117,15 +121,7 @@ static const struct pam_conv conv = {
+@@ -123,15 +127,7 @@ static const struct pam_conv conv = {
  	NULL
  };
  
@@ -129,7 +129,7 @@ diff -up at-3.1.14/atd.c.pam at-3.1.14/atd.c
  
  /* Signal handlers */
  RETSIGTYPE 
-@@ -220,7 +216,7 @@ run_file(const char *filename, uid_t uid
+@@ -292,7 +288,7 @@ run_file(const char *filename, uid_t uid
      char fmt[64];
      unsigned long jobno;
      int rc;
@@ -138,7 +138,7 @@ diff -up at-3.1.14/atd.c.pam at-3.1.14/atd.c
      int retcode;
  #endif
  
-@@ -377,17 +373,11 @@ run_file(const char *filename, uid_t uid
+@@ -449,17 +445,11 @@ run_file(const char *filename, uid_t uid
      fstat(fd_out, &buf);
      size = buf.st_size;
  
@@ -161,7 +161,7 @@ diff -up at-3.1.14/atd.c.pam at-3.1.14/atd.c
  #endif
  
      close(STDIN_FILENO);
-@@ -401,7 +391,14 @@ run_file(const char *filename, uid_t uid
+@@ -473,7 +463,14 @@ run_file(const char *filename, uid_t uid
      else if (pid == 0) {
  	char *nul = NULL;
  	char **nenvp = &nul;
@@ -176,7 +176,7 @@ diff -up at-3.1.14/atd.c.pam at-3.1.14/atd.c
  	/* Set up things for the child; we want standard input from the
  	 * input file, and standard output and error sent to our output file.
  	 */
-@@ -420,8 +417,6 @@ run_file(const char *filename, uid_t uid
+@@ -492,8 +489,6 @@ run_file(const char *filename, uid_t uid
  	close(fd_in);
  	close(fd_out);
  
@@ -184,8 +184,8 @@ diff -up at-3.1.14/atd.c.pam at-3.1.14/atd.c
 -
  	    nice((tolower((int) queue) - 'a' + 1) * 2);
  
- 	    if (initgroups(pentry->pw_name, pentry->pw_gid))
-@@ -435,9 +430,9 @@ run_file(const char *filename, uid_t uid
+ #ifdef WITH_SELINUX
+@@ -514,9 +509,9 @@ run_file(const char *filename, uid_t uid
  
  	    chdir("/");
  
@@ -198,7 +198,7 @@ diff -up at-3.1.14/atd.c.pam at-3.1.14/atd.c
  	PRIV_END
      }
      /* We're the parent.  Let's wait.
-@@ -450,14 +445,6 @@ run_file(const char *filename, uid_t uid
+@@ -529,14 +524,6 @@ run_file(const char *filename, uid_t uid
       */
      waitpid(pid, (int *) NULL, 0);
  
@@ -213,7 +213,7 @@ diff -up at-3.1.14/atd.c.pam at-3.1.14/atd.c
      /* Send mail.  Unlink the output file after opening it, so it
       * doesn't hang around after the run.
       */
-@@ -488,8 +475,13 @@ run_file(const char *filename, uid_t uid
+@@ -567,8 +554,13 @@ run_file(const char *filename, uid_t uid
      unlink(newname);
      free(newname);
  
@@ -227,7 +227,7 @@ diff -up at-3.1.14/atd.c.pam at-3.1.14/atd.c
  	PRIV_START
  
  	    if (initgroups(pentry->pw_name, pentry->pw_gid))
-@@ -511,7 +503,20 @@ run_file(const char *filename, uid_t uid
+@@ -590,7 +582,20 @@ run_file(const char *filename, uid_t uid
  	    perr("Exec failed for mail command");
  
  	PRIV_END
@@ -248,9 +248,9 @@ diff -up at-3.1.14/atd.c.pam at-3.1.14/atd.c
      exit(EXIT_SUCCESS);
  }
  
-diff -up at-3.1.14/config.h.in.pam at-3.1.14/config.h.in
---- at-3.1.14/config.h.in.pam	2013-09-08 14:43:53.000000000 +0200
-+++ at-3.1.14/config.h.in	2013-12-04 11:09:56.165752053 +0100
+diff -up at-3.1.18/config.h.in.pam at-3.1.18/config.h.in
+--- at-3.1.18/config.h.in.pam	2015-12-06 16:45:10.000000000 +0100
++++ at-3.1.18/config.h.in	2016-03-23 12:40:10.695447139 +0100
 @@ -68,8 +68,8 @@
  /* Define to 1 if you have the <nlist.h> header file. */
  #undef HAVE_NLIST_H
@@ -262,9 +262,9 @@ diff -up at-3.1.14/config.h.in.pam at-3.1.14/config.h.in
  
  /* Define to 1 if you have the `pstat_getdynamic' function. */
  #undef HAVE_PSTAT_GETDYNAMIC
-diff -up at-3.1.14/configure.ac.pam at-3.1.14/configure.ac
---- at-3.1.14/configure.ac.pam	2013-09-08 14:43:53.000000000 +0200
-+++ at-3.1.14/configure.ac	2013-12-04 11:09:56.165752053 +0100
+diff -up at-3.1.18/configure.ac.pam at-3.1.18/configure.ac
+--- at-3.1.18/configure.ac.pam	2015-12-06 16:45:10.000000000 +0100
++++ at-3.1.18/configure.ac	2016-03-23 12:45:27.885473913 +0100
 @@ -78,7 +78,7 @@ AC_FUNC_GETLOADAVG
  AC_CHECK_FUNCS(getcwd mktime strftime setreuid setresuid sigaction waitpid)
  AC_CHECK_HEADERS(security/pam_appl.h, [
@@ -285,12 +285,24 @@ diff -up at-3.1.14/configure.ac.pam at-3.1.14/configure.ac
 +AC_CHECK_LIB(pam, pam_start, PAMLIB='-lpam -lpam_misc')
 +AC_SUBST(PAMLIB)
 +
- AC_MSG_CHECKING(groupname to run under)
- AC_ARG_WITH(daemon_groupname,
- [ --with-daemon_groupname=DAEMON_GROUPNAME	Groupname to run under (default daemon) ],
-diff -up at-3.1.14/perm.c.pam at-3.1.14/perm.c
---- at-3.1.14/perm.c.pam	2013-09-08 14:43:53.000000000 +0200
-+++ at-3.1.14/perm.c	2013-12-04 11:09:56.165752053 +0100
+ AC_ARG_WITH(selinux,
+ [ --with-selinux       Define to run with selinux],
+ AC_DEFINE(WITH_SELINUX, 1, [Define if you are building with_selinux]),
+diff -up at-3.1.18/Makefile.in.pam at-3.1.18/Makefile.in
+--- at-3.1.18/Makefile.in.pam	2016-03-23 12:55:30.000000000 +0100
++++ at-3.1.18/Makefile.in	2016-03-23 12:57:58.347145148 +0100
+@@ -68,7 +68,7 @@ LIST = Filelist Filelist.asc
+ all: at atd atd.service atrun
+ 
+ at: $(ATOBJECTS)
+-	$(CC) $(LDFLAGS) -pie -o at $(ATOBJECTS) $(LIBS) $(LEXLIB)
++	$(CC) $(LDFLAGS) -pie -o at $(ATOBJECTS) $(LIBS) $(LEXLIB) $(PAMLIB)
+ 	rm -f $(CLONES)
+ 	$(LN_S) -f at atq
+ 	$(LN_S) -f at atrm
+diff -up at-3.1.18/perm.c.pam at-3.1.18/perm.c
+--- at-3.1.18/perm.c.pam	2015-12-06 16:45:10.000000000 +0100
++++ at-3.1.18/perm.c	2016-03-23 12:40:10.695447139 +0100
 @@ -51,6 +51,14 @@
  #define PRIV_END while(0)
  #endif
@@ -355,9 +367,9 @@ diff -up at-3.1.14/perm.c.pam at-3.1.14/perm.c
    allow = user_in_file(ETCDIR "/at.allow", pentry->pw_name);
    if (allow==0 || allow==1)
      return allow;
-diff -up at-3.1.14/privs.h.pam at-3.1.14/privs.h
---- at-3.1.14/privs.h.pam	2013-09-08 14:43:53.000000000 +0200
-+++ at-3.1.14/privs.h	2013-12-04 11:09:56.166752054 +0100
+diff -up at-3.1.18/privs.h.pam at-3.1.18/privs.h
+--- at-3.1.18/privs.h.pam	2015-12-06 16:45:10.000000000 +0100
++++ at-3.1.18/privs.h	2016-03-23 12:40:10.695447139 +0100
 @@ -144,3 +144,63 @@ extern gid_t real_gid, effective_gid, da
  #error "Cannot implement user ID swapping without setreuid or setresuid"
  #endif

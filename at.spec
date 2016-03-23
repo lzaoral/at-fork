@@ -2,8 +2,8 @@
 
 Summary:	Job spooling tools
 Name:		at
-Version:	3.1.16
-Release:	8%{?dist}
+Version:	3.1.18
+Release:	1%{?dist}
 # http://packages.debian.org/changelogs/pool/main/a/at/current/copyright
 # + install-sh is MIT license with changes under Public Domain
 License:	GPLv3+ and GPLv2+ and ISC and MIT and Public Domain
@@ -17,19 +17,19 @@ Source3:	atd.sysconf
 Source5:	atd.systemd
 
 Patch0:		at-aarch64.patch
-Patch1:		at-3.1.14-makefile.patch
-Patch2:		at-3.1.14-pam.patch
-Patch3:		at-3.1.14-selinux.patch
+Patch1:		at-3.1.18-make.patch
+Patch2:		at-3.1.18-pam.patch
 Patch4:		at-3.1.14-opt_V.patch
 Patch5:		at-3.1.14-shell.patch
-Patch6:		at-3.1.14-nitpicks.patch
+Patch6:		at-3.1.18-nitpicks.patch
 Patch8:		at-3.1.14-fix_no_export.patch 
 Patch9:		at-3.1.14-mailwithhostname.patch
 Patch10:	at-3.1.14-usePOSIXtimers.patch
 Patch12:	at-3.1.14-wrong_format.patch
-Patch13:	at-3.1.16-noabort.patch
+Patch13:	at-3.1.18-noabort.patch
 Patch14:	at-3.1.16-fclose-error.patch
 Patch15:	at-3.1.16-clear-nonjobs.patch
+Patch16:	at-3.1.18-utc-dst.patch
 
 BuildRequires: fileutils /etc/init.d
 BuildRequires: flex flex-static bison autoconf
@@ -63,12 +63,11 @@ need to be repeated at the same time every day/week, etc. you should
 use crontab instead.
 
 %prep
-%setup -q
+%setup -c -q
 cp %{SOURCE1} .
 %patch0 -p1 -b .arm
 %patch1 -p1 -b .make
 %patch2 -p1 -b .pam
-%patch3 -p1 -b .selinux
 %patch4 -p1 -b .opt_V
 %patch5 -p1 -b .shell
 %patch6 -p1 -b .nit
@@ -79,6 +78,7 @@ cp %{SOURCE1} .
 %patch13 -p1 -b .noabort
 %patch14 -p1 -b .fclose
 %patch15 -p1 -b .clear-nojobs
+%patch16 -p1 -b .dst
 
 %build
 # patch9 touches configure.in
@@ -176,6 +176,10 @@ chown daemon:daemon %{_localstatedir}/spool/at/.SEQ
 %attr(0644,root,root)		/%{_unitdir}/atd.service
 
 %changelog
+* Wed Mar 23 2016 Tomáš Mráz <tmraz@redhat.com> - 3.1.18-1
+- new upstream release
+- correct the DST correction when using UTC time specification (#1320322)
+
 * Wed Feb 03 2016 Fedora Release Engineering <releng@fedoraproject.org> - 3.1.16-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
 
