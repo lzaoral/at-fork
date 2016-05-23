@@ -3,7 +3,7 @@
 Summary:	Job spooling tools
 Name:		at
 Version:	3.1.18
-Release:	1%{?dist}
+Release:	2%{?dist}
 # http://packages.debian.org/changelogs/pool/main/a/at/current/copyright
 # + install-sh is MIT license with changes under Public Domain
 License:	GPLv3+ and GPLv2+ and ISC and MIT and Public Domain
@@ -176,6 +176,9 @@ chown daemon:daemon %{_localstatedir}/spool/at/.SEQ
 %attr(0644,root,root)		/%{_unitdir}/atd.service
 
 %changelog
+* Mon May 23 2016 Tomáš Mráz <tmraz@redhat.com> - 3.1.18-2
+- SIGPIPE should not be ignored in atd (#1338039)
+
 * Wed Mar 23 2016 Tomáš Mráz <tmraz@redhat.com> - 3.1.18-1
 - new upstream release
 - correct the DST correction when using UTC time specification (#1320322)
