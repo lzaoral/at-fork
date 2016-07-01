@@ -2,8 +2,8 @@
 
 Summary:	Job spooling tools
 Name:		at
-Version:	3.1.18
-Release:	2%{?dist}
+Version:	3.1.20
+Release:	1%{?dist}
 # http://packages.debian.org/changelogs/pool/main/a/at/current/copyright
 # + install-sh is MIT license with changes under Public Domain
 License:	GPLv3+ and GPLv2+ and ISC and MIT and Public Domain
@@ -18,9 +18,9 @@ Source5:	atd.systemd
 
 Patch0:		at-aarch64.patch
 Patch1:		at-3.1.18-make.patch
-Patch2:		at-3.1.18-pam.patch
+Patch2:		at-3.1.20-pam.patch
 Patch4:		at-3.1.14-opt_V.patch
-Patch5:		at-3.1.14-shell.patch
+Patch5:		at-3.1.20-shell.patch
 Patch6:		at-3.1.18-nitpicks.patch
 Patch8:		at-3.1.14-fix_no_export.patch 
 Patch9:		at-3.1.14-mailwithhostname.patch
@@ -30,6 +30,7 @@ Patch13:	at-3.1.18-noabort.patch
 Patch14:	at-3.1.16-fclose-error.patch
 Patch15:	at-3.1.16-clear-nonjobs.patch
 Patch16:	at-3.1.18-utc-dst.patch
+Patch17:	at-3.1.20-lock-locks.patch
 
 BuildRequires: fileutils /etc/init.d
 BuildRequires: flex flex-static bison autoconf
@@ -63,7 +64,7 @@ need to be repeated at the same time every day/week, etc. you should
 use crontab instead.
 
 %prep
-%setup -c -q
+%setup -q
 cp %{SOURCE1} .
 %patch0 -p1 -b .arm
 %patch1 -p1 -b .make
@@ -79,6 +80,7 @@ cp %{SOURCE1} .
 %patch14 -p1 -b .fclose
 %patch15 -p1 -b .clear-nojobs
 %patch16 -p1 -b .dst
+%patch17 -p1 -b .lock-locks
 
 %build
 # patch9 touches configure.in
@@ -176,6 +178,11 @@ chown daemon:daemon %{_localstatedir}/spool/at/.SEQ
 %attr(0644,root,root)		/%{_unitdir}/atd.service
 
 %changelog
+* Fri Jul  1 2016 Tomáš Mráz <tmraz@redhat.com> - 3.1.20-1
+- new upstream release
+- properly lock the lock files to be able to safely remove
+  stale ones
+
 * Mon May 23 2016 Tomáš Mráz <tmraz@redhat.com> - 3.1.18-2
 - SIGPIPE should not be ignored in atd (#1338039)
 
