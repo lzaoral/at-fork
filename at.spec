@@ -3,7 +3,7 @@
 Summary:	Job spooling tools
 Name:		at
 Version:	3.1.20
-Release:	1%{?dist}
+Release:	2%{?dist}
 # http://packages.debian.org/changelogs/pool/main/a/at/current/copyright
 # + install-sh is MIT license with changes under Public Domain
 License:	GPLv3+ and GPLv2+ and ISC and MIT and Public Domain
@@ -161,7 +161,8 @@ chown daemon:daemon %{_localstatedir}/spool/at/.SEQ
 /bin/systemctl daemon-reload >/dev/null 2>&1 || :
 
 %files
-%doc docs/*
+%license Copyright COPYING
+%doc README timespec ChangeLog
 %attr(0644,root,root)		%config(noreplace) %{_sysconfdir}/at.deny
 %attr(0644,root,root)		%config(noreplace) %{_sysconfdir}/sysconfig/atd
 %attr(0700,daemon,daemon)	%dir %{_localstatedir}/spool/at
@@ -178,6 +179,9 @@ chown daemon:daemon %{_localstatedir}/spool/at/.SEQ
 %attr(0644,root,root)		/%{_unitdir}/atd.service
 
 %changelog
+* Thu Feb  2 2017 Tomáš Mráz <tmraz@redhat.com> - 3.1.20-2
+- properly include the license files
+
 * Fri Jul  1 2016 Tomáš Mráz <tmraz@redhat.com> - 3.1.20-1
 - new upstream release
 - properly lock the lock files to be able to safely remove
