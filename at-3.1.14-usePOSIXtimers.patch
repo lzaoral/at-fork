@@ -5,7 +5,7 @@ diff -up at-3.1.14/atd.c.timers at-3.1.14/atd.c
      return next_job;
  }
  
-+#ifdef HAVE_CLOCK_GETTIME
++#ifdef HAVE_TIMER_CREATE
 +timer_t timer;
 +struct itimerspec timeout;
 +
@@ -89,7 +89,7 @@ diff -up at-3.1.14/config.h.in.timers at-3.1.14/config.h.in
  /* Define to 1 if you have the `getloadavg' function. */
  #undef HAVE_GETLOADAVG
  
-+/* Define to 1 if you have the `clock_gettime' function. */
++/* Define to 1 if you have the `timer_create' function. */
 +#undef HAVE_TIMER_CREATE
 +
  /* Define to 1 if you have the <getopt.h> header file. */
