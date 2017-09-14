@@ -3,7 +3,7 @@
 Summary:	Job spooling tools
 Name:		at
 Version:	3.1.20
-Release:	7%{?dist}
+Release:	8%{?dist}
 # http://packages.debian.org/changelogs/pool/main/a/at/current/copyright
 # + install-sh is MIT license with changes under Public Domain
 License:	GPLv3+ and GPLv2+ and ISC and MIT and Public Domain
@@ -25,7 +25,7 @@ Patch6:		at-3.1.18-nitpicks.patch
 Patch8:		at-3.1.14-fix_no_export.patch 
 Patch9:		at-3.1.14-mailwithhostname.patch
 Patch10:	at-3.1.14-usePOSIXtimers.patch
-Patch12:	at-3.1.14-wrong_format.patch
+Patch12:	at-3.1.20-aborted-jobs.patch
 Patch13:	at-3.1.18-noabort.patch
 Patch14:	at-3.1.16-fclose-error.patch
 Patch15:	at-3.1.16-clear-nonjobs.patch
@@ -76,7 +76,7 @@ cp %{SOURCE1} .
 %patch8 -p1 -b .export
 %patch9 -p1 -b .mail
 %patch10 -p1 -b .posix
-%patch12 -p1 -b .wrong
+%patch12 -p1 -b .aborted
 %patch13 -p1 -b .noabort
 %patch14 -p1 -b .fclose
 %patch15 -p1 -b .clear-nojobs
@@ -181,6 +181,9 @@ chown root:root %{_localstatedir}/spool/at/.SEQ
 %attr(0644,root,root)		/%{_unitdir}/atd.service
 
 %changelog
+* Thu Sep 14 2017 Tomáš Mráz <tmraz@redhat.com> - 3.1.20-8
+- improve the wrong_format patch, also rename it to correct name
+
 * Thu Sep 14 2017 Tomáš Mráz <tmraz@redhat.com> - 3.1.20-7
 - the ownership of the spool directory should be root as at is configured
   with daemon username root
