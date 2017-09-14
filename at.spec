@@ -3,7 +3,7 @@
 Summary:	Job spooling tools
 Name:		at
 Version:	3.1.20
-Release:	6%{?dist}
+Release:	7%{?dist}
 # http://packages.debian.org/changelogs/pool/main/a/at/current/copyright
 # + install-sh is MIT license with changes under Public Domain
 License:	GPLv3+ and GPLv2+ and ISC and MIT and Public Domain
@@ -31,6 +31,7 @@ Patch14:	at-3.1.16-fclose-error.patch
 Patch15:	at-3.1.16-clear-nonjobs.patch
 Patch16:	at-3.1.18-utc-dst.patch
 Patch17:	at-3.1.20-lock-locks.patch
+Patch18:	at-3.1.20-document-n.patch
 
 BuildRequires: fileutils /etc/init.d
 BuildRequires: flex flex-static bison autoconf
@@ -81,6 +82,7 @@ cp %{SOURCE1} .
 %patch15 -p1 -b .clear-nojobs
 %patch16 -p1 -b .dst
 %patch17 -p1 -b .lock-locks
+%patch18 -p1 -b .document-n
 
 %build
 # patch9 touches configure.in
@@ -138,7 +140,7 @@ make test
 %post
 touch %{_localstatedir}/spool/at/.SEQ
 chmod 600 %{_localstatedir}/spool/at/.SEQ
-chown daemon:daemon %{_localstatedir}/spool/at/.SEQ
+chown root:root %{_localstatedir}/spool/at/.SEQ
 %systemd_post atd.service
 
 %preun
@@ -165,9 +167,9 @@ chown daemon:daemon %{_localstatedir}/spool/at/.SEQ
 %doc README timespec ChangeLog
 %attr(0644,root,root)		%config(noreplace) %{_sysconfdir}/at.deny
 %attr(0644,root,root)		%config(noreplace) %{_sysconfdir}/sysconfig/atd
-%attr(0700,daemon,daemon)	%dir %{_localstatedir}/spool/at
-%attr(0600,daemon,daemon)	%verify(not md5 size mtime) %ghost %{_localstatedir}/spool/at/.SEQ
-%attr(0700,daemon,daemon)	%dir %{_localstatedir}/spool/at/spool
+%attr(0700,root,root)		%dir %{_localstatedir}/spool/at
+%attr(0600,root,root)		%verify(not md5 size mtime) %ghost %{_localstatedir}/spool/at/.SEQ
+%attr(0700,root,root)		%dir %{_localstatedir}/spool/at/spool
 %attr(0644,root,root)		%config(noreplace) %{_sysconfdir}/pam.d/atd
 %{_sbindir}/atrun
 %attr(0755,root,root)		%{_sbindir}/atd
@@ -179,6 +181,11 @@ chown daemon:daemon %{_localstatedir}/spool/at/.SEQ
 %attr(0644,root,root)		/%{_unitdir}/atd.service
 
 %changelog
+* Thu Sep 14 2017 Tomáš Mráz <tmraz@redhat.com> - 3.1.20-7
+- the ownership of the spool directory should be root as at is configured
+  with daemon username root
+- document the -n option
+
 * Wed Aug 02 2017 Fedora Release Engineering <releng@fedoraproject.org> - 3.1.20-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Binutils_Mass_Rebuild
 
