@@ -33,6 +33,7 @@ Patch16:	at-3.1.18-utc-dst.patch
 Patch17:	at-3.1.20-lock-locks.patch
 Patch18:	at-3.1.20-document-n.patch
 
+BuildRequires: gcc
 BuildRequires: flex flex-static bison autoconf
 BuildRequires: libselinux-devel >= 1.27.9
 BuildRequires: perl(Test::Harness)
