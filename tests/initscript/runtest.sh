@@ -27,7 +27,6 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Include rhts environment
-. /usr/bin/rhts-environment.sh
 . /usr/share/rhts-library/rhtslib.sh
 
 PACKAGE="at"

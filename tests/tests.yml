@@ -5,6 +5,8 @@
   - role: standard-test-beakerlib
     tags:
     - classic
+    - container
+    - atomic
     tests:
     - initscript
     required_packages:
