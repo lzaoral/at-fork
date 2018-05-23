@@ -3,7 +3,7 @@
 Summary:	Job spooling tools
 Name:		at
 Version:	3.1.20
-Release:	10%{?dist}
+Release:	11%{?dist}
 # http://packages.debian.org/changelogs/pool/main/a/at/current/copyright
 # + install-sh is MIT license with changes under Public Domain
 License:	GPLv3+ and GPLv2+ and ISC and MIT and Public Domain
@@ -32,6 +32,7 @@ Patch15:	at-3.1.16-clear-nonjobs.patch
 Patch16:	at-3.1.18-utc-dst.patch
 Patch17:	at-3.1.20-lock-locks.patch
 Patch18:	at-3.1.20-document-n.patch
+Patch19:	at-3.1.20-log-jobs.patch
 
 BuildRequires: gcc
 BuildRequires: flex flex-static bison autoconf
@@ -83,6 +84,7 @@ cp %{SOURCE1} .
 %patch16 -p1 -b .dst
 %patch17 -p1 -b .lock-locks
 %patch18 -p1 -b .document-n
+%patch19 -p1 -b .log-jobs
 
 %build
 # patch9 touches configure.in
@@ -181,6 +183,9 @@ chown root:root %{_localstatedir}/spool/at/.SEQ
 %attr(0644,root,root)		/%{_unitdir}/atd.service
 
 %changelog
+* Wed May 23 2018 Tomáš Mráz <tmraz@redhat.com> - 3.1.20-11
+- log the jobs being run
+
 * Sun Feb 25 2018 Florian Weimer <fweimer@redhat.com> - 3.1.20-10
 - Drop "BuildRequires: fileutils /etc/init.d"
 
