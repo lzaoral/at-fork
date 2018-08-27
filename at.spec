@@ -2,8 +2,8 @@
 
 Summary:	Job spooling tools
 Name:		at
-Version:	3.1.20
-Release:	12%{?dist}
+Version:	3.1.23
+Release:	1%{?dist}
 # http://packages.debian.org/changelogs/pool/main/a/at/current/copyright
 # + install-sh is MIT license with changes under Public Domain
 License:	GPLv3+ and GPLv2+ and ISC and MIT and Public Domain
@@ -31,7 +31,7 @@ Patch14:	at-3.1.16-fclose-error.patch
 Patch15:	at-3.1.16-clear-nonjobs.patch
 Patch16:	at-3.1.18-utc-dst.patch
 Patch17:	at-3.1.20-lock-locks.patch
-Patch18:	at-3.1.20-document-n.patch
+Patch18:	at-3.1.23-document-n.patch
 Patch19:	at-3.1.20-log-jobs.patch
 
 BuildRequires: gcc
@@ -183,6 +183,9 @@ chown root:root %{_localstatedir}/spool/at/.SEQ
 %attr(0644,root,root)		/%{_unitdir}/atd.service
 
 %changelog
+* Mon Aug 27 2018 Tomáš Mráz <tmraz@redhat.com> - 3.1.23-1
+- new upstream release
+
 * Thu Jul 12 2018 Fedora Release Engineering <releng@fedoraproject.org> - 3.1.20-12
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
 
