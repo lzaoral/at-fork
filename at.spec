@@ -7,7 +7,6 @@ Release:	1%{?dist}
 # http://packages.debian.org/changelogs/pool/main/a/at/current/copyright
 # + install-sh is MIT license with changes under Public Domain
 License:	GPLv3+ and GPLv2+ and ISC and MIT and Public Domain
-Group:		System Environment/Daemons
 URL:		http://ftp.debian.org/debian/pool/main/a/at
 
 Source:		http://ftp.debian.org/debian/pool/main/a/at/at_%{version}.orig.tar.gz
