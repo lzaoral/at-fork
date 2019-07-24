@@ -3,7 +3,7 @@
 Summary:	Job spooling tools
 Name:		at
 Version:	3.1.23
-Release:	2%{?dist}
+Release:	3%{?dist}
 # http://packages.debian.org/changelogs/pool/main/a/at/current/copyright
 # + install-sh is MIT license with changes under Public Domain
 License:	GPLv3+ and GPLv2+ and ISC and MIT and Public Domain
@@ -182,6 +182,9 @@ chown root:root %{_localstatedir}/spool/at/.SEQ
 %attr(0644,root,root)		/%{_unitdir}/atd.service
 
 %changelog
+* Wed Jul 24 2019 Fedora Release Engineering <releng@fedoraproject.org> - 3.1.23-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
+
 * Thu Jan 31 2019 Fedora Release Engineering <releng@fedoraproject.org> - 3.1.23-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
 
