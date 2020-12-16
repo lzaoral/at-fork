@@ -45,6 +45,7 @@ BuildRequires: pam-devel
 Conflicts: crontabs <= 1.5
 # No, I'm not kidding
 BuildRequires: smtpdaemon
+BuildRequires: make
 
 Requires(post): systemd-units
 Requires(preun): systemd-units
