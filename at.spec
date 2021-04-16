@@ -1,37 +1,37 @@
 %bcond_without pam
 
-Summary:	Job spooling tools
-Name:		at
-Version:	3.1.23
-Release:	7%{?dist}
+Summary:    Job spooling tools
+Name:       at
+Version:    3.1.23
+Release:    7%{?dist}
 # http://packages.debian.org/changelogs/pool/main/a/at/current/copyright
 # + install-sh is MIT license with changes under Public Domain
-License:	GPLv3+ and GPLv2+ and ISC and MIT and Public Domain
-URL:		http://ftp.debian.org/debian/pool/main/a/at
+License:    GPLv3+ and GPLv2+ and ISC and MIT and Public Domain
+URL:        http://ftp.debian.org/debian/pool/main/a/at
 
-Source:		http://ftp.debian.org/debian/pool/main/a/at/at_%{version}.orig.tar.gz
+Source:     http://ftp.debian.org/debian/pool/main/a/at/at_%{version}.orig.tar.gz
 # git upstream source git://git.debian.org/git/collab-maint/at.git
-Source1:	pam_atd
-Source3:	atd.sysconf
-Source5:	atd.systemd
+Source1:    pam_atd
+Source3:    atd.sysconf
+Source5:    atd.systemd
 
-Patch0:		at-aarch64.patch
-Patch1:		at-3.1.18-make.patch
-Patch2:		at-3.1.20-pam.patch
-Patch4:		at-3.1.14-opt_V.patch
-Patch5:		at-3.1.20-shell.patch
-Patch6:		at-3.1.18-nitpicks.patch
-Patch8:		at-3.1.14-fix_no_export.patch 
-Patch9:		at-3.1.14-mailwithhostname.patch
-Patch10:	at-3.1.14-usePOSIXtimers.patch
-Patch12:	at-3.1.20-aborted-jobs.patch
-Patch13:	at-3.1.18-noabort.patch
-Patch14:	at-3.1.16-fclose-error.patch
-Patch15:	at-3.1.16-clear-nonjobs.patch
-Patch16:	at-3.1.18-utc-dst.patch
-Patch17:	at-3.1.20-lock-locks.patch
-Patch18:	at-3.1.23-document-n.patch
-Patch19:	at-3.1.20-log-jobs.patch
+Patch:      at-aarch64.patch
+Patch:      at-3.1.18-make.patch
+Patch:      at-3.1.20-pam.patch
+Patch:      at-3.1.14-opt_V.patch
+Patch:      at-3.1.20-shell.patch
+Patch:      at-3.1.18-nitpicks.patch
+Patch:      at-3.1.14-fix_no_export.patch
+Patch:      at-3.1.14-mailwithhostname.patch
+Patch:      at-3.1.14-usePOSIXtimers.patch
+Patch:      at-3.1.20-aborted-jobs.patch
+Patch:      at-3.1.18-noabort.patch
+Patch:      at-3.1.16-fclose-error.patch
+Patch:      at-3.1.16-clear-nonjobs.patch
+Patch:      at-3.1.18-utc-dst.patch
+Patch:      at-3.1.20-lock-locks.patch
+Patch:      at-3.1.23-document-n.patch
+Patch:      at-3.1.20-log-jobs.patch
 
 BuildRequires: gcc
 BuildRequires: flex flex-static bison autoconf
@@ -66,58 +66,41 @@ need to be repeated at the same time every day/week, etc. you should
 use crontab instead.
 
 %prep
-%setup -q
+%autosetup -N
 cp %{SOURCE1} .
-%patch0 -p1 -b .arm
-%patch1 -p1 -b .make
-%patch2 -p1 -b .pam
-%patch4 -p1 -b .opt_V
-%patch5 -p1 -b .shell
-%patch6 -p1 -b .nit
-%patch8 -p1 -b .export
-%patch9 -p1 -b .mail
-%patch10 -p1 -b .posix
-%patch12 -p1 -b .aborted
-%patch13 -p1 -b .noabort
-%patch14 -p1 -b .fclose
-%patch15 -p1 -b .clear-nojobs
-%patch16 -p1 -b .dst
-%patch17 -p1 -b .lock-locks
-%patch18 -p1 -b .document-n
-%patch19 -p1 -b .log-jobs
+%autopatch -p1
 
 %build
-# patch9 touches configure.in
+# at-3.1.14-usePOSIXtimers.patch touches configure.in
 autoconf
 # uselles files
 rm -f lex.yy.* y.tab.*
+
 %configure --with-atspool=%{_localstatedir}/spool/at/spool \
-	--with-jobdir=%{_localstatedir}/spool/at \
-	--with-daemon_username=root  \
-	--with-daemon_groupname=root \
-	--with-selinux \
-%if %{with pam}
-	--with-pam
-%endif
+    --with-jobdir=%{_localstatedir}/spool/at \
+    --with-daemon_username=root  \
+    --with-daemon_groupname=root \
+    --with-selinux \
+    %{?with_pam:--with-pam}
 
 make
 
 %install
 make install \
-	DAEMON_USERNAME=`id -nu`\
-	DAEMON_GROUPNAME=`id -ng` \
-	DESTDIR=%{buildroot}\
-	sbindir=%{buildroot}%{_prefix}/sbin\
-	bindir=%{buildroot}%{_bindir}\
-	prefix=%{buildroot}%{_prefix}\
-	exec_prefix=%{buildroot}%{_prefix}\
-	docdir=%{buildroot}/usr/doc\
-	mandir=%{buildroot}%{_mandir}\
-	etcdir=%{buildroot}%{_sysconfdir} \
-	ATJOB_DIR=%{buildroot}%{_localstatedir}/spool/at \
-	ATSPOOL_DIR=%{buildroot}%{_localstatedir}/spool/at/spool \
-	INSTALL_ROOT_USER=`id -nu` \
-	INSTALL_ROOT_GROUP=`id -nu`;
+    DAEMON_USERNAME=`id -nu`\
+    DAEMON_GROUPNAME=`id -ng` \
+    DESTDIR=%{buildroot}\
+    sbindir=%{buildroot}%{_prefix}/sbin\
+    bindir=%{buildroot}%{_bindir}\
+    prefix=%{buildroot}%{_prefix}\
+    exec_prefix=%{buildroot}%{_prefix}\
+    docdir=%{buildroot}/usr/doc\
+    mandir=%{buildroot}%{_mandir}\
+    etcdir=%{buildroot}%{_sysconfdir} \
+    ATJOB_DIR=%{buildroot}%{_localstatedir}/spool/at \
+    ATSPOOL_DIR=%{buildroot}%{_localstatedir}/spool/at/spool \
+    INSTALL_ROOT_USER=`id -nu` \
+    INSTALL_ROOT_GROUP=`id -nu`;
 
 echo > %{buildroot}%{_sysconfdir}/at.deny
 mkdir docs
@@ -167,20 +150,20 @@ chown root:root %{_localstatedir}/spool/at/.SEQ
 %files
 %license Copyright COPYING
 %doc README timespec ChangeLog
-%attr(0644,root,root)		%config(noreplace) %{_sysconfdir}/at.deny
-%attr(0644,root,root)		%config(noreplace) %{_sysconfdir}/sysconfig/atd
-%attr(0700,root,root)		%dir %{_localstatedir}/spool/at
-%attr(0600,root,root)		%verify(not md5 size mtime) %ghost %{_localstatedir}/spool/at/.SEQ
-%attr(0700,root,root)		%dir %{_localstatedir}/spool/at/spool
-%attr(0644,root,root)		%config(noreplace) %{_sysconfdir}/pam.d/atd
+%attr(0644,root,root)       %config(noreplace) %{_sysconfdir}/at.deny
+%attr(0644,root,root)       %config(noreplace) %{_sysconfdir}/sysconfig/atd
+%attr(0700,root,root)       %dir %{_localstatedir}/spool/at
+%attr(0600,root,root)       %verify(not md5 size mtime) %ghost %{_localstatedir}/spool/at/.SEQ
+%attr(0700,root,root)       %dir %{_localstatedir}/spool/at/spool
+%attr(0644,root,root)       %config(noreplace) %{_sysconfdir}/pam.d/atd
 %{_sbindir}/atrun
-%attr(0755,root,root)		%{_sbindir}/atd
+%attr(0755,root,root)       %{_sbindir}/atd
 %{_mandir}/man*/*
 %{_bindir}/batch
 %{_bindir}/atrm
 %{_bindir}/atq
-%attr(4755,root,root)		%{_bindir}/at
-%attr(0644,root,root)		/%{_unitdir}/atd.service
+%attr(4755,root,root)       %{_bindir}/at
+%attr(0644,root,root)       /%{_unitdir}/atd.service
 
 %changelog
 * Tue Mar 02 2021 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 3.1.23-7
@@ -325,7 +308,7 @@ chown root:root %{_localstatedir}/spool/at/.SEQ
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
 
 * Mon Nov 14 2011 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.13-5
-- 754156 fix typo in script 
+- 754156 fix typo in script
 
 * Mon Nov 14 2011 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.13-5
 - fix incorrect option in test in 56atd
@@ -367,7 +350,7 @@ chown root:root %{_localstatedir}/spool/at/.SEQ
 - 617320 systemd init script replacement
 
 * Mon Mar 15 2010 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.12-5
-- 568222 interrupted 'at' job creates empty job for non-root 
+- 568222 interrupted 'at' job creates empty job for non-root
 
 * Mon Mar  1 2010 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.12-4
 - 568779 atd is alway runnig after suspend/resume
@@ -424,8 +407,8 @@ chown root:root %{_localstatedir}/spool/at/.SEQ
 - 486227 add hyphen date into manual page.
 
 * Wed Dec 3 2008 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.10-27
-- 464393 add script into pm-utils, because daemon wasn't taking all jobs 
-	after suspend/hibernate
+- 464393 add script into pm-utils, because daemon wasn't taking all jobs
+    after suspend/hibernate
 
 * Fri Oct 24 2008 Marcela Mašláňová <mmaslano@redhat.com> - 3.1.10-26
 - update init script according to SysVInitScript
@@ -502,7 +485,7 @@ chown root:root %{_localstatedir}/spool/at/.SEQ
 - rhbz#224597
 
 * Fri Oct 27 2006 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-6
-- fix daylight-saving again 
+- fix daylight-saving again
 - fix #214759 - problem with seteuid
 
 * Wed Oct 25 2006 Marcela Maslanova <mmaslano@redhat.com> - 3.1.10-5
@@ -537,11 +520,11 @@ chown root:root %{_localstatedir}/spool/at/.SEQ
 - use include instead of pam_stack in pam config
 
 * Fri Jun 03 2005 Jason Vas Dias <jvdias@redhat.com> 3.1.8-78
-- fix bug 159220: add pam_loginuid to pam session stack in /etc/pam.d/atd 
+- fix bug 159220: add pam_loginuid to pam session stack in /etc/pam.d/atd
 - fix bug 102341: add '-r' synonym for '-d' / atrm for POSIX / SuS conformance
 
 * Fri Apr 08 2005 Jason Vas Dias <jvdias@redhat.com> 3.1.8-77
-- always call pam_setcred(pamh, PAM_DELETE_CRED) before session 
+- always call pam_setcred(pamh, PAM_DELETE_CRED) before session
 - close
 
 * Tue Apr 05 2005 Jason Vas Dias <jvdias@redhat.com> 3.1.8-70
@@ -552,7 +535,7 @@ chown root:root %{_localstatedir}/spool/at/.SEQ
 - user can know when using at(1) if PAM permission is denied.
 
 * Tue Mar 08 2005 Jason Vas Dias <jvdias@redhat.com> 3.1.8-67
-- better fix for bug 150131: change DAEMON_USERNAME and 
+- better fix for bug 150131: change DAEMON_USERNAME and
 - DAEMON_GROUPNAME to 'root' .
 
 * Mon Mar 07 2005 Jason Vas Dias <jvdias@redhat.com> 3.1.8-66
@@ -570,7 +553,7 @@ chown root:root %{_localstatedir}/spool/at/.SEQ
 - details of blacklisted variables.
 
 * Tue Sep 28 2004 Rik van Riel <riel@redhat.com> 3.1.8-58
-- fix typo in man page, bug 112303 
+- fix typo in man page, bug 112303
 - (regenerated at-3.1.8-man-timespec-path.patch with fix)
 
 * Tue Aug 03 2004 Jason Vas Dias <jvdias@redhat.com>
@@ -703,7 +686,7 @@ chown root:root %{_localstatedir}/spool/at/.SEQ
 - updated patch update, still bug #46546
 
 * Wed Jul 18 2001 Crutcher Dunnavant <crutcher@redhat.com>
-- applied enrico.scholz@informatik.tu-chemnitz.de's change to the env patch to 
+- applied enrico.scholz@informatik.tu-chemnitz.de's change to the env patch to
 - address bug #46546
 
 * Mon Jun 25 2001 Crutcher Dunnavant <crutcher@redhat.com>
@@ -786,7 +769,7 @@ chown root:root %{_localstatedir}/spool/at/.SEQ
 * Mon May 24 1999 Jeff Johnson <jbj@redhat.com>
 - reset SIGCHLD before exec (#3016).
 
-* Sun Mar 21 1999 Cristian Gafton <gafton@redhat.com> 
+* Sun Mar 21 1999 Cristian Gafton <gafton@redhat.com>
 - auto rebuild in the new build environment (release 8)
 
 * Thu Mar 18 1999 Cristian Gafton <gafton@redhat.com>
