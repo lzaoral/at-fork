@@ -3,7 +3,7 @@
 Summary:    Job spooling tools
 Name:       at
 Version:    3.1.23
-Release:    7%{?dist}
+Release:    8%{?dist}
 # http://packages.debian.org/changelogs/pool/main/a/at/current/copyright
 # + install-sh is MIT license with changes under Public Domain
 License:    GPLv3+ and GPLv2+ and ISC and MIT and Public Domain
@@ -32,6 +32,7 @@ Patch:      at-3.1.18-utc-dst.patch
 Patch:      at-3.1.20-lock-locks.patch
 Patch:      at-3.1.23-document-n.patch
 Patch:      at-3.1.20-log-jobs.patch
+Patch:      at-3.2.23-coverity-fix.patch
 
 BuildRequires: gcc
 BuildRequires: flex flex-static bison autoconf
@@ -166,6 +167,9 @@ chown root:root %{_localstatedir}/spool/at/.SEQ
 %attr(0644,root,root)       /%{_unitdir}/atd.service
 
 %changelog
+* Fri Apr 16 2021 Jan Staněk <jstanek@redhat.com> - 3.1.23-8
+- Patch issues found by coverity (rhbz#1938678)
+
 * Tue Mar 02 2021 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 3.1.23-7
 - Rebuilt for updated systemd-rpm-macros
   See https://pagure.io/fesco/issue/2583.
