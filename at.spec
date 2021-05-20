@@ -2,24 +2,24 @@
 
 Summary:    Job spooling tools
 Name:       at
-Version:    3.1.23
-Release:    8%{?dist}
+Version:    3.2.2
+Release:    1%{?dist}
 # http://packages.debian.org/changelogs/pool/main/a/at/current/copyright
 # + install-sh is MIT license with changes under Public Domain
 License:    GPLv3+ and GPLv2+ and ISC and MIT and Public Domain
 URL:        http://ftp.debian.org/debian/pool/main/a/at
 
-Source:     http://ftp.debian.org/debian/pool/main/a/at/at_%{version}.orig.tar.gz
+Source:     http://software.calhariz.com/at/at_%{version}.orig.tar.gz
 # git upstream source git://git.debian.org/git/collab-maint/at.git
 Source1:    pam_atd
 Source3:    atd.sysconf
 Source5:    atd.systemd
 
 Patch:      at-aarch64.patch
-Patch:      at-3.1.18-make.patch
-Patch:      at-3.1.20-pam.patch
+Patch:      at-3.2.2-make.patch
+Patch:      at-3.2.2-pam.patch
 Patch:      at-3.1.14-opt_V.patch
-Patch:      at-3.1.20-shell.patch
+Patch:      at-3.2.2-shell.patch
 Patch:      at-3.1.18-nitpicks.patch
 Patch:      at-3.1.14-fix_no_export.patch
 Patch:      at-3.1.14-mailwithhostname.patch
@@ -28,8 +28,7 @@ Patch:      at-3.1.20-aborted-jobs.patch
 Patch:      at-3.1.18-noabort.patch
 Patch:      at-3.1.16-fclose-error.patch
 Patch:      at-3.1.16-clear-nonjobs.patch
-Patch:      at-3.1.18-utc-dst.patch
-Patch:      at-3.1.20-lock-locks.patch
+Patch:      at-3.2.2-lock-locks.patch
 Patch:      at-3.1.23-document-n.patch
 Patch:      at-3.1.20-log-jobs.patch
 Patch:      at-3.2.23-coverity-fix.patch
@@ -167,6 +166,9 @@ chown root:root %{_localstatedir}/spool/at/.SEQ
 %attr(0644,root,root)       /%{_unitdir}/atd.service
 
 %changelog
+* Fri May 21 2021 Ondřej Pohořelský <opohorel@redhat.com> - 3.2.2-1
+- Update to new upstream release
+
 * Fri Apr 16 2021 Jan Staněk <jstanek@redhat.com> - 3.1.23-8
 - Patch issues found by coverity (rhbz#1938678)
 
