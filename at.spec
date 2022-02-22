@@ -2,8 +2,8 @@
 
 Summary:    Job spooling tools
 Name:       at
-Version:    3.2.2
-Release:    3%{?dist}
+Version:    3.2.5
+Release:    1%{?dist}
 # http://packages.debian.org/changelogs/pool/main/a/at/current/copyright
 # + install-sh is MIT license with changes under Public Domain
 License:    GPLv3+ and GPLv2+ and ISC and MIT and Public Domain
@@ -16,22 +16,20 @@ Source3:    atd.sysconf
 Source5:    atd.systemd
 
 Patch:      at-aarch64.patch
-Patch:      at-3.2.2-make.patch
-Patch:      at-3.2.2-pam.patch
+Patch:      at-3.2.5-make.patch
+Patch:      at-3.2.5-pam.patch
 Patch:      at-3.1.14-opt_V.patch
 Patch:      at-3.2.2-shell.patch
-Patch:      at-3.1.18-nitpicks.patch
+Patch:      at-3.2.5-nitpicks.patch
 Patch:      at-3.1.14-fix_no_export.patch
-Patch:      at-3.1.14-mailwithhostname.patch
-Patch:      at-3.1.14-usePOSIXtimers.patch
-Patch:      at-3.1.20-aborted-jobs.patch
-Patch:      at-3.1.18-noabort.patch
+Patch:      at-3.2.5-mailwithhostname.patch
+Patch:      at-3.2.5-aborted-jobs.patch
+Patch:      at-3.2.5-noabort.patch
 Patch:      at-3.1.16-fclose-error.patch
 Patch:      at-3.1.16-clear-nonjobs.patch
 Patch:      at-3.2.2-lock-locks.patch
 Patch:      at-3.1.23-document-n.patch
 Patch:      at-3.1.20-log-jobs.patch
-Patch:      at-3.2.23-coverity-fix.patch
 
 BuildRequires: gcc
 BuildRequires: flex flex-static bison autoconf
@@ -71,8 +69,6 @@ cp %{SOURCE1} .
 %autopatch -p1
 
 %build
-# at-3.1.14-usePOSIXtimers.patch touches configure.in
-autoconf
 # uselles files
 rm -f lex.yy.* y.tab.*
 
@@ -87,24 +83,24 @@ make
 
 %install
 make install \
-    DAEMON_USERNAME=`id -nu`\
+    DAEMON_USERNAME=`id -nu` \
     DAEMON_GROUPNAME=`id -ng` \
-    DESTDIR=%{buildroot}\
-    sbindir=%{buildroot}%{_prefix}/sbin\
-    bindir=%{buildroot}%{_bindir}\
-    prefix=%{buildroot}%{_prefix}\
-    exec_prefix=%{buildroot}%{_prefix}\
-    docdir=%{buildroot}/usr/doc\
-    mandir=%{buildroot}%{_mandir}\
-    etcdir=%{buildroot}%{_sysconfdir} \
-    ATJOB_DIR=%{buildroot}%{_localstatedir}/spool/at \
-    ATSPOOL_DIR=%{buildroot}%{_localstatedir}/spool/at/spool \
+    DESTDIR=%{buildroot} \
+    sbindir=%{_prefix}/sbin \
+    bindir=%{_bindir} \
+    prefix=%{_prefix} \
+    exec_prefix=%{_prefix} \
+    docdir=%{_prefix}/doc \
+    mandir=%{_mandir} \
+    etcdir=%{_sysconfdir} \
+    ATJOB_DIR=%{_localstatedir}/spool/at \
+    ATSPOOL_DIR=%{_localstatedir}/spool/at/spool \
     INSTALL_ROOT_USER=`id -nu` \
     INSTALL_ROOT_GROUP=`id -nu`;
 
 echo > %{buildroot}%{_sysconfdir}/at.deny
 mkdir docs
-cp  %{buildroot}/%{_prefix}/doc/at/* docs/
+cp  %{buildroot}%{_prefix}/doc/at/* docs/
 
 mkdir -p %{buildroot}%{_sysconfdir}/pam.d
 install -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/pam.d/atd
@@ -166,6 +162,14 @@ chown root:root %{_localstatedir}/spool/at/.SEQ
 %attr(0644,root,root)       /%{_unitdir}/atd.service
 
 %changelog
+* Tue Mar 01 2022 Ondřej Pohořelský <opohorel@redhat.com> - 3.2.5-1
+- Update to new upstream release
+- Removed at-3.1.14-usePOSIXtimers.patch and at-3.2.23-coverity-fix.patch, because
+  upstream implemented them
+- Defined folder paths without %%{buildroot} in order to make them work with latest
+  Makefile changes
+- Resolves: rhbz#2048132
+
 * Wed Jan 19 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.2-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
 
