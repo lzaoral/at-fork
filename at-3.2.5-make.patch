@@ -1,6 +1,6 @@
 diff -ur b/Makefile.in a/Makefile.in
---- b/Makefile.in	2022-01-29 17:42:19.000000000 +0100
-+++ a/Makefile.in	2022-02-22 13:22:45.060320153 +0100
+--- b/Makefile.in	2022-02-05 11:00:57.000000000 +0100
++++ a/Makefile.in	2022-03-08 16:05:28.088069816 +0100
 @@ -76,13 +76,13 @@
  all: at atd atd.service atrun
  
@@ -17,7 +17,7 @@ diff -ur b/Makefile.in a/Makefile.in
  
  y.tab.c y.tab.h: parsetime.y
  	$(YACC) -d parsetime.y
-@@ -99,40 +99,41 @@
+@@ -99,40 +99,43 @@
  	configure
  
  .c.o:
@@ -36,6 +36,7 @@ diff -ur b/Makefile.in a/Makefile.in
 +	$(INSTALL) -m 755 -d $(DESTDIR)$(etcdir)
 +	$(INSTALL) -m 755 -d $(DESTDIR)$(bindir)
 +	$(INSTALL) -m 755 -d $(DESTDIR)$(sbindir)
++	$(INSTALL) -m 755 -d $(DESTDIR)$(atdatadir)
 +	$(INSTALL) -m 755 -d $(DESTDIR)$(docdir)
 +	$(INSTALL) -m 755 -d $(DESTDIR)$(atdocdir)
 +	$(INSTALL) -m 755 -d $(DESTDIR)$(etcdir)/pam.d/
@@ -61,6 +62,7 @@ diff -ur b/Makefile.in a/Makefile.in
 -	$(INSTALL) -g root -o root -m 755 atrun $(DESTDIR)$(sbindir)
 -	$(INSTALL) -g root -o root -m 644 at.1 $(DESTDIR)$(man1dir)/
 +	$(INSTALL) -m 755 batch $(DESTDIR)$(bindir)
++	$(INSTALL) -m 755 batch-job $(DESTDIR)$(atdatadir)
 +	$(INSTALL) -d -m 755 $(DESTDIR)$(man1dir)
 +	$(INSTALL) -d -m 755 $(DESTDIR)$(man5dir)
 +	$(INSTALL) -d -m 755 $(DESTDIR)$(man8dir)

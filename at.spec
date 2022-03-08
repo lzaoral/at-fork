@@ -3,7 +3,7 @@
 Summary:    Job spooling tools
 Name:       at
 Version:    3.2.5
-Release:    1%{?dist}
+Release:    2%{?dist}
 # http://packages.debian.org/changelogs/pool/main/a/at/current/copyright
 # + install-sh is MIT license with changes under Public Domain
 License:    GPLv3+ and GPLv2+ and ISC and MIT and Public Domain
@@ -88,6 +88,7 @@ make install \
     DESTDIR=%{buildroot} \
     sbindir=%{_prefix}/sbin \
     bindir=%{_bindir} \
+    datadir=%{_datadir} \
     prefix=%{_prefix} \
     exec_prefix=%{_prefix} \
     docdir=%{_prefix}/doc \
@@ -159,9 +160,14 @@ chown root:root %{_localstatedir}/spool/at/.SEQ
 %{_bindir}/atrm
 %{_bindir}/atq
 %attr(4755,root,root)       %{_bindir}/at
+%{_datadir}/at/batch-job
 %attr(0644,root,root)       /%{_unitdir}/atd.service
 
 %changelog
+* Tue Mar 08 2022 Ondřej Pohořelský <opohorel@redhat.com> - 3.2.5-2
+- Add mising directory and batch-job script into at-3.2.5-make.patch
+- Defined datadir in %%install section and listed batch-job in %%files section 
+
 * Tue Mar 01 2022 Ondřej Pohořelský <opohorel@redhat.com> - 3.2.5-1
 - Update to new upstream release
 - Removed at-3.1.14-usePOSIXtimers.patch and at-3.2.23-coverity-fix.patch, because
