@@ -3,7 +3,7 @@
 Summary:    Job spooling tools
 Name:       at
 Version:    3.2.5
-Release:    2%{?dist}
+Release:    3%{?dist}
 # http://packages.debian.org/changelogs/pool/main/a/at/current/copyright
 # + install-sh is MIT license with changes under Public Domain
 License:    GPLv3+ and GPLv2+ and ISC and MIT and Public Domain
@@ -164,9 +164,12 @@ chown root:root %{_localstatedir}/spool/at/.SEQ
 %attr(0644,root,root)       /%{_unitdir}/atd.service
 
 %changelog
+* Thu Mar 31 2022 Jan Staněk <jstanek@redhat.com> - 3.2.5-3
+- Add preceding newline to delimiter in at-3.2.2-shell.patch
+
 * Tue Mar 08 2022 Ondřej Pohořelský <opohorel@redhat.com> - 3.2.5-2
 - Add mising directory and batch-job script into at-3.2.5-make.patch
-- Defined datadir in %%install section and listed batch-job in %%files section 
+- Defined datadir in %%install section and listed batch-job in %%files section
 
 * Tue Mar 01 2022 Ondřej Pohořelský <opohorel@redhat.com> - 3.2.5-1
 - Update to new upstream release
