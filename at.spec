@@ -3,7 +3,7 @@
 Summary:    Job spooling tools
 Name:       at
 Version:    3.2.5
-Release:    3%{?dist}
+Release:    4%{?dist}
 # http://packages.debian.org/changelogs/pool/main/a/at/current/copyright
 # + install-sh is MIT license with changes under Public Domain
 License:    GPLv3+ and GPLv2+ and ISC and MIT and Public Domain
@@ -164,6 +164,9 @@ chown root:root %{_localstatedir}/spool/at/.SEQ
 %attr(0644,root,root)       /%{_unitdir}/atd.service
 
 %changelog
+* Wed Jul 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.5-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
 * Thu Mar 31 2022 Jan Staněk <jstanek@redhat.com> - 3.2.5-3
 - Add preceding newline to delimiter in at-3.2.2-shell.patch
 
