@@ -9,10 +9,11 @@ diff -up at-3.1.23/atd.8.in.document-n at-3.1.23/atd.8.in
  .RB [ \-s ]
  .SH DESCRIPTION
  .B atd
-@@ -44,6 +45,10 @@ in the foreground.
+@@ -44,6 +45,11 @@ in the foreground.
  Process the at/batch queue only once.
  This is primarily of use for compatibility with old versions of
  .BR at ;
++.TP
 +.B \-n
 +Append the hostname of the system to the subject of the e-mails sent by
 +.BR atd .
