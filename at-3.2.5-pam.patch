@@ -131,7 +131,7 @@ diff -ur b/atd.c a/atd.c
 @@ -293,7 +289,7 @@
      char fmt[64];
      unsigned long jobno;
-     int rc;
+     long rc;
 -#ifdef HAVE_PAM
 +#ifdef WITH_PAM
      int retcode;

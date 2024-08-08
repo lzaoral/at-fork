@@ -3,7 +3,7 @@
 Summary:    Job spooling tools
 Name:       at
 Version:    3.2.5
-Release:    11%{?dist}
+Release:    12%{?dist}
 # http://packages.debian.org/changelogs/pool/main/a/at/current/copyright
 # + install-sh is MIT license with changes under Public Domain
 License:    GPL-3.0-or-later AND GPL-2.0-or-later AND ISC
@@ -15,6 +15,7 @@ Source1:    pam_atd
 Source3:    atd.sysconf
 Source5:    atd.systemd
 
+Patch:      at-3.2.5-address-sast.patch
 Patch:      at-aarch64.patch
 Patch:      at-3.2.5-make.patch
 Patch:      at-3.2.5-pam.patch
@@ -164,6 +165,10 @@ chown root:root %{_localstatedir}/spool/at/.SEQ
 %attr(0644,root,root)       /%{_unitdir}/atd.service
 
 %changelog
+* Thu Aug 8 2024 Ales Nezbeda <anezbeda@redhat.com> - 3.2.5-12
+- Backport fixes from upstream PR
+- https://salsa.debian.org/debian/at/-/merge_requests/34
+
 * Wed Jul 17 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.5-11
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 

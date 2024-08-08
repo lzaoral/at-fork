@@ -19,7 +19,7 @@ diff -ur b/atd.c a/atd.c
 +    int fd_out, fd_in, fd_std;
      char jobbuf[9];
      char *mailname = NULL;
-     int mailsize = 128;
+     size_t mailsize = 128;
 @@ -390,6 +393,10 @@
  
      fcntl(fd_in, F_SETFD, fflags & ~FD_CLOEXEC);
