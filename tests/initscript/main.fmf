@@ -1,0 +1,12 @@
+summary: Initscript sanity
+description: ''
+contact: Radek Biba <rbiba@redhat.com>
+component:
+  - at
+test: ./runtest.sh
+framework: beakerlib
+recommend:
+  - at
+duration: 5m
+extra-summary: /CoreOS/at/Sanity/initscript
+extra-task: /CoreOS/at/Sanity/initscript

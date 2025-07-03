@@ -27,7 +27,7 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Include rhts environment
-. /usr/share/rhts-library/rhtslib.sh
+. /usr/share/beakerlib/beakerlib.sh || exit 1
 
 PACKAGE="at"
 SERVICE="atd"
